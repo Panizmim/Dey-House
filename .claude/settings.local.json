@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /opt/homebrew/bin/ 2>/dev/null | wc -l; ls /opt/homebrew/bin/ 2>/dev/null)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(ls /opt/homebrew/Cellar/ 2>/dev/null | head -20)",
+      "Read(//opt/homebrew/Cellar/**)",
+      "Bash(ls /opt/pmk/env/global/bin/ 2>/dev/null | head -30)",
+      "Read(//opt/pmk/env/global/**)",
+      "Bash(ls /usr/local/bin/ 2>/dev/null | head -20)",
+      "Read(//usr/local/**)",
+      "Bash(ls /Users/paniz/ 2>/dev/null)",
+      "Read(//Users/paniz/**)",
+      "Bash(find /Applications -name \"node\" -type f 2>/dev/null | head -5; find /usr -name \"node\" 2>/dev/null | head -5)",
+      "Read(//Applications/**)",
+      "Read(//usr/**)",
+      "Bash(/Applications/Cursor.app/Contents/Resources/app/resources/helpers/node --version)",
+      "Bash(/Applications/Cursor.app/Contents/Resources/app/resources/helpers/node -e 'console.log\\(process.execPath\\)')",
+      "Bash(find / -name \"npm\" -type f)",
+      "Bash(/Applications/Cursor.app/Contents/Resources/app/resources/helpers/node -e 'const path = require\\('\\\\''path'\\\\''\\); console.log\\(path.dirname\\(process.execPath\\)\\)')",
+      "Bash(find /private/var -name \"node\" -type f 2>/dev/null | head -5)",
+      "Read(//private/var/**)",
+      "Bash(/Applications/Antigravity.app/Contents/MacOS/Electron --version)",
+      "Bash(curl --version)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -fsSL \"https://nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-arm64.tar.gz\" -o node.tar.gz)",
+      "Bash(curl -fsSL \"https://nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-x64.tar.gz\" -o node-x64.tar.gz)",
+      "Bash(tar -xzf node-x64.tar.gz)",
+      "Bash(export PATH=\"/tmp/node-v20.18.0-darwin-x64/bin:$PATH\")",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@14 deyhouse --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(rsync -a \"/Users/paniz/Downloads/Brand Asset/deyhouse/\" \"/Users/paniz/Downloads/Brand Asset/\" --exclude='.git')",
+      "Bash(rm -rf \"/Users/paniz/Downloads/Brand Asset/deyhouse\" && echo \"Removed deyhouse directory\")",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(node -e \"require\\('@prisma/client'\\)\")",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(npm list *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)"
+    ],
+    "additionalDirectories": [
+      "/Users/paniz/Downloads/Brand Asset/deyhouse"
+    ]
+  }
+}

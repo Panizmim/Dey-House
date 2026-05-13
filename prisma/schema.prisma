@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  password  String?
+  role      String    @default("USER")
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Studio {
+  id           String    @id @default(cuid())
+  name         String
+  description  String?
+  capacity     Int
+  pricePerHour Int
+  imageUrl     String?
+  isActive     Boolean   @default(true)
+  bookings     Booking[]
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  userId        String
+  studioId      String
+  date          DateTime
+  startTime     String
+  endTime       String
+  durationHours Float
+  type          String
+  status        String   @default("PENDING")
+  totalPrice    Int
+  paymentStatus String   @default("UNPAID")
+  zarinpalRef   String?
+  notes         String?
+  user          User     @relation(fields: [userId], references: [id])
+  studio        Studio   @relation(fields: [studioId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([studioId])
+  @@index([date])
+}
+
+model ContactRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  usageType String
+  message   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ArtistSubmission {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  artField    String
+  bio         String?
+  artworkUrls String   @default("[]")
+  resumeUrl   String?
+  status      String   @default("PENDING")
+  adminNote   String?
+  createdAt   DateTime @default(now())
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  date        DateTime
+  time        String
+  location    String?
+  type        String
+  imageUrl    String?
+  isFeatured  Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([date])
+}
+
+model CafeMenuItem {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  price       Int
+  category    String
+  imageUrl    String?
+  isAvailable Boolean @default(true)
+  order       Int     @default(0)
+}
+
+model GalleryImage {
+  id       String  @id @default(cuid())
+  url      String
+  caption  String?
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+}

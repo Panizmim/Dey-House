@@ -1,0 +1,171 @@
+/**
+ * خانه دی — Design Tokens
+ * منبع واحد برای همه تصمیم‌های بصری پروژه
+ * ⚠️ هیچ رنگ یا اندازه‌ای نباید مستقیم در کامپوننت‌ها هاردکد بشه — همه از اینجا
+ */
+
+:root {
+  /* ─── BRAND COLORS ─── */
+  --color-brand-red:        #8C2020;
+  --color-brand-red-hover:  #A82828;
+  --color-brand-red-dark:   #6E1818;
+  --color-brand-red-bg:     #F9F0F0;
+  --color-brand-red-border: rgba(140, 32, 32, 0.2);
+
+  /* ─── NEUTRAL PALETTE ─── */
+  --color-black:      #111111;
+  --color-gray-900:   #1A1A1A;
+  --color-gray-700:   #3D3D3D;
+  --color-gray-500:   #6B6B6B;
+  --color-gray-300:   #B0B0B0;
+  --color-gray-200:   #D8D8D8;
+  --color-gray-100:   #F0F0F0;
+  --color-gray-50:    #F7F7F7;
+  --color-white:      #FFFFFF;
+
+  /* ─── SEMANTIC COLORS ─── */
+  --color-text-primary:   var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-500);
+  --color-text-muted:     var(--color-gray-300);
+  --color-text-inverse:   var(--color-white);
+  --color-text-brand:     var(--color-brand-red);
+
+  --color-bg-primary:   var(--color-white);
+  --color-bg-secondary: var(--color-gray-50);
+  --color-bg-dark:      var(--color-gray-900);
+
+  --color-border-default: var(--color-gray-200);
+  --color-border-strong:  var(--color-gray-300);
+  --color-border-brand:   var(--color-brand-red-border);
+
+  --color-success: #2D7A3A;
+  --color-warning: #B45309;
+  --color-error:   #C0392B;
+
+  /* ─── TOPBAR ─── */
+  --color-topbar-bg:   var(--color-brand-red);
+  --color-topbar-text: rgba(255, 255, 255, 0.85);
+
+  /* ─── TYPOGRAPHY ─── */
+  --font-primary: 'YekanBakh', Tahoma, sans-serif;
+
+  --font-weight-light:   300;
+  --font-weight-regular: 400;
+  --font-weight-bold:    700;
+  --font-weight-heavy:   900;
+
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+  --text-3xl:  40px;
+  --text-4xl:  56px;
+  --text-hero: clamp(36px, 6vw, 72px);
+
+  --leading-tight:  1.1;
+  --leading-normal: 1.6;
+  --leading-loose:  1.9;
+
+  --tracking-tight:  -0.03em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.08em;
+  --tracking-wider:  0.14em;
+  --tracking-widest: 0.22em;
+
+  /* ─── SPACING (base 4px) ─── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ─── BORDER RADIUS ─── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  /* ─── SHADOWS ─── */
+  --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.16);
+
+  /* ─── TRANSITIONS ─── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* ─── Z-INDEX ─── */
+  --z-base:    0;
+  --z-above:   10;
+  --z-nav:     100;
+  --z-modal:   200;
+  --z-toast:   300;
+  --z-tooltip: 400;
+
+  /* ─── LAYOUT ─── */
+  --container-max:    1280px;
+  --container-pad:    32px;
+  --container-pad-sm: 20px;
+
+  --nav-height:    72px;
+  --topbar-height: 40px;
+
+  /* ─── COMPONENT TOKENS ─── */
+
+  /* Button */
+  --btn-primary-bg:      var(--color-brand-red);
+  --btn-primary-bg-hover:var(--color-brand-red-hover);
+  --btn-primary-text:    var(--color-white);
+  --btn-padding-y:       12px;
+  --btn-padding-x:       24px;
+  --btn-radius:          var(--radius-sm);
+  --btn-font-size:       var(--text-sm);
+  --btn-font-weight:     var(--font-weight-bold);
+
+  /* Card */
+  --card-bg:      var(--color-white);
+  --card-border:  var(--color-border-default);
+  --card-radius:  var(--radius-lg);
+  --card-shadow:  var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-img-height: 196px;
+
+  /* Input */
+  --input-bg:          var(--color-gray-50);
+  --input-border:      var(--color-border-default);
+  --input-border-focus:var(--color-brand-red);
+  --input-radius:      var(--radius-sm);
+  --input-padding-y:   12px;
+  --input-padding-x:   16px;
+  --input-font-size:   var(--text-sm);
+
+  /* Badge */
+  --badge-red-bg:     var(--color-brand-red-bg);
+  --badge-red-text:   var(--color-brand-red);
+  --badge-red-border: var(--color-brand-red-border);
+  --badge-radius:     var(--radius-full);
+  --badge-padding:    4px 12px;
+  --badge-font-size:  var(--text-xs);
+
+  /* Section */
+  --section-pad-y: var(--space-16);
+  --section-gap:   var(--space-8);
+
+  /* Event Card */
+  --event-card-img-height: 196px;
+  --event-card-date-bg:    rgba(255, 255, 255, 0.95);
+}
