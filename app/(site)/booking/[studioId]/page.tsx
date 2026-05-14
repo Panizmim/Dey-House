@@ -10,8 +10,9 @@ import {
 } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/style.css'
+import { faIR } from 'date-fns/locale'
 import toast from 'react-hot-toast'
-import { toPersianNum } from '@/lib/utils'
+import { toPersianNum, toJalali } from '@/lib/utils'
 
 /* ─── آیکون‌ها ─── */
 const iconMap: Record<string, React.ElementType> = {
@@ -176,8 +177,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
   const hours      = startIdx >= 0 && endIdx > startIdx ? endIdx - startIdx : 0
   const totalPrice = hours * studio.pricePerHour
 
-  const formatDate = (d: Date) =>
-    d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
+  const formatDate = (d: Date) => toJalali(d)
 
   return (
     <div style={{ background: 'white', minHeight: '100vh' }}>
@@ -459,11 +459,13 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 mode="single"
                 selected={selectedDate ?? undefined}
                 onSelect={(d) => { if (d) { setSelectedDate(d); setStep('idle') } }}
+                locale={faIR}
                 disabled={{ before: new Date() }}
                 modifiersStyles={{
                   selected: { background: '#8B1E1E', color: 'white', borderRadius: 8 },
                   today: { fontWeight: 700, color: '#8B1E1E' },
                 }}
+                style={{ fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
               />
             </div>
             <button

@@ -8,7 +8,6 @@ import { Logo } from '@/components/ui/Logo'
 import { Menu, X, ChevronLeft } from '@/components/ui/icons'
 import { ChevronDown, User, CalendarDays, CreditCard, LogOut } from 'lucide-react'
 import { signOut } from 'next-auth/react'
-import { cn } from '@/lib/utils'
 
 const navLinks = [
   { href: '/events',  label: 'رویدادها' },
@@ -145,15 +144,15 @@ function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => {
+    const handler = () => {
       const isPDP = document.documentElement.getAttribute('data-page') === 'pdp'
-      setScrolled(isPDP || window.scrollY > 0)
+      setScrolled(isPDP || window.scrollY > 20)
       setMobileMenuOpen(false)
     }
     const isPDP = document.documentElement.getAttribute('data-page') === 'pdp'
-    setScrolled(isPDP || window.scrollY > 0)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    setScrolled(isPDP || window.scrollY > 20)
+    window.addEventListener('scroll', handler, { passive: true })
+    return () => window.removeEventListener('scroll', handler)
   }, [])
 
   useEffect(() => {
@@ -166,13 +165,14 @@ function Navbar() {
   return (
     <>
       <header
-        className={cn(
-          'fixed top-0 w-full z-50 transition-all duration-300',
-          scrolled
-            ? 'border-b border-[#EFEFEF] bg-white/95 backdrop-blur-md text-neutral-700'
-            : 'border-b border-transparent bg-transparent text-white'
-        )}
-        style={{ height: '68px' }}
+        className="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
+        style={{
+          height: '68px',
+          background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
+          borderBottom: scrolled ? '1px solid #EFEFEF' : 'none',
+          color: scrolled ? '#171717' : 'white',
+        }}
       >
         <div className="max-w-[1280px] mx-auto px-8 h-[68px] grid grid-cols-3 items-center">
 

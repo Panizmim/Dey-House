@@ -190,9 +190,6 @@ export function StudiosSection() {
       {/* هدر */}
       <div className="flex items-end justify-between mb-10">
         <div>
-          <p className="text-xs font-bold text-[#8B1E1E] tracking-wider uppercase mb-2">
-            فضاهای خانه دی
-          </p>
           <h2 className="text-3xl font-black text-[#171717] tracking-tight">
             رزرو فضا
           </h2>
