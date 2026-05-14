@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true,
+    unoptimized: false,
   },
-};
+  experimental: {
+    serverComponentsExternalPackages: ['sharp'],
+  },
+}
 
-export default nextConfig;
+export default nextConfig
