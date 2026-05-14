@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Mail, Phone, Download, Globe, Instagram, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import { Mail, Phone, Download, Globe, Link as LinkIcon, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type ArtworkItem = { url: string; description: string }
@@ -70,6 +70,7 @@ export default function AdminSubmissionsPage() {
     setLoading(false)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchSubmissions() }, [filter])
 
   async function updateStatus(id: string, status: string) {
@@ -175,7 +176,7 @@ export default function AdminSubmissionsPage() {
                     )}
                     {links.instagram && (
                       <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <Instagram size={12} />{links.instagram}
+                        <LinkIcon size={12} />{links.instagram}
                       </span>
                     )}
                   </div>

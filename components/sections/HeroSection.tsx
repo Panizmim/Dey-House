@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useState, useCallback } from 'react'
 
 const heroSlides = [
@@ -41,23 +42,12 @@ export function HeroSection() {
               className="absolute inset-0"
               style={{ background: slide.gradient }}
             />
-            {/* عکس روی gradient — به ترتیب jpg/jpeg/png/webp امتحان می‌کند */}
-            <img
+            <Image
               src={`${slide.image}.jpg`}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.currentTarget
-                if (target.src.endsWith('.jpg')) {
-                  target.src = `${slide.image}.jpeg`
-                } else if (target.src.endsWith('.jpeg')) {
-                  target.src = `${slide.image}.png`
-                } else if (target.src.endsWith('.png')) {
-                  target.src = `${slide.image}.webp`
-                } else {
-                  target.style.display = 'none'
-                }
-              }}
+              fill
+              className="object-cover"
+              priority={index === 0}
             />
           </div>
         ))}

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { ImagePlus, X } from 'lucide-react'
 
@@ -24,7 +25,7 @@ export default function ImageUploadZone({ currentUrl, preview, onFileSelect, onC
     <div>
       {currentUrl && !preview && (
         <div style={{ marginBottom: 12 }}>
-          <img src={currentUrl} alt="تصویر فعلی" className="w-20 h-20 rounded-lg object-cover" />
+          <Image src={currentUrl} alt="تصویر فعلی" width={80} height={80} className="rounded-lg object-cover" />
           <p style={{ fontSize: 11, color: '#B0B0B0', marginTop: 4 }}>
             تصویر فعلی — برای تغییر، تصویر جدید انتخاب کنید
           </p>
@@ -33,6 +34,7 @@ export default function ImageUploadZone({ currentUrl, preview, onFileSelect, onC
 
       {preview ? (
         <div style={{ position: 'relative' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="پیش‌نمایش" className="w-full rounded-lg object-cover" style={{ height: 160 }} />
           <button
             onClick={onClear}
