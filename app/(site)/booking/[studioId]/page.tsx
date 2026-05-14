@@ -145,12 +145,6 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
   const [endTime, setEndTime]           = useState<string | null>(null)
   const [lightbox, setLightbox]         = useState<{ open: boolean; index: number }>({ open: false, index: 0 })
 
-  /* navbar همیشه scrolled */
-  useEffect(() => {
-    document.documentElement.setAttribute('data-page', 'pdp')
-    return () => document.documentElement.removeAttribute('data-page')
-  }, [])
-
   /* body overflow برای lightbox */
   useEffect(() => {
     document.body.style.overflow = lightbox.open ? 'hidden' : ''

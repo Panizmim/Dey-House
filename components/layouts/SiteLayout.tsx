@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/ui/Logo'
 import { Menu, X, ChevronLeft } from '@/components/ui/icons'
 import { ChevronDown, User, CalendarDays, CreditCard, LogOut } from 'lucide-react'
@@ -140,20 +141,17 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
 /* ─── Navbar ─── */
 function Navbar() {
   const { data: session } = useSession()
-  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const hasHero = pathname === '/'
+  const [scrolled, setScrolled] = useState(!hasHero)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handler = () => {
-      const isPDP = document.documentElement.getAttribute('data-page') === 'pdp'
-      setScrolled(isPDP || window.scrollY > 20)
-      setMobileMenuOpen(false)
-    }
-    const isPDP = document.documentElement.getAttribute('data-page') === 'pdp'
-    setScrolled(isPDP || window.scrollY > 20)
+    const handler = () => setScrolled(!hasHero || window.scrollY > 10)
+    handler()
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
-  }, [])
+  }, [hasHero])
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
@@ -483,10 +481,14 @@ function Footer() {
 
 /* ─── SiteLayout ─── */
 export function SiteLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className={isHomePage ? 'flex-1' : 'flex-1 pt-[68px]'}>
+        {children}
+      </main>
       <Footer />
     </div>
   )
