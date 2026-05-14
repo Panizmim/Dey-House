@@ -80,19 +80,20 @@ model ArtistSubmission {
 }
 
 model Event {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String?
-  date        DateTime
-  time        String
-  location    String?
-  type        String
-  imageUrl    String?
-  isFeatured  Boolean  @default(false)
-  isArchived  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  description   String?
+  date          DateTime
+  time          String
+  location      String?
+  type          String
+  imageUrl      String?
+  galleryImages String   @default("[]")
+  isFeatured    Boolean  @default(false)
+  isArchived    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([slug])
   @@index([date])

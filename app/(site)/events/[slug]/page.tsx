@@ -134,16 +134,21 @@ export default async function EventDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* ─── گالری (فقط اگر imageUrl داشت) ─── */}
-      {event.imageUrl && (
-        <div style={{ marginTop: 64 }}>
-          <EventGallery
-            images={[event.imageUrl]}
-            imageGradients={[gradient]}
-            title={event.title}
-          />
-        </div>
-      )}
+      {/* ─── گالری (از galleryImages دیتابیس) ─── */}
+      {(() => {
+        let galleryImages: string[] = []
+        try { galleryImages = JSON.parse((event as { galleryImages?: string }).galleryImages ?? '[]') } catch {}
+        if (galleryImages.length === 0) return null
+        return (
+          <div style={{ marginTop: 64 }}>
+            <EventGallery
+              images={galleryImages}
+              imageGradients={galleryImages.map(() => gradient)}
+              title={event.title}
+            />
+          </div>
+        )
+      })()}
 
       {/* ─── رویدادهای دیگر ─── */}
       {related.length > 0 && (

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { ImagePlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
 import ImageUploadZone from './ImageUploadZone'
@@ -14,6 +15,7 @@ export interface EventRow {
   location: string | null
   description: string | null
   imageUrl: string | null
+  galleryImages: string
   isFeatured: boolean
   isArchived: boolean
 }
@@ -25,9 +27,11 @@ interface EventModalProps {
   onSaved: () => void
 }
 
+type GallerySlot = { url: string | null; file: File | null; preview: string | null }
+
+const MAX_GALLERY = 8
 const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#8B1E1E] transition-colors'
 const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
-
 const eventTypes = ['تئاتر', 'نمایشگاه', 'موسیقی', 'ادبی', 'ورکشاپ', 'سایر']
 
 async function uploadImage(file: File): Promise<string> {
@@ -36,14 +40,82 @@ async function uploadImage(file: File): Promise<string> {
   fd.append('folder', 'events')
   const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
   if (!res.ok) throw new Error('خطا در آپلود تصویر')
-  const data = await res.json()
-  return data.url as string
+  return ((await res.json()) as { url: string }).url
+}
+
+/* ─── یک slot گالری ─── */
+function GallerySlotCard({
+  slot,
+  onFile,
+  onRemove,
+}: {
+  slot: GallerySlot
+  onFile: (file: File) => void
+  onRemove: () => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const src = slot.preview ?? slot.url
+
+  if (src) {
+    return (
+      <div style={{ position: 'relative', aspectRatio: '1', borderRadius: 8, overflow: 'hidden', background: '#F0F0F0' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <button
+          onClick={onRemove}
+          style={{
+            position: 'absolute', top: 5, left: 5,
+            width: 24, height: 24, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.6)', border: 'none',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <X size={12} color="white" />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={() => inputRef.current?.click()}
+      style={{
+        aspectRatio: '1', borderRadius: 8,
+        border: '1.5px dashed #D0D0D0',
+        background: 'white', cursor: 'pointer',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 4,
+        transition: 'border-color 150ms, background 150ms',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.background = '#FDF5F5' }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#D0D0D0'; e.currentTarget.style.background = 'white' }}
+    >
+      <ImagePlus size={18} color="#B0B0B0" />
+      <span style={{ fontSize: 10, color: '#B0B0B0' }}>افزودن</span>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file && file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) {
+            onFile(file)
+          } else if (file) {
+            toast.error('فایل باید تصویر و حداکثر ۵MB باشد')
+          }
+          e.target.value = ''
+        }}
+      />
+    </button>
+  )
 }
 
 export default function EventModal({ open, event, onClose, onSaved }: EventModalProps) {
-  const [loading, setLoading]         = useState(false)
-  const [imageFile, setImageFile]     = useState<File | null>(null)
+  const [loading, setLoading]           = useState(false)
+  const [imageFile, setImageFile]       = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [gallery, setGallery]           = useState<GallerySlot[]>([])
   const [form, setForm] = useState({
     title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false,
   })
@@ -62,17 +134,33 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         description: event.description ?? '',
         isFeatured:  event.isFeatured,
       })
+      try {
+        const saved: string[] = JSON.parse(event.galleryImages || '[]')
+        setGallery(saved.map((url) => ({ url, file: null, preview: null })))
+      } catch {
+        setGallery([])
+      }
     } else {
       setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false })
+      setGallery([])
     }
   }, [event, open])
 
   const set = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }))
 
-  function handleFileSelect(file: File) {
-    setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
+  function addGallerySlot() {
+    if (gallery.length >= MAX_GALLERY) return
+    setGallery((g) => [...g, { url: null, file: null, preview: null }])
+  }
+
+  function handleGalleryFile(index: number, file: File) {
+    const preview = URL.createObjectURL(file)
+    setGallery((g) => g.map((slot, i) => i === index ? { url: null, file, preview } : slot))
+  }
+
+  function removeGallerySlot(index: number) {
+    setGallery((g) => g.filter((_, i) => i !== index))
   }
 
   async function handleSubmit() {
@@ -85,12 +173,21 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       let imageUrl: string | null = event?.imageUrl ?? null
       if (imageFile) imageUrl = await uploadImage(imageFile)
 
+      const galleryUrls: string[] = []
+      for (const slot of gallery) {
+        if (slot.file) {
+          galleryUrls.push(await uploadImage(slot.file))
+        } else if (slot.url) {
+          galleryUrls.push(slot.url)
+        }
+      }
+
       const url    = event ? `/api/admin/events/${event.id}` : '/api/admin/events'
       const method = event ? 'PUT' : 'POST'
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, imageUrl }),
+        body: JSON.stringify({ ...form, imageUrl, galleryImages: galleryUrls }),
       })
       if (!res.ok) throw new Error()
       toast.success(event ? 'رویداد با موفقیت ویرایش شد' : 'رویداد با موفقیت ایجاد شد')
@@ -102,6 +199,9 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       setLoading(false)
     }
   }
+
+  const filledCount = gallery.filter((s) => s.url || s.file).length
+  const canAdd      = gallery.length < MAX_GALLERY
 
   return (
     <Modal
@@ -151,23 +251,11 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>تاریخ *</label>
-            <input
-              type="date"
-              className={inputClass}
-              value={form.date}
-              onChange={(e) => set('date', e.target.value)}
-              placeholder="مثال: ۱۵ خرداد ۱۴۰۴"
-            />
+            <input type="date" className={inputClass} value={form.date} onChange={(e) => set('date', e.target.value)} />
           </div>
           <div>
             <label className={labelClass}>ساعت *</label>
-            <input
-              type="time"
-              className={inputClass}
-              value={form.time}
-              onChange={(e) => set('time', e.target.value)}
-              placeholder="مثال: ۱۹:۳۰"
-            />
+            <input type="time" className={inputClass} value={form.time} onChange={(e) => set('time', e.target.value)} />
           </div>
         </div>
 
@@ -190,9 +278,80 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           <ImageUploadZone
             currentUrl={event?.imageUrl}
             preview={imagePreview}
-            onFileSelect={handleFileSelect}
+            onFileSelect={(file) => { setImageFile(file); setImagePreview(URL.createObjectURL(file)) }}
             onClear={() => { setImageFile(null); setImagePreview(null) }}
           />
+        </div>
+
+        {/* گالری */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <label className={labelClass} style={{ margin: 0 }}>
+              گالری رویداد
+              <span style={{ fontSize: 11, color: '#A0A0A0', fontWeight: 400, marginRight: 6 }}>
+                ({filledCount}/{MAX_GALLERY} تصویر)
+              </span>
+            </label>
+            {canAdd && (
+              <button
+                onClick={addGallerySlot}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '4px 10px', borderRadius: 6,
+                  border: '1px solid #E5E5E5', background: 'white',
+                  fontSize: 12, color: '#404040', cursor: 'pointer',
+                }}
+              >
+                <ImagePlus size={13} />
+                افزودن تصویر
+              </button>
+            )}
+          </div>
+
+          {gallery.length === 0 ? (
+            <button
+              onClick={addGallerySlot}
+              style={{
+                width: '100%', padding: '20px', borderRadius: 8,
+                border: '1.5px dashed #D0D0D0', background: 'white',
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 6, transition: 'all 150ms',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.background = '#FDF5F5' }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#D0D0D0'; e.currentTarget.style.background = 'white' }}
+            >
+              <ImagePlus size={22} color="#B0B0B0" />
+              <span style={{ fontSize: 12, color: '#A0A0A0' }}>تصاویر گالری را اینجا اضافه کنید (حداکثر ۸ تصویر)</span>
+            </button>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              {gallery.map((slot, i) => (
+                <GallerySlotCard
+                  key={i}
+                  slot={slot}
+                  onFile={(file) => handleGalleryFile(i, file)}
+                  onRemove={() => removeGallerySlot(i)}
+                />
+              ))}
+              {canAdd && (
+                <button
+                  onClick={addGallerySlot}
+                  style={{
+                    aspectRatio: '1', borderRadius: 8,
+                    border: '1.5px dashed #D0D0D0', background: 'white',
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', gap: 4,
+                    transition: 'border-color 150ms, background 150ms',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.background = '#FDF5F5' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#D0D0D0'; e.currentTarget.style.background = 'white' }}
+                >
+                  <ImagePlus size={18} color="#B0B0B0" />
+                  <span style={{ fontSize: 10, color: '#B0B0B0' }}>افزودن</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* رویداد ویژه */}
