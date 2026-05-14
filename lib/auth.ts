@@ -13,16 +13,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.role = (user as { role?: string }).role
+        token.role  = (user as { role?: string }).role
         token.phone = (user as { phone?: string }).phone
+      }
+      if (trigger === 'update' && session) {
+        if (session.name)  token.name    = session.name
+        if (session.image) token.picture = session.image
       }
       return token
     },
     async session({ session, token }) {
-      session.user.id = token.sub ?? ''
-      session.user.role = (token.role as string) ?? ''
+      session.user.id    = token.sub ?? ''
+      session.user.role  = (token.role as string) ?? ''
       session.user.phone = (token.phone as string) ?? ''
       return session
     },

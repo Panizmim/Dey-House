@@ -6,10 +6,10 @@ export default auth((req) => {
   const session = req.auth
 
   if (pathname.startsWith('/dashboard') && !session) {
-    return NextResponse.redirect(new URL('/login?from=' + pathname, req.url))
+    return NextResponse.redirect(new URL('/login?callbackUrl=' + encodeURIComponent(pathname), req.url))
   }
   if (pathname.startsWith('/admin') && session?.user?.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/', req.url))
+    return NextResponse.redirect(new URL('/login', req.url))
   }
   return NextResponse.next()
 })

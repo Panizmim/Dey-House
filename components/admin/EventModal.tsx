@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
+import ImageUploadZone from './ImageUploadZone'
 
 export interface EventRow {
   id: string
@@ -12,6 +13,7 @@ export interface EventRow {
   time: string
   location: string | null
   description: string | null
+  imageUrl: string | null
   isFeatured: boolean
   isArchived: boolean
 }
@@ -28,13 +30,28 @@ const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
 
 const eventTypes = ['تئاتر', 'نمایشگاه', 'موسیقی', 'ادبی', 'ورکشاپ', 'سایر']
 
+async function uploadImage(file: File): Promise<string> {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('folder', 'events')
+  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+  if (!res.ok) throw new Error('خطا در آپلود تصویر')
+  const data = await res.json()
+  return data.url as string
+}
+
 export default function EventModal({ open, event, onClose, onSaved }: EventModalProps) {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]         = useState(false)
+  const [imageFile, setImageFile]     = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [form, setForm] = useState({
     title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false,
   })
 
   useEffect(() => {
+    if (!open) return
+    setImageFile(null)
+    setImagePreview(null)
     if (event) {
       setForm({
         title:       event.title,
@@ -53,6 +70,11 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const set = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }))
 
+  function handleFileSelect(file: File) {
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
   async function handleSubmit() {
     if (!form.title || !form.date || !form.time) {
       toast.error('عنوان، تاریخ و ساعت الزامی هستند')
@@ -60,15 +82,18 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
     }
     setLoading(true)
     try {
-      const url  = event ? `/api/admin/events/${event.id}` : '/api/admin/events'
+      let imageUrl: string | null = event?.imageUrl ?? null
+      if (imageFile) imageUrl = await uploadImage(imageFile)
+
+      const url    = event ? `/api/admin/events/${event.id}` : '/api/admin/events'
       const method = event ? 'PUT' : 'POST'
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, imageUrl }),
       })
       if (!res.ok) throw new Error()
-      toast.success(event ? 'رویداد ویرایش شد' : 'رویداد ایجاد شد')
+      toast.success(event ? 'رویداد با موفقیت ویرایش شد' : 'رویداد با موفقیت ایجاد شد')
       onSaved()
       onClose()
     } catch {
@@ -94,19 +119,21 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           <button
             onClick={handleSubmit}
             disabled={loading}
-            style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}
+            style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
           >
-            {loading ? 'در حال ذخیره...' : 'ذخیره'}
+            {loading ? 'در حال ذخیره...' : event ? 'ذخیره تغییرات' : 'افزودن رویداد'}
           </button>
         </>
       }
     >
       <div className="flex flex-col gap-4">
+        {/* عنوان */}
         <div>
           <label className={labelClass}>عنوان رویداد *</label>
           <input className={inputClass} value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="عنوان رویداد" />
         </div>
 
+        {/* نوع + مکان */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>نوع رویداد *</label>
@@ -116,21 +143,35 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           </div>
           <div>
             <label className={labelClass}>مکان</label>
-            <input className={inputClass} value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="مکان برگزاری" />
+            <input className={inputClass} value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="مثال: سالن اصلی" />
           </div>
         </div>
 
+        {/* تاریخ + ساعت */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>تاریخ *</label>
-            <input type="date" className={inputClass} value={form.date} onChange={(e) => set('date', e.target.value)} />
+            <input
+              type="date"
+              className={inputClass}
+              value={form.date}
+              onChange={(e) => set('date', e.target.value)}
+              placeholder="مثال: ۱۵ خرداد ۱۴۰۴"
+            />
           </div>
           <div>
             <label className={labelClass}>ساعت *</label>
-            <input type="time" className={inputClass} value={form.time} onChange={(e) => set('time', e.target.value)} />
+            <input
+              type="time"
+              className={inputClass}
+              value={form.time}
+              onChange={(e) => set('time', e.target.value)}
+              placeholder="مثال: ۱۹:۳۰"
+            />
           </div>
         </div>
 
+        {/* توضیحات */}
         <div>
           <label className={labelClass}>توضیحات</label>
           <textarea
@@ -143,6 +184,18 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           />
         </div>
 
+        {/* تصویر پوستر */}
+        <div>
+          <label className={labelClass}>تصویر پوستر</label>
+          <ImageUploadZone
+            currentUrl={event?.imageUrl}
+            preview={imagePreview}
+            onFileSelect={handleFileSelect}
+            onClear={() => { setImageFile(null); setImagePreview(null) }}
+          />
+        </div>
+
+        {/* رویداد ویژه */}
         <label className="flex items-center gap-2 cursor-pointer" style={{ fontSize: 14, color: '#404040' }}>
           <input
             type="checkbox"
@@ -150,7 +203,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
             onChange={(e) => set('isFeatured', e.target.checked)}
             className="w-4 h-4 accent-[#8B1E1E]"
           />
-          رویداد ویژه؟
+          نمایش به عنوان رویداد ویژه در صفحه اصلی
         </label>
       </div>
     </Modal>

@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Logo } from '@/components/ui/Logo'
-import { LayoutDashboard, Menu, X, ChevronLeft } from '@/components/ui/icons'
+import { Menu, X, ChevronLeft } from '@/components/ui/icons'
+import { ChevronDown, User, CalendarDays, CreditCard, LogOut } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 
@@ -16,6 +17,127 @@ const navLinks = [
   { href: '/about',   label: 'درباره ما' },
 ]
 
+/* ─── منوی کاربر لاگین‌شده ─── */
+function UserDropdown({ scrolled }: { scrolled: boolean }) {
+  const { data: session } = useSession()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const name    = session?.user?.name  || 'کاربر'
+  const email   = session?.user?.email || ''
+  const initial = name.charAt(0)
+
+  const textColor = scrolled ? '#171717' : 'white'
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      {/* trigger */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: 'transparent', border: 'none', cursor: 'pointer',
+          fontSize: '15px', fontWeight: 600, color: textColor,
+          fontFamily: 'YekanBakh, Tahoma, sans-serif',
+          padding: 0,
+        }}
+      >
+        {name}
+        <ChevronDown
+          size={15}
+          style={{
+            transition: 'transform 200ms',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          }}
+        />
+      </button>
+
+      {/* dropdown panel */}
+      {open && (
+        <div
+          style={{
+            position: 'absolute', top: 'calc(100% + 12px)', left: 0,
+            minWidth: '260px', background: 'white',
+            border: '1px solid #EFEFEF', borderRadius: 16,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+            zIndex: 100, overflow: 'hidden',
+          }}
+        >
+          {/* هدر: آواتار + نام + ایمیل */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderBottom: '1px solid #F5F5F5' }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: '50%',
+              background: '#8B1E1E', color: 'white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 18, fontWeight: 700, flexShrink: 0,
+            }}>
+              {initial}
+            </div>
+            <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#171717', marginBottom: 2 }}>{name}</p>
+              <p style={{ fontSize: 12, color: '#A0A0A0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{email}</p>
+            </div>
+          </div>
+
+          {/* آیتم‌های منو */}
+          <div style={{ padding: '8px 0' }}>
+            {[
+              { href: '/dashboard/profile',  icon: <User size={16} />,         label: 'اطلاعات شخصی' },
+              { href: '/dashboard/bookings', icon: <CalendarDays size={16} />, label: 'رزروهای قبلی'  },
+              { href: '/dashboard/payments', icon: <CreditCard size={16} />,   label: 'پرداخت‌ها'     },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
+                  gap: 10, padding: '11px 20px',
+                  fontSize: 13, color: '#404040', textDecoration: 'none',
+                  transition: 'background 150ms',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#FAFAFA' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+              >
+                <span style={{ color: '#A0A0A0' }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* خروج */}
+          <div style={{ borderTop: '1px solid #F5F5F5', padding: '8px 0 4px' }}>
+            <button
+              onClick={() => { setOpen(false); signOut() }}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
+                gap: 10, padding: '11px 20px',
+                background: 'transparent', border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 600, color: '#8B1E1E',
+                fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                transition: 'background 150ms',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#FDF5F5' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+            >
+              <LogOut size={16} />
+              <span>خروج از حساب</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ─── Navbar ─── */
 function Navbar() {
   const { data: session } = useSession()
@@ -24,9 +146,12 @@ function Navbar() {
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 0)
+      const isPDP = document.documentElement.getAttribute('data-page') === 'pdp'
+      setScrolled(isPDP || window.scrollY > 0)
       setMobileMenuOpen(false)
     }
+    const isPDP = document.documentElement.getAttribute('data-page') === 'pdp'
+    setScrolled(isPDP || window.scrollY > 0)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -88,34 +213,29 @@ function Navbar() {
           <div className="flex items-center justify-end gap-6">
             {/* دکمه‌های desktop */}
             <div className="hidden lg:flex items-center gap-6">
+              {/* رزرو پلاتو — سمت راست */}
+              <Link
+                href="/#studios"
+                className="relative pb-0.5 group"
+                style={{ fontSize: '15px', fontWeight: 600 }}
+              >
+                رزرو پلاتو
+                <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
+              </Link>
+
+              {/* ورود/ثبت‌نام یا منوی کاربر — سمت چپ */}
               {session ? (
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-1.5 group relative pb-0.5"
-                  style={{ fontSize: '18px', fontWeight: 600 }}
-                >
-                  <LayoutDashboard size={18} />
-                  <span>داشبورد</span>
-                  <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
-                </Link>
+                <UserDropdown scrolled={scrolled} />
               ) : (
                 <Link
                   href="/login"
                   className="relative pb-0.5 group"
-                  style={{ fontSize: '18px', fontWeight: 600 }}
+                  style={{ fontSize: '15px', fontWeight: 600 }}
                 >
                   ورود / ثبت‌نام
                   <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
                 </Link>
               )}
-              <Link
-                href="/booking"
-                className="relative pb-0.5 group"
-                style={{ fontSize: '18px', fontWeight: 600 }}
-              >
-                رزرو پلاتو
-                <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
-              </Link>
             </div>
 
             {/* دکمه همبرگر موبایل */}
@@ -167,53 +287,56 @@ function Navbar() {
           <div className="flex flex-col gap-[10px]">
             {session ? (
               <>
+                {/* آواتار + نام */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: '1px solid #EFEFEF', borderRadius: 12 }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: '50%',
+                    background: '#8B1E1E', color: 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, fontWeight: 700, flexShrink: 0,
+                  }}>
+                    {(session.user?.name || 'ک').charAt(0)}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>{session.user?.name || 'کاربر'}</p>
+                    <p style={{ fontSize: 11, color: '#A0A0A0' }}>{session.user?.email || ''}</p>
+                  </div>
+                </div>
+                {[
+                  { href: '/dashboard/profile',  label: 'اطلاعات شخصی' },
+                  { href: '/dashboard/bookings', label: 'رزروهای قبلی'  },
+                  { href: '/dashboard/payments', label: 'پرداخت‌ها'     },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={close}
+                    style={{
+                      display: 'block', padding: '12px 16px',
+                      border: '1px solid #EFEFEF', borderRadius: 8,
+                      fontSize: 14, color: '#404040', textDecoration: 'none',
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
                 <Link
-                  href="/dashboard"
+                  href="/#studios"
                   onClick={close}
-                  className="flex items-center justify-center gap-2 text-center rounded-lg bg-white"
-                  style={{
-                    width: '100%',
-                    border: '1px solid #E5E5E5',
-                    borderRadius: '8px',
-                    padding: '14px',
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    color: '#171717',
-                  }}
-                >
-                  <LayoutDashboard size={16} />
-                  داشبورد من
-                </Link>
-                <Link
-                  href="/booking"
-                  onClick={close}
-                  className="block text-center text-white rounded-lg"
-                  style={{
-                    width: '100%',
-                    background: '#8B1E1E',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '14px',
-                    fontSize: '15px',
-                    fontWeight: 700,
-                  }}
+                  className="block text-center text-white"
+                  style={{ background: '#8B1E1E', borderRadius: '8px', padding: '14px', fontSize: '15px', fontWeight: 700 }}
                 >
                   رزرو پلاتو
                 </Link>
                 <button
                   onClick={() => { close(); signOut() }}
-                  className="w-full text-center"
                   style={{
-                    background: 'transparent',
-                    border: 'none',
-                    padding: '14px',
-                    fontSize: '15px',
-                    fontWeight: 400,
-                    color: '#717171',
-                    cursor: 'pointer',
+                    background: 'transparent', border: 'none', padding: '14px',
+                    fontSize: '14px', fontWeight: 600, color: '#8B1E1E',
+                    cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
                   }}
                 >
-                  خروج
+                  خروج از حساب
                 </button>
               </>
             ) : (
@@ -221,32 +344,19 @@ function Navbar() {
                 <Link
                   href="/login"
                   onClick={close}
-                  className="block text-center rounded-lg bg-white"
                   style={{
-                    width: '100%',
-                    border: '1px solid #E5E5E5',
-                    borderRadius: '8px',
-                    padding: '14px',
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    color: '#171717',
+                    display: 'block', textAlign: 'center', borderRadius: '8px',
+                    border: '1px solid #E5E5E5', padding: '14px',
+                    fontSize: '15px', fontWeight: 600, color: '#171717',
                   }}
                 >
                   ورود / ثبت‌نام
                 </Link>
                 <Link
-                  href="/booking"
+                  href="/#studios"
                   onClick={close}
                   className="block text-center text-white"
-                  style={{
-                    width: '100%',
-                    background: '#8B1E1E',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '14px',
-                    fontSize: '15px',
-                    fontWeight: 700,
-                  }}
+                  style={{ background: '#8B1E1E', borderRadius: '8px', padding: '14px', fontSize: '15px', fontWeight: 700 }}
                 >
                   رزرو پلاتو
                 </Link>

@@ -11,7 +11,6 @@ import PageHero from '@/components/ui/PageHero'
 const schema = z.object({
   firstName: z.string().min(2, 'حداقل ۲ حرف'),
   lastName:  z.string().min(2, 'حداقل ۲ حرف'),
-  city:      z.string().min(2, 'حداقل ۲ حرف'),
   phone:     z.string().regex(/^09[0-9]{9}$/, 'شماره موبایل معتبر نیست'),
   email:     z.string().email('ایمیل معتبر نیست'),
   website:   z.string().optional(),
@@ -115,11 +114,25 @@ function ArtworkUploadZone({ fileName, onFile }: { fileName?: string; onFile: (f
 }
 
 /* ─── Page ─── */
+async function uploadFile(file: File, folder: string): Promise<string> {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('folder', folder)
+  const res = await fetch('/api/uploads', { method: 'POST', body: fd })
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}))
+    throw new Error(j.error ?? 'خطا در آپلود فایل')
+  }
+  const { url } = await res.json()
+  return url as string
+}
+
 export default function ArtistPage() {
   const [submitted, setSubmitted]         = useState(false)
   const [loading, setLoading]             = useState(false)
-  const [portfolioFile, setPortfolioFile] = useState<string>()
-  const [artworkFiles, setArtworkFiles]   = useState<Record<number, string>>({})
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null)
+  const [portfolioName, setPortfolioName] = useState<string>()
+  const [artworkFiles, setArtworkFiles]   = useState<Record<number, File>>({})
 
   const {
     register,
@@ -143,12 +156,38 @@ export default function ArtistPage() {
   const onSubmit = async (data: ArtistFormData) => {
     setLoading(true)
     try {
-      await fetch('/api/artist-submissions', {
+      // آپلود پرتفولیو
+      let portfolioUrl: string | undefined
+      if (portfolioFile) {
+        portfolioUrl = await uploadFile(portfolioFile, 'portfolios')
+      }
+
+      // آپلود نمونه کارها + توضیحات
+      const artworkItems: { url: string; description: string }[] = []
+      for (let i = 0; i < 4; i++) {
+        const file = artworkFiles[i]
+        const description = data.artworks[i]?.description ?? ''
+        if (file || description) {
+          const url = file ? await uploadFile(file, 'artworks') : ''
+          artworkItems.push({ url, description })
+        }
+      }
+
+      const res = await fetch('/api/artist-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, portfolioUrl, artworkItems }),
       })
-      setSubmitted(true)
+
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j.error ?? 'خطای سرور')
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'خطا در ارسال فرم'
+      alert(msg)
     } finally {
       setLoading(false)
     }
@@ -199,15 +238,12 @@ export default function ArtistPage() {
             اطلاعات فردی و هنری شما به صورت درپشت انجام مراحل بررسی موردنظر فرایند بررسی پروفایل شما را سریع‌تر خواهد کرد.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-0">
             <Field error={errors.firstName?.message}>
               <input {...register('firstName')} placeholder="نام کوچک" className={inputClass} />
             </Field>
             <Field error={errors.lastName?.message}>
               <input {...register('lastName')} placeholder="نام خانوادگی" className={inputClass} />
-            </Field>
-            <Field error={errors.city?.message}>
-              <input {...register('city')} placeholder="شهر محل سکونت" className={inputClass} />
             </Field>
           </div>
 
@@ -220,16 +256,16 @@ export default function ArtistPage() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field error={errors.phone?.message}>
-              <input {...register('phone')} placeholder="شماره تماس" className={inputClass} dir="ltr" />
+              <input {...register('phone')} placeholder="شماره تماس" className={inputClass} dir="rtl" />
             </Field>
             <Field error={errors.email?.message}>
-              <input {...register('email')} placeholder="ایمیل" className={inputClass} dir="ltr" />
+              <input {...register('email')} placeholder="ایمیل" className={inputClass} dir="rtl" />
             </Field>
             <Field>
-              <input {...register('website')} placeholder="وب سایت شما (اختیاری)" className={inputClass} dir="ltr" />
+              <input {...register('website')} placeholder="وب سایت شما (اختیاری)" className={inputClass} dir="rtl" />
             </Field>
             <Field>
-              <input {...register('instagram')} placeholder="اینستاگرام شما (اختیاری)" className={inputClass} dir="ltr" />
+              <input {...register('instagram')} placeholder="اینستاگرام شما (اختیاری)" className={inputClass} dir="rtl" />
             </Field>
           </div>
 
@@ -273,22 +309,17 @@ export default function ArtistPage() {
 
           {/* ─── بخش ۴ — پرتفولیو ─── */}
           <div className="mt-8">
-            <div className="flex items-start justify-between gap-4 mb-1">
-              <a href="#" className="text-[#8B1E1E] underline whitespace-nowrap" style={{ fontSize: '12px' }}>
-                پرتفولیو نمونه را اینجا ببینید!
-              </a>
-              <h3 className="text-right font-[800] text-[#171717]" style={{ fontSize: '16px' }}>
-                برای آشنایی کامل با شما، پرتفولیو خود را برایمان ارسال کنید.
-              </h3>
-            </div>
+            <h3 className="text-right font-[800] text-[#171717] mb-1" style={{ fontSize: '16px' }}>
+              برای آشنایی کامل با شما، پرتفولیو خود را برایمان ارسال کنید.
+            </h3>
             <p className="text-right text-[#717171] mb-4" style={{ fontSize: '12px' }}>
               فایل از ارسال توجه داشته باشید: پرتفولیو باید شامل اطلاعات کامل رزومه و همچنین بهترین کارهای شما باشد. فرمت فایل PDF است.
             </p>
             <UploadZone
               accept=".pdf"
               hint="Allowed types: application/pdf"
-              fileName={portfolioFile}
-              onFile={(f) => setPortfolioFile(f.name)}
+              fileName={portfolioName}
+              onFile={(f) => { setPortfolioFile(f); setPortfolioName(f.name) }}
             />
           </div>
 
@@ -317,8 +348,8 @@ export default function ArtistPage() {
                   />
                   {/* upload — چپ */}
                   <ArtworkUploadZone
-                    fileName={artworkFiles[i]}
-                    onFile={(f) => setArtworkFiles((prev) => ({ ...prev, [i]: f.name }))}
+                    fileName={artworkFiles[i]?.name}
+                    onFile={(f) => setArtworkFiles((prev) => ({ ...prev, [i]: f }))}
                   />
                 </div>
               ))}

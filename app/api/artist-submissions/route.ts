@@ -4,20 +4,27 @@ import { db } from '@/lib/db'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { firstName, lastName, city, phone, email, website, instagram, artField } = body
+    const {
+      firstName, lastName, phone, email, website, instagram,
+      artField, portfolioUrl, artworkItems,
+    } = body
 
     if (!firstName || !lastName || !phone || !email || !artField) {
       return NextResponse.json({ error: 'فیلدهای اجباری پر نشده‌اند' }, { status: 400 })
     }
 
+    const bio = [website, instagram].filter(Boolean).join(' | ') || null
+
     await db.artistSubmission.create({
       data: {
-        name: `${firstName} ${lastName}`,
+        name:        `${firstName} ${lastName}`,
         email,
         phone,
         artField,
-        bio: [city, website, instagram].filter(Boolean).join(' | ') || null,
-        status: 'PENDING',
+        bio,
+        resumeUrl:   portfolioUrl ?? null,
+        artworkUrls: JSON.stringify(artworkItems ?? []),
+        status:      'PENDING',
       },
     })
 

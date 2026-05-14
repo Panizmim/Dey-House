@@ -1,40 +1,64 @@
-import { Logo } from '@/components/ui/Logo'
-import { toPersianNum } from '@/lib/utils'
-
-const stats = [
-  { value: '+۱۰', label: 'سال فعالیت' },
-  { value: `+${toPersianNum(500)}`, label: 'رویداد' },
-  { value: `+${toPersianNum(120)}`, label: 'هنرمند' },
-]
-
 export function AboutSection() {
   return (
-    <section className="bg-neutral-50 border-t border-b border-neutral-200">
-      <div className="max-w-container mx-auto px-6 md:px-8 lg:px-12 py-20">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="flex flex-col gap-6">
-            <h2 className="text-3xl font-[900] text-neutral-900 leading-snug">
-              فضایی زنده برای هنر و فرهنگ
-            </h2>
-            <p className="text-base font-light text-neutral-500 leading-loose">
-              خانه دی، ترکیبی از کافه، گالری و پلاتوهای تمرین است. فضایی که هنرمندان،
-              مخاطبان و دوستداران فرهنگ را گرد هم می‌آورد. ما باور داریم که هنر باید
-              در دسترس همه باشد و هر فضایی می‌تواند صحنه‌ای برای خلق باشد.
-            </p>
-            <div className="flex items-center gap-10 pt-6 border-t border-neutral-200">
-              {stats.map((s) => (
-                <div key={s.label} className="flex flex-col">
-                  <span className="text-brand font-[900] text-2xl">{s.value}</span>
-                  <span className="text-neutral-500 text-sm font-light">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center justify-center">
-            <div className="w-56 h-56 rounded-full bg-brand-light border border-brand-border flex items-center justify-center">
-              <Logo size="lg" />
-            </div>
-          </div>
+    <section
+      className="bg-neutral-50 border-t border-b border-neutral-200"
+      style={{ position: 'relative', overflow: 'hidden' }}
+    >
+      {/* ─── صندلی + خط ─── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/chair.png"
+        alt=""
+        style={{
+          position:      'absolute',
+          top:           '50%',
+          left:          0,
+          transform:     'translateY(-50%)',
+          width:         '38%',
+          height:        'auto',
+          opacity:       0.18,
+          mixBlendMode:  'multiply',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ─── محتوا ─── */}
+      <div className="max-w-container mx-auto px-6 md:px-8 lg:px-12" style={{ position: 'relative', zIndex: 1, paddingTop: 88, paddingBottom: 88 }}>
+        <div style={{ maxWidth: 600 }}>
+
+          <h2
+            style={{
+              fontSize:      'clamp(28px, 3.2vw, 40px)',
+              fontWeight:    900,
+              color:         '#171717',
+              letterSpacing: '-0.025em',
+              lineHeight:    1.15,
+              marginBottom:  28,
+            }}
+          >
+            خانه دی
+          </h2>
+
+          <div
+            style={{
+              width:        48,
+              height:       2,
+              background:   '#8B1E1E',
+              marginBottom: 28,
+            }}
+          />
+
+          <p
+            style={{
+              fontSize:   'clamp(14px, 1.5vw, 16px)',
+              fontWeight: 300,
+              color:      '#717171',
+              lineHeight: 2.3,
+            }}
+          >
+            خانه‌دی، یک خانه‌ی قدیمی‌ست که با احیائ دوباره‌اش، جانی تازه گرفته تا بستری برای جریان هنر، گفت‌وگو و تجربه‌های جمعی باشد؛ جایی که کافه-‌گالری در کنار فضاهای دیگر، امکانِ مواجهه و زیستن در امتداد هنر را فراهم می‌کند. خانه دی در روزهایی متولد شد که ادامه‌دادن، خود شکلی از امید بود؛ و حالا تلاش می‌کند فضایی باشد برای روایت‌های تازه، برای دیدن، بودن و ادامه داشتن، برای زندگی تازه‌ای که هنوز نزیسته‌ایم.
+          </p>
+
         </div>
       </div>
     </section>

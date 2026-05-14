@@ -262,7 +262,7 @@ export default function CafePage() {
 
               {/* جداکننده صندلی بین نوشیدنی‌ها و خوراکی‌ها */}
               {catIdx === 5 && (
-                <ChairIllustration color="#8B1E1E" opacity={0.12} className="w-full h-16 my-4" />
+                <ChairIllustration color="#8B1E1E" opacity={0.15} className="w-full h-28 my-4" />
               )}
             </div>
           ))}

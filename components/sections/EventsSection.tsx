@@ -1,170 +1,163 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Calendar, Clock, MapPin, ChevronRight, ChevronLeft } from '@/components/ui/icons'
 
-const events = [
-  {
-    id: '1',
-    title: 'نمایشگاه آثار هنرمندان معاصر',
-    type: 'نمایشگاه',
-    date: '۱۵ خرداد ۱۴۰۴',
-    time: '۱۶:۰۰ تا ۲۱:۰۰',
-    location: 'گالری خانه دی',
-    description:
-      'گردهمایی آثار ۱۲ هنرمند برجسته در گالری خانه دی — تجربه‌ای از نقاشی، عکاسی و چیدمان معاصر.',
-    gradient: 'linear-gradient(135deg, #c8d4b8, #8fa87a)',
-  },
-  {
-    id: '2',
-    title: 'تئاتر تجربی «آستانه»',
-    type: 'تئاتر',
-    date: '۲۲ خرداد ۱۴۰۴',
-    time: '۱۹:۳۰',
-    location: 'پلاتو اصلی',
-    description: 'یک اجرای تئاتری تجربی که مرزهای فضا و زمان را به چالش می‌کشد.',
-    gradient: 'linear-gradient(135deg, #d4c8e8, #9882c8)',
-  },
-  {
-    id: '3',
-    title: 'شب شعر معاصر',
-    type: 'ادبی',
-    date: '۰۵ تیر ۱۴۰۴',
-    time: '۲۰:۰۰',
-    location: 'سالن اصلی',
-    description: 'شبی با صدای شاعران معاصر ایران در فضای صمیمی خانه دی.',
-    gradient: 'linear-gradient(135deg, #c8e8d4, #72b88a)',
-  },
-]
+type PublicEvent = {
+  id:          string
+  slug:        string
+  title:       string
+  type:        string
+  date:        string
+  time:        string
+  location:    string
+  description: string
+  imageUrl?:   string
+  gradient:    string
+}
 
-export function EventsSection() {
-  const [current, setCurrent] = useState(0)
-
-  const prev = useCallback(() =>
-    setCurrent((c) => (c - 1 + events.length) % events.length), [])
-  const next = useCallback(() =>
-    setCurrent((c) => (c + 1) % events.length), [])
-
-  const event = events[current]
+function EventCard({ event }: { event: PublicEvent }) {
+  const [hovered, setHovered] = useState(false)
 
   return (
-    <section className="max-w-container mx-auto px-6 md:px-8 lg:px-12 py-20">
-      {/* هدر */}
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="text-xl font-[800] text-neutral-900">رویدادها</h2>
-        <Link
-          href="/events"
-          className="text-sm text-neutral-500 border border-neutral-200 rounded-lg px-4 py-2 hover:border-brand hover:text-brand transition-colors duration-200"
-        >
-          مشاهده همه
-        </Link>
+    <Link
+      href={`/events/${event.slug}`}
+      style={{ display: 'block', textDecoration: 'none' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* ─── پوستر مربعی ─── */}
+      <div style={{
+        position: 'relative', paddingTop: '125%',
+        background: event.gradient, overflow: 'hidden',
+        borderRadius: 2,
+      }}>
+        {event.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={event.imageUrl}
+            alt={event.title}
+            style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%', objectFit: 'cover',
+              transform: hovered ? 'scale(1.04)' : 'scale(1)',
+              transition: 'transform 500ms ease',
+            }}
+          />
+        )}
+
+        {/* badge نوع رویداد */}
+        <span style={{
+          position: 'absolute', top: 10, right: 10,
+          background: 'rgba(20,20,20,0.62)',
+          backdropFilter: 'blur(6px)',
+          color: 'white', fontSize: 11, fontWeight: 600,
+          padding: '4px 10px', borderRadius: 4,
+          letterSpacing: '0.02em',
+        }}>
+          {event.type}
+        </span>
       </div>
 
-      {/* اسلایدر */}
-      <div className="flex gap-8 items-stretch min-h-[420px]">
-        {/* تصویر — راست ۵۵٪ */}
-        <div className="w-[55%] flex-shrink-0">
-          <div
-            className="w-full rounded-lg overflow-hidden"
-            style={{ aspectRatio: '3/4', maxHeight: '520px', background: event.gradient }}
-          />
-        </div>
+      {/* ─── اطلاعات زیر پوستر ─── */}
+      <div style={{ paddingTop: 14 }}>
+        {/* عنوان */}
+        <h3
+          style={{
+            fontSize: 18, fontWeight: 900, color: '#171717',
+            lineHeight: 1.4, marginBottom: 10,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          } as React.CSSProperties}
+        >
+          {event.title}
+        </h3>
 
-        {/* اطلاعات — چپ ۴۵٪ */}
-        <div className="flex-1 flex flex-col justify-center gap-4 py-4">
-          {/* badge نوع */}
-          <span
-            className="self-start text-[12px] font-[700] px-[10px] py-[3px] rounded-sm"
-            style={{ border: '1px solid #8B1E1E', color: '#8B1E1E' }}
-          >
-            {event.type}
-          </span>
-
-          {/* عنوان */}
-          <h3 className="font-[900] text-neutral-900 leading-snug" style={{ fontSize: '28px' }}>
-            {event.title}
-          </h3>
-
-          {/* جزئیات */}
-          <div className="flex flex-col gap-2 text-neutral-500" style={{ fontSize: '14px' }}>
-            <span className="flex items-center gap-2">
-              <Calendar size={15} className="flex-shrink-0" />
-              {event.date}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock size={15} className="flex-shrink-0" />
-              {event.time}
-            </span>
-            <span className="flex items-center gap-2">
-              <MapPin size={15} className="flex-shrink-0" />
+        {/* ردیف: نوع | مکان | تاریخ */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          fontSize: 12, color: '#909090', gap: 6,
+        }}>
+          <span style={{ fontWeight: 500, flexShrink: 0 }}>{event.type}</span>
+          {event.location && (
+            <span style={{ color: '#B8B8B8', flexShrink: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {event.location}
             </span>
-          </div>
-
-          {/* توضیحات */}
-          <p
-            className="text-neutral-500 leading-loose overflow-hidden"
-            style={{
-              fontSize: '15px',
-              lineHeight: 1.8,
-              display: '-webkit-box',
-              WebkitLineClamp: 4,
-              WebkitBoxOrient: 'vertical',
-            }}
-          >
-            {event.description}
-          </p>
-
-          <hr style={{ borderColor: '#EFEFEF' }} />
-
-          {/* navigation */}
-          <div className="flex items-center gap-3 mt-auto">
-            <button
-              onClick={next}
-              aria-label="رویداد بعدی"
-              className="flex items-center justify-center bg-white hover:bg-neutral-50 transition-colors"
-              style={{
-                width: '40px',
-                height: '40px',
-                border: '1px solid #EFEFEF',
-                borderRadius: '8px',
-              }}
-            >
-              <ChevronRight size={18} />
-            </button>
-            <button
-              onClick={prev}
-              aria-label="رویداد قبلی"
-              className="flex items-center justify-center bg-white hover:bg-neutral-50 transition-colors"
-              style={{
-                width: '40px',
-                height: '40px',
-                border: '1px solid #EFEFEF',
-                borderRadius: '8px',
-              }}
-            >
-              <ChevronLeft size={18} />
-            </button>
-
-            {/* dots */}
-            <div className="flex items-center gap-2 mr-2">
-              {events.map((e, idx) => (
-                <button
-                  key={e.id}
-                  onClick={() => setCurrent(idx)}
-                  aria-label={`رویداد ${idx + 1}`}
-                  className="rounded-full transition-all duration-300"
-                  style={{
-                    width: idx === current ? '20px' : '8px',
-                    height: '8px',
-                    background: idx === current ? '#171717' : '#D4D4D4',
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          )}
+          <span style={{ flexShrink: 0 }}>{event.date}</span>
         </div>
+      </div>
+    </Link>
+  )
+}
+
+function SkeletonCard() {
+  return (
+    <div>
+      <div className="animate-pulse" style={{ paddingTop: '125%', background: '#F0F0F0', borderRadius: 2, position: 'relative' }} />
+      <div style={{ paddingTop: 14 }}>
+        <div className="animate-pulse" style={{ height: 18, background: '#F0F0F0', borderRadius: 4, marginBottom: 10, width: '75%' }} />
+        <div className="animate-pulse" style={{ height: 12, background: '#F0F0F0', borderRadius: 4, width: '55%' }} />
+      </div>
+    </div>
+  )
+}
+
+export function EventsSection() {
+  const [events,  setEvents]  = useState<PublicEvent[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/events')
+      .then((r) => r.json())
+      .then((data: PublicEvent[]) => setEvents(data.slice(0, 8)))
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (!loading && events.length === 0) return null
+
+  return (
+    <section style={{ padding: '64px 0' }}>
+      <div className="max-w-container mx-auto px-6 md:px-8 lg:px-12">
+
+        {/* ─── هدر ─── */}
+        <div style={{
+          display: 'flex', alignItems: 'baseline',
+          justifyContent: 'space-between', marginBottom: 32,
+        }}>
+          <h2 style={{
+            fontSize: 'clamp(24px, 3vw, 32px)',
+            fontWeight: 900, color: '#171717',
+            letterSpacing: '-0.02em',
+          }}>
+            رویدادها
+          </h2>
+          <Link
+            href="/events"
+            style={{
+              fontSize: 13, color: '#909090',
+              textDecoration: 'none',
+              display: 'flex', alignItems: 'center', gap: 4,
+              transition: 'color 200ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#171717' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#909090' }}
+          >
+            همه رویدادها ↗
+          </Link>
+        </div>
+
+        {/* ─── گرید کارت‌ها ─── */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            : events.map((event) => <EventCard key={event.id} event={event} />)
+          }
+        </div>
+
       </div>
     </section>
   )

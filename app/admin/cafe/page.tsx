@@ -1,182 +1,288 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ImageOff } from 'lucide-react'
 import toast from 'react-hot-toast'
-import Modal from '@/components/admin/Modal'
-
-type MenuItem = { id: string; name: string; price: number; category: string; isAvailable: boolean; description: string | null }
+import CafeItemModal, { type CafeMenuItem } from '@/components/admin/CafeItemModal'
 
 const CATEGORIES = [
+  'همه',
   'نوشیدنی گرم بر پایه اسپرسو', 'نوشیدنی سرد بر پایه اسپرسو', 'چای و دمنوش',
   'نوشیدنی گرم', 'نوشیدنی سرد', 'نوشیدنی ساده',
   'میان وعده', 'سالاد', 'ساندویچ', 'پاستا', 'بشقاب', 'تاپینگ',
 ]
 
+function CategoryBadge({ label }: { label: string }) {
+  return (
+    <span style={{
+      display: 'inline-block', padding: '2px 8px', borderRadius: 4,
+      fontSize: 11, fontWeight: 500,
+      background: '#F3F4F6', color: '#6B7280',
+      whiteSpace: 'nowrap',
+    }}>
+      {label}
+    </span>
+  )
+}
+
+function AvailabilityToggle({ item, onToggle }: { item: CafeMenuItem; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      title={item.isAvailable ? 'کلیک برای ناموجود کردن' : 'کلیک برای موجود کردن'}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '4px 10px', borderRadius: 20, border: 'none', cursor: 'pointer',
+        fontSize: 12, fontWeight: 600,
+        background: item.isAvailable ? '#D1FAE5' : '#F3F4F6',
+        color:      item.isAvailable ? '#065F46' : '#6B7280',
+        transition: 'all 0.15s',
+      }}
+    >
+      <span style={{
+        display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
+        background: item.isAvailable ? '#10B981' : '#9CA3AF',
+      }} />
+      {item.isAvailable ? 'موجود' : 'ناموجود'}
+    </button>
+  )
+}
+
 export default function AdminCafePage() {
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0])
-  const [items, setItems]                   = useState<MenuItem[]>([])
-  const [loading, setLoading]               = useState(true)
-  const [editingPrice, setEditingPrice]     = useState<Record<string, string>>({})
-  const [addModal, setAddModal]             = useState(false)
-  const [addForm, setAddForm]               = useState({ name: '', price: '', description: '' })
-  const [saving, setSaving]                 = useState(false)
+  const [items, setItems]             = useState<CafeMenuItem[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [activeTab, setActiveTab]     = useState('همه')
+  const [modalOpen, setModalOpen]     = useState(false)
+  const [editingItem, setEditingItem] = useState<CafeMenuItem | null>(null)
 
   async function fetchItems() {
     setLoading(true)
-    const res  = await fetch('/api/admin/cafe-menu')
-    const data = await res.json()
-    setItems(data)
-    setLoading(false)
+    try {
+      const res  = await fetch('/api/admin/cafe-menu')
+      const data = await res.json()
+      setItems(Array.isArray(data) ? data : [])
+    } catch {
+      toast.error('خطا در بارگذاری آیتم‌ها')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { fetchItems() }, [])
 
-  const categoryItems = items.filter((i) => i.category === activeCategory)
+  const displayed = activeTab === 'همه'
+    ? items
+    : items.filter((i) => i.category === activeTab)
 
-  async function savePrice(id: string) {
-    const raw = editingPrice[id]
-    if (!raw) return
-    const price = parseInt(raw, 10)
-    if (isNaN(price)) { toast.error('قیمت نامعتبر'); return }
-    const res = await fetch(`/api/admin/cafe-menu/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ price }),
-    })
-    if (res.ok) {
-      toast.success('قیمت ذخیره شد')
-      setEditingPrice((p) => { const n = { ...p }; delete n[id]; return n })
-      fetchItems()
-    } else {
-      toast.error('خطا در ذخیره')
-    }
+  function openAdd() {
+    setEditingItem(null)
+    setModalOpen(true)
   }
 
-  async function toggleAvailability(item: MenuItem) {
+  function openEdit(item: CafeMenuItem) {
+    setEditingItem(item)
+    setModalOpen(true)
+  }
+
+  async function toggleAvailability(item: CafeMenuItem) {
     const res = await fetch(`/api/admin/cafe-menu/${item.id}/toggle`, { method: 'PATCH' })
-    if (res.ok) { toast.success('وضعیت بروز شد'); fetchItems() }
-    else toast.error('خطا')
+    if (res.ok) fetchItems()
+    else toast.error('خطا در تغییر وضعیت')
   }
 
-  async function deleteItem(id: string) {
-    if (!window.confirm('آیا مطمئن هستید که می‌خواهید این آیتم را حذف کنید؟')) return
-    const res = await fetch(`/api/admin/cafe-menu/${id}`, { method: 'DELETE' })
+  async function deleteItem(item: CafeMenuItem) {
+    if (!window.confirm(`آیا مطمئنید می‌خواهید «${item.name}» را حذف کنید؟`)) return
+    const res = await fetch(`/api/admin/cafe-menu/${item.id}`, { method: 'DELETE' })
     if (res.ok) { toast.success('آیتم حذف شد'); fetchItems() }
-    else toast.error('خطا در حذف')
-  }
-
-  async function addItem() {
-    if (!addForm.name || !addForm.price) { toast.error('نام و قیمت الزامی هستند'); return }
-    setSaving(true)
-    const res = await fetch('/api/admin/cafe-menu', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: addForm.name, price: parseInt(addForm.price, 10), category: activeCategory, description: addForm.description || null }),
-    })
-    setSaving(false)
-    if (res.ok) {
-      toast.success('آیتم اضافه شد')
-      setAddModal(false)
-      setAddForm({ name: '', price: '', description: '' })
-      fetchItems()
-    } else {
-      toast.error('خطا در افزودن')
-    }
+    else toast.error('خطا در حذف آیتم')
   }
 
   return (
     <div>
-      <h1 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 20 }}>منوی کافه</h1>
+      {/* هدر */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 style={{ fontSize: 18, fontWeight: 800, color: '#171717' }}>مدیریت منوی کافه</h1>
+          <p style={{ fontSize: 13, color: '#717171', marginTop: 2 }}>
+            {items.length} آیتم در {CATEGORIES.length - 1} دسته‌بندی
+          </p>
+        </div>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2"
+          style={{
+            padding: '9px 18px', borderRadius: 8, border: 'none',
+            background: '#8B1E1E', color: 'white', fontSize: 14,
+            fontWeight: 600, cursor: 'pointer',
+          }}
+        >
+          <Plus size={16} />
+          افزودن آیتم جدید
+        </button>
+      </div>
 
       {/* تب‌های دسته‌بندی */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-1">
+      <div
+        className="flex gap-2 pb-2 mb-5"
+        style={{ overflowX: 'auto', scrollbarWidth: 'none' }}
+      >
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => setActiveTab(cat)}
             style={{
-              flexShrink: 0, padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 500, cursor: 'pointer',
-              background: activeCategory === cat ? '#8B1E1E' : 'white',
-              color: activeCategory === cat ? 'white' : '#404040',
-              border: activeCategory === cat ? 'none' : '1px solid #EFEFEF',
+              flexShrink: 0, padding: '6px 14px', borderRadius: 20,
+              fontSize: 13, fontWeight: activeTab === cat ? 700 : 400,
+              cursor: 'pointer', transition: 'all 0.15s',
+              background: activeTab === cat ? '#8B1E1E' : 'white',
+              color:      activeTab === cat ? 'white' : '#404040',
+              border:     activeTab === cat ? 'none' : '1px solid #E5E5E5',
             }}
           >
             {cat}
+            {cat !== 'همه' && (
+              <span style={{
+                marginRight: 4, fontSize: 11,
+                opacity: activeTab === cat ? 0.8 : 0.5,
+              }}>
+                ({items.filter((i) => i.category === cat).length})
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* جدول آیتم‌ها */}
-      <div style={{ background: 'white', border: '1px solid #EFEFEF', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+      {/* جدول */}
+      <div style={{ background: 'white', border: '1px solid #EFEFEF', borderRadius: 10, overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
             <thead>
               <tr style={{ background: '#FAFAFA', borderBottom: '1px solid #EFEFEF' }}>
-                {['نام', 'قیمت (تومان)', 'وضعیت', 'عملیات'].map((h) => (
-                  <th key={h} style={{ padding: '12px 16px', fontSize: 12, color: '#717171', textAlign: 'right', fontWeight: 600 }}>{h}</th>
+                {['تصویر', 'نام', 'دسته', 'قیمت', 'وضعیت', 'عملیات'].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: '12px 16px', fontSize: 12,
+                      color: '#717171', textAlign: 'right',
+                      fontWeight: 600, whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                Array.from({ length: 4 }).map((_, i) => (
+                Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid #EFEFEF' }}>
-                    {[1,2,3,4].map((j) => (
-                      <td key={j} style={{ padding: '12px 16px' }}>
-                        <div className="animate-pulse rounded" style={{ height: 16, background: '#F3F4F6', width: '70%' }} />
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <td key={j} style={{ padding: '14px 16px' }}>
+                        <div
+                          className="animate-pulse rounded"
+                          style={{ height: 16, background: '#F3F4F6', width: j === 0 ? 40 : '70%' }}
+                        />
                       </td>
                     ))}
                   </tr>
                 ))
-              ) : categoryItems.length === 0 ? (
-                <tr><td colSpan={4} style={{ padding: '24px', textAlign: 'center', fontSize: 14, color: '#717171' }}>هیچ آیتمی در این دسته وجود ندارد</td></tr>
+              ) : displayed.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: '#717171' }}
+                  >
+                    هیچ آیتمی در این دسته وجود ندارد
+                  </td>
+                </tr>
               ) : (
-                categoryItems.map((item) => (
-                  <tr key={item.id} style={{ borderBottom: '1px solid #EFEFEF' }}>
-                    <td style={{ padding: '12px 16px', fontSize: 14, color: '#171717' }}>{item.name}</td>
+                displayed.map((item) => (
+                  <tr
+                    key={item.id}
+                    style={{ borderBottom: '1px solid #EFEFEF' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#FAFAFA' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                  >
+                    {/* تصویر */}
                     <td style={{ padding: '12px 16px' }}>
-                      {editingPrice[item.id] !== undefined ? (
-                        <input
-                          type="number"
-                          value={editingPrice[item.id]}
-                          onChange={(e) => setEditingPrice((p) => ({ ...p, [item.id]: e.target.value }))}
-                          onKeyDown={(e) => e.key === 'Enter' && savePrice(item.id)}
-                          onBlur={() => savePrice(item.id)}
-                          style={{ width: 120, padding: '4px 8px', borderRadius: 6, border: '1px solid #8B1E1E', fontSize: 14, outline: 'none' }}
-                          autoFocus
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover', display: 'block' }}
                         />
                       ) : (
-                        <span
-                          onClick={() => setEditingPrice((p) => ({ ...p, [item.id]: String(item.price) }))}
-                          style={{ cursor: 'pointer', fontSize: 14, color: '#171717', textDecoration: 'underline dotted' }}
-                          title="کلیک برای ویرایش"
-                        >
-                          {item.price.toLocaleString('fa-IR')}
-                        </span>
+                        <div style={{
+                          width: 40, height: 40, borderRadius: 6,
+                          background: '#F3F4F6', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <ImageOff size={16} color="#B0B0B0" />
+                        </div>
                       )}
                     </td>
+
+                    {/* نام */}
                     <td style={{ padding: '12px 16px' }}>
-                      <button
-                        onClick={() => toggleAvailability(item)}
-                        style={{
-                          padding: '4px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                          background: item.isAvailable ? '#D1FAE5' : '#F3F4F6',
-                          color:      item.isAvailable ? '#065F46' : '#6B7280',
-                        }}
-                      >
-                        {item.isAvailable ? 'موجود' : 'ناموجود'}
-                      </button>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#171717' }}>{item.name}</span>
+                      {item.description && (
+                        <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>{item.description}</p>
+                      )}
                     </td>
+
+                    {/* دسته */}
                     <td style={{ padding: '12px 16px' }}>
-                      <button
-                        onClick={() => deleteItem(item.id)}
-                        className="flex items-center gap-1"
-                        style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #FEE2E2', background: 'white', color: '#DC2626', fontSize: 13, cursor: 'pointer' }}
-                      >
-                        <Trash2 size={13} />
-                        حذف
-                      </button>
+                      <CategoryBadge label={item.category} />
+                    </td>
+
+                    {/* قیمت */}
+                    <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#8B1E1E' }}>
+                        {item.price.toLocaleString('fa-IR')} تومان
+                      </span>
+                    </td>
+
+                    {/* وضعیت */}
+                    <td style={{ padding: '12px 16px' }}>
+                      <AvailabilityToggle item={item} onToggle={() => toggleAvailability(item)} />
+                    </td>
+
+                    {/* عملیات */}
+                    <td style={{ padding: '12px 16px' }}>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEdit(item)}
+                          title="ویرایش"
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            padding: '5px 10px', borderRadius: 6,
+                            border: '1px solid #E5E5E5', background: 'white',
+                            fontSize: 12, color: '#717171', cursor: 'pointer',
+                            transition: 'all 0.15s',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#8B1E1E'; e.currentTarget.style.borderColor = '#8B1E1E' }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#717171'; e.currentTarget.style.borderColor = '#E5E5E5' }}
+                        >
+                          <Pencil size={13} />
+                          ویرایش
+                        </button>
+                        <button
+                          onClick={() => deleteItem(item)}
+                          title="حذف"
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            padding: '5px 10px', borderRadius: 6,
+                            border: '1px solid #FEE2E2', background: 'white',
+                            fontSize: 12, color: '#DC2626', cursor: 'pointer',
+                            transition: 'all 0.15s',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF2F2' }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = 'white' }}
+                        >
+                          <Trash2 size={13} />
+                          حذف
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -184,47 +290,23 @@ export default function AdminCafePage() {
             </tbody>
           </table>
         </div>
+
+        {/* فوتر جدول */}
+        {!loading && displayed.length > 0 && (
+          <div style={{ padding: '10px 16px', borderTop: '1px solid #EFEFEF', background: '#FAFAFA' }}>
+            <p style={{ fontSize: 12, color: '#9CA3AF' }}>
+              نمایش {displayed.length} از {items.length} آیتم
+            </p>
+          </div>
+        )}
       </div>
 
-      <button
-        onClick={() => setAddModal(true)}
-        className="flex items-center gap-2"
-        style={{ padding: '8px 16px', borderRadius: 8, border: '1px dashed #8B1E1E', background: 'white', color: '#8B1E1E', fontSize: 14, cursor: 'pointer' }}
-      >
-        <Plus size={16} />
-        افزودن آیتم به {activeCategory}
-      </button>
-
-      {/* Modal افزودن */}
-      <Modal
-        open={addModal}
-        title="افزودن آیتم جدید"
-        onClose={() => setAddModal(false)}
-        footer={
-          <>
-            <button onClick={() => setAddModal(false)} style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 14, cursor: 'pointer' }}>انصراف</button>
-            <button onClick={addItem} disabled={saving} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
-              {saving ? 'در حال ذخیره...' : 'افزودن'}
-            </button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-4">
-          <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#404040', marginBottom: 6 }}>نام آیتم *</label>
-            <input className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm" value={addForm.name} onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))} placeholder="مثال: اسپرسو" />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#404040', marginBottom: 6 }}>قیمت (تومان) *</label>
-            <input type="number" className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm" value={addForm.price} onChange={(e) => setAddForm((f) => ({ ...f, price: e.target.value }))} placeholder="مثال: 225000" />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#404040', marginBottom: 6 }}>توضیح (اختیاری)</label>
-            <input className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm" value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} placeholder="توضیح کوتاه" />
-          </div>
-          <p style={{ fontSize: 12, color: '#717171' }}>دسته‌بندی: {activeCategory}</p>
-        </div>
-      </Modal>
+      <CafeItemModal
+        open={modalOpen}
+        item={editingItem}
+        onClose={() => setModalOpen(false)}
+        onSave={() => fetchItems()}
+      />
     </div>
   )
 }

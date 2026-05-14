@@ -12,10 +12,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   try {
     const body = await req.json()
-    const { name, price, category, description } = body
+    const { name, price, category, description, imageUrl, isAvailable } = body
     const item = await db.cafeMenuItem.update({
       where: { id: params.id },
-      data: { name, price: Number(price), category, description: description || null },
+      data: {
+        name, price: Number(price), category,
+        description: description || null,
+        imageUrl: imageUrl || null,
+        ...(isAvailable !== undefined && { isAvailable: !!isAvailable }),
+      },
     })
     return NextResponse.json(item)
   } catch {

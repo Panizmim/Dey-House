@@ -10,12 +10,12 @@ export default function HomePage() {
     <>
       <HeroSection />
       <AboutSection />
-      <StudiosSection />
+      <section id="studios">
+        <StudiosSection />
+      </section>
       <EventsSection />
       <CafePreview />
-      <section className="py-20 px-8 bg-[#FAFAFA] border-t border-[#EFEFEF] border-b">
-        <ArtistSubmissionCTA />
-      </section>
+      <ArtistSubmissionCTA />
     </>
   )
 }
