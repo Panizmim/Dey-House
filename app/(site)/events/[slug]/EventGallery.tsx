@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, ChevronRight, ChevronLeft } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 interface Props {

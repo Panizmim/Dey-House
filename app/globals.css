@@ -67,3 +67,9 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+@media (max-width: 768px) {
+  .mobile-text-base { font-size: 15px !important; }
+  .mobile-text-sm   { font-size: 14px !important; }
+  .mobile-text-xs   { font-size: 13px !important; }
+}

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, MapPin, CalendarDays, Clock, User, X, Check } from 'lucide-react'
+import { ArrowRight, MapPin, CalendarDays, Clock, User, X, Check } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 type Booking = {

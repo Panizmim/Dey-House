@@ -4,10 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import {
-  LayoutDashboard, Calendar, UtensilsCrossed, BookOpen,
-  Phone, Users, Palette, ArrowRight, LogOut,
-} from 'lucide-react'
+import { LayoutDashboard, Calendar, UtensilsCrossed, BookOpen, Phone, Users, Palette, ArrowRight, LogOut } from '@/components/ui/icons'
 
 const navGroups = [
   {

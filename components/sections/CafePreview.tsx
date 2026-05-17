@@ -87,7 +87,12 @@ export function CafePreview() {
     <section className="bg-neutral-50 border-t border-neutral-200">
       <div className="max-w-container mx-auto px-6 md:px-8 lg:px-12 py-20">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-[800] text-neutral-900">منوی کافه</h2>
+          <h2
+            className="font-black text-[#171717]"
+            style={{ fontSize: 'clamp(24px, 3vw, 36px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+          >
+            منوی کافه
+          </h2>
           <Link
             href="/cafe"
             className="text-sm text-neutral-500 border border-neutral-200 rounded-lg px-4 py-2 hover:border-brand hover:text-brand transition-colors duration-200"

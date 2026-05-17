@@ -5,9 +5,7 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { Logo } from '@/components/ui/Logo'
-import { Menu, X, ChevronLeft } from '@/components/ui/icons'
-import { ChevronDown, User, CalendarDays, CreditCard, LogOut } from 'lucide-react'
+import { Menu, X, ChevronLeft, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone } from '@/components/ui/icons'
 import { signOut } from 'next-auth/react'
 
 const navLinks = [
@@ -45,7 +43,7 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
           background: 'transparent', border: 'none', cursor: 'pointer',
-          fontSize: '15px', fontWeight: 600, color: textColor,
+          fontSize: '17px', fontWeight: 600, color: textColor,
           fontFamily: 'YekanBakh, Tahoma, sans-serif',
           padding: 0,
         }}
@@ -163,17 +161,52 @@ function Navbar() {
   return (
     <>
       <header
-        className="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
+        className="fixed top-0 right-0 left-0 z-50 transition-all duration-300 h-[60px] lg:h-[68px]"
         style={{
-          height: '68px',
           background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
           borderBottom: scrolled ? '1px solid #EFEFEF' : 'none',
           color: scrolled ? '#171717' : 'white',
         }}
       >
-        <div className="max-w-[1280px] mx-auto px-8 h-[68px] grid grid-cols-3 items-center">
+        {/* ── موبایل ── */}
+        <div className="lg:hidden relative flex items-center justify-between px-4 h-[60px]">
+          {/* همبرگر — راست */}
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            style={{ background: 'transparent', border: 'none', padding: '6px', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center' }}
+            aria-label="باز کردن منو"
+          >
+            <Menu size={22} />
+          </button>
 
+          {/* لوگو — وسط */}
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <Link href="/" onClick={close}>
+              <div className="relative" style={{ width: 76, height: 30 }}>
+                <Image
+                  src="/images/logo.png"
+                  alt="خانه دی"
+                  fill
+                  className="object-contain"
+                  style={scrolled ? { mixBlendMode: 'multiply' } : { filter: 'brightness(0) invert(1)' }}
+                />
+              </div>
+            </Link>
+          </div>
+
+          {/* آیکون کاربر — چپ */}
+          <Link
+            href={session ? '/dashboard/profile' : '/login'}
+            style={{ color: 'inherit', display: 'flex', alignItems: 'center', padding: '6px' }}
+            aria-label="حساب کاربری"
+          >
+            <User size={22} />
+          </Link>
+        </div>
+
+        {/* ── دسکتاپ ── */}
+        <div className="hidden lg:grid max-w-[1280px] mx-auto px-8 h-[68px] grid-cols-3 items-center">
           {/* راست — لوگو */}
           <div className="flex items-center">
             <Link href="/" onClick={close}>
@@ -193,8 +226,8 @@ function Navbar() {
             </Link>
           </div>
 
-          {/* وسط — لینک‌ها (فقط desktop) */}
-          <div className="hidden lg:flex items-center justify-center gap-1">
+          {/* وسط — لینک‌ها */}
+          <div className="flex items-center justify-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -207,180 +240,133 @@ function Navbar() {
             ))}
           </div>
 
-          {/* چپ — دکمه‌های desktop / همبرگر موبایل */}
+          {/* چپ — دکمه‌ها */}
           <div className="flex items-center justify-end gap-6">
-            {/* دکمه‌های desktop */}
-            <div className="hidden lg:flex items-center gap-6">
-              {/* رزرو پلاتو — سمت راست */}
+            <Link
+              href="/#studios"
+              className="relative pb-0.5 group"
+              style={{ fontSize: '17px', fontWeight: 600 }}
+            >
+              رزرو پلاتو
+              <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
+            </Link>
+
+            {session ? (
+              <UserDropdown scrolled={scrolled} />
+            ) : (
               <Link
-                href="/#studios"
+                href="/login"
                 className="relative pb-0.5 group"
-                style={{ fontSize: '15px', fontWeight: 600 }}
+                style={{ fontSize: '17px', fontWeight: 600 }}
               >
-                رزرو پلاتو
+                ورود / ثبت‌نام
                 <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
               </Link>
-
-              {/* ورود/ثبت‌نام یا منوی کاربر — سمت چپ */}
-              {session ? (
-                <UserDropdown scrolled={scrolled} />
-              ) : (
-                <Link
-                  href="/login"
-                  className="relative pb-0.5 group"
-                  style={{ fontSize: '15px', fontWeight: 600 }}
-                >
-                  ورود / ثبت‌نام
-                  <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
-                </Link>
-              )}
-            </div>
-
-            {/* دکمه همبرگر موبایل */}
-            <button
-              className="lg:hidden"
-              onClick={() => setMobileMenuOpen((v) => !v)}
-              style={{ background: 'transparent', border: 'none', padding: '8px', cursor: 'pointer' }}
-              aria-label={mobileMenuOpen ? 'بستن منو' : 'باز کردن منو'}
-            >
-              {mobileMenuOpen
-                ? <X size={24} className="text-inherit" />
-                : <Menu size={24} className="text-inherit" />
-              }
-            </button>
+            )}
           </div>
         </div>
       </header>
 
-      {/* منوی کشویی موبایل */}
+      {/* ── پنل کشویی موبایل (راست) ── */}
       {mobileMenuOpen && (
-        <div
-          className="lg:hidden fixed right-0 left-0 bottom-0 bg-white overflow-y-auto z-[49]"
-          style={{
-            top: '68px',
-            padding: '24px',
-            animation: 'mobileMenuIn 200ms ease forwards',
-          }}
-        >
-          {/* بخش ۱ — لینک‌های ناوبار */}
-          <div className="flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
+        <>
+          {/* overlay */}
+          <div
+            className="lg:hidden fixed inset-0 z-[48]"
+            style={{ background: 'rgba(0,0,0,0.52)' }}
+            onClick={close}
+          />
+
+          {/* پنل */}
+          <div
+            className="lg:hidden fixed top-0 right-0 bottom-0 z-[49] bg-white flex flex-col"
+            style={{ width: 'min(72vw, 280px)', animation: 'slideInFromRight 240ms ease forwards' }}
+          >
+            {/* هدر پنل */}
+            <div className="flex items-center justify-between px-5 border-b border-[#F0F0F0]" style={{ height: 60, flexShrink: 0 }}>
+              <button
                 onClick={close}
-                className="flex items-center justify-between rounded-lg hover:bg-[#FAFAFA] transition-colors duration-150"
-                style={{ padding: '14px 16px', fontSize: '16px', fontWeight: 400, color: '#171717' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', color: '#171717' }}
+                aria-label="بستن منو"
               >
-                <span>{link.label}</span>
-                <ChevronLeft size={16} style={{ color: '#C0C0C0', flexShrink: 0 }} />
-              </Link>
-            ))}
-          </div>
+                <X size={22} />
+              </button>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>خانه دی</span>
+            </div>
 
-          {/* divider */}
-          <div style={{ height: '1px', background: '#EFEFEF', margin: '16px 0' }} />
-
-          {/* بخش ۲ — دکمه‌های اکشن */}
-          <div className="flex flex-col gap-[10px]">
-            {session ? (
-              <>
-                {/* آواتار + نام */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: '1px solid #EFEFEF', borderRadius: 12 }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: '50%',
-                    background: '#8B1E1E', color: 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, fontWeight: 700, flexShrink: 0,
-                  }}>
-                    {(session.user?.name || 'ک').charAt(0)}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>{session.user?.name || 'کاربر'}</p>
-                    <p style={{ fontSize: 11, color: '#A0A0A0' }}>{session.user?.email || ''}</p>
-                  </div>
-                </div>
-                {[
-                  { href: '/dashboard/profile',  label: 'اطلاعات شخصی' },
-                  { href: '/dashboard/bookings', label: 'رزروهای قبلی'  },
-                  { href: '/dashboard/payments', label: 'پرداخت‌ها'     },
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={close}
-                    style={{
-                      display: 'block', padding: '12px 16px',
-                      border: '1px solid #EFEFEF', borderRadius: 8,
-                      fontSize: 14, color: '#404040', textDecoration: 'none',
-                    }}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+            {/* لینک‌ها */}
+            <div className="flex flex-col flex-1 overflow-y-auto">
+              {navLinks.map((link) => (
                 <Link
-                  href="/#studios"
+                  key={link.href}
+                  href={link.href}
                   onClick={close}
-                  className="block text-center text-white"
-                  style={{ background: '#8B1E1E', borderRadius: '8px', padding: '14px', fontSize: '15px', fontWeight: 700 }}
+                  style={{
+                    display: 'block',
+                    padding: '15px 20px',
+                    fontSize: 16,
+                    fontWeight: 500,
+                    color: '#171717',
+                    borderBottom: '1px solid #F5F5F5',
+                    textDecoration: 'none',
+                  }}
                 >
-                  رزرو پلاتو
+                  {link.label}
                 </Link>
+              ))}
+            </div>
+
+            {/* دکمه‌های اکشن */}
+            <div className="px-4 pt-4 pb-8 flex flex-col gap-3" style={{ borderTop: '1px solid #F0F0F0', flexShrink: 0 }}>
+              <Link
+                href="/#studios"
+                onClick={close}
+                style={{
+                  display: 'block', textAlign: 'center',
+                  background: '#8B1E1E', color: 'white',
+                  borderRadius: 10, padding: '13px',
+                  fontSize: 15, fontWeight: 700, textDecoration: 'none',
+                }}
+              >
+                رزرو پلاتو
+              </Link>
+
+              {session ? (
                 <button
                   onClick={() => { close(); signOut() }}
                   style={{
-                    background: 'transparent', border: 'none', padding: '14px',
-                    fontSize: '14px', fontWeight: 600, color: '#8B1E1E',
+                    background: 'transparent', border: '1px solid #E5E5E5',
+                    borderRadius: 10, padding: '13px',
+                    fontSize: 14, fontWeight: 600, color: '#8B1E1E',
                     cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                    width: '100%',
                   }}
                 >
                   خروج از حساب
                 </button>
-              </>
-            ) : (
-              <>
+              ) : (
                 <Link
                   href="/login"
                   onClick={close}
                   style={{
-                    display: 'block', textAlign: 'center', borderRadius: '8px',
-                    border: '1px solid #E5E5E5', padding: '14px',
-                    fontSize: '15px', fontWeight: 600, color: '#171717',
+                    display: 'block', textAlign: 'center',
+                    border: '1px solid #E5E5E5',
+                    borderRadius: 10, padding: '13px',
+                    fontSize: 15, fontWeight: 600, color: '#171717', textDecoration: 'none',
                   }}
                 >
                   ورود / ثبت‌نام
                 </Link>
-                <Link
-                  href="/#studios"
-                  onClick={close}
-                  className="block text-center text-white"
-                  style={{ background: '#8B1E1E', borderRadius: '8px', padding: '14px', fontSize: '15px', fontWeight: 700 }}
-                >
-                  رزرو پلاتو
-                </Link>
-              </>
-            )}
+              )}
+            </div>
           </div>
-
-          {/* divider دوم */}
-          <div style={{ height: '1px', background: '#EFEFEF', margin: '16px 0' }} />
-
-          {/* بخش ۳ — اطلاعات تماس */}
-          <div style={{ padding: '16px', background: '#FAFAFA', borderRadius: '8px' }}>
-            <p style={{ fontSize: '13px', fontWeight: 700, color: '#171717', marginBottom: '8px' }}>
-              خانه دی — کافه‌گالری فرهنگی معاصر
-            </p>
-            <p style={{ fontSize: '12px', color: '#717171', fontWeight: 300 }}>
-              تهران | @Dey___house
-            </p>
-          </div>
-        </div>
+        </>
       )}
 
       <style>{`
-        @keyframes mobileMenuIn {
-          from { transform: translateY(-8px); opacity: 0; }
-          to   { transform: translateY(0);    opacity: 1; }
+        @keyframes slideInFromRight {
+          from { transform: translateX(100%); }
+          to   { transform: translateX(0); }
         }
       `}</style>
     </>
@@ -415,22 +401,50 @@ function Footer() {
         <div className="flex flex-col md:flex-row gap-12">
 
           <div className="md:w-[30%] flex flex-col gap-5">
-            <div className="flex items-center gap-3">
-              <Logo size="md" light />
-              <span className="text-white font-bold text-body">خانه دی</span>
+            <div className="flex items-center mb-5">
+              <Image
+                src="/images/logo.png"
+                alt="خانه دی"
+                width={140}
+                height={46}
+                className="object-contain"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
             </div>
+
             <p className="text-white/40 text-base font-light leading-loose">
               برای زندگی تازه‌ای که هنوز نزیسته‌ایم
             </p>
-            <div className="flex flex-col gap-2 mt-1">
-              <span className="text-white/40 text-sm">تهران، خیابان ولیعصر</span>
-              <span className="text-white/40 text-sm">۰۲۱-۸۸۴۴-۵۵۶۶</span>
-              <a
-                href="mailto:info@deyhouse.ir"
-                className="text-white/40 text-sm hover:text-white/80 transition-colors duration-200"
-              >
-                info@deyhouse.ir
-              </a>
+
+            {/* آدرس */}
+            <div className="flex items-start gap-2">
+              <MapPin size={14} className="flex-shrink-0 mt-0.5" style={{ opacity: 0.5, color: 'white' }} />
+              <p className="font-light leading-relaxed" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
+                خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳
+              </p>
+            </div>
+
+            {/* شماره‌های تماس */}
+            <div className="flex flex-col gap-2">
+              {[
+                { label: 'کافه',  tel: '09029282135', display: '۰۹۰۲۹۲۸۲۱۳۵' },
+                { label: 'پلاتو', tel: '09020282145', display: '۰۹۰۲۰۲۸۲۱۴۵' },
+                { label: 'گالری', tel: '09189282145', display: '۰۹۱۸۹۲۸۲۱۴۵' },
+              ].map(({ label, tel, display }) => (
+                <div key={tel} className="flex items-center gap-2">
+                  <Phone size={13} style={{ opacity: 0.4, color: 'white', flexShrink: 0 }} />
+                  <span className="font-light" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>
+                    {label}
+                  </span>
+                  <a
+                    href={`tel:${tel}`}
+                    className="font-light transition-colors hover:text-white"
+                    style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', direction: 'ltr', display: 'inline-block' }}
+                  >
+                    {display}
+                  </a>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -486,7 +500,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className={isHomePage ? 'flex-1' : 'flex-1 pt-[68px]'}>
+      <main className={isHomePage ? 'flex-1' : 'flex-1 pt-[60px] lg:pt-[68px]'}>
         {children}
       </main>
       <Footer />

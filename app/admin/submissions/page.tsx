@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Mail, Phone, Download, Globe, Link as LinkIcon, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import { Mail, Phone, Download, Globe, LinkIcon, ChevronDown, ChevronUp, ExternalLink } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 
 type ArtworkItem = { url: string; description: string }

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import StatCard from '@/components/admin/StatCard'
-import { BookOpen, Users, Calendar, Palette } from 'lucide-react'
+import { BookOpen, Users, Calendar, Palette } from '@/components/ui/icons'
 
 function statusLabel(s: string) {
   return s === 'PENDING' ? 'در انتظار' : s === 'CONFIRMED' ? 'تایید شده' : 'لغو شده'

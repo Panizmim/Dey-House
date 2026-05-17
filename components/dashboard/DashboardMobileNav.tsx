@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, CalendarDays, CreditCard } from 'lucide-react'
+import { User, CalendarDays, CreditCard, Home } from '@/components/ui/icons'
 
 const items = [
+  { label: 'خانه',      icon: Home,         href: '/'                   },
   { label: 'رزروها',    icon: CalendarDays, href: '/dashboard/bookings' },
   { label: 'پروفایل',   icon: User,         href: '/dashboard/profile'  },
   { label: 'پرداخت‌ها', icon: CreditCard,   href: '/dashboard/payments' },
@@ -21,7 +22,7 @@ export function DashboardMobileNav() {
       zIndex: 50,
     }}>
       {items.map(({ label, icon: Icon, href }) => {
-        const active = pathname === href || pathname.startsWith(href + '/')
+        const active = href === '/' ? pathname === '/' : (pathname === href || pathname.startsWith(href + '/'))
         return (
           <Link
             key={href}

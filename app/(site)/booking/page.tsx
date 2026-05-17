@@ -287,7 +287,7 @@ export default function BookingPage() {
                       <div className="flex gap-4 mt-2">
                         <span className="text-xs text-neutral-400">ظرفیت: {s.capacity} نفر</span>
                         <span className="text-xs font-medium text-brand">
-                          {s.pricePerHour.toLocaleString('fa-IR')} تومان/ساعت
+                          {s.pricePerHour.toLocaleString('fa-IR')} <span className="font-bold">تومان</span>/ساعت
                         </span>
                       </div>
                     </div>
@@ -400,7 +400,7 @@ export default function BookingPage() {
               ))}
               <div className="flex justify-between items-center px-5 py-4 bg-brand-light rounded-b-card">
                 <span className="font-bold text-neutral-900">مبلغ قابل پرداخت</span>
-                <span className="font-heavy text-brand text-lg">{totalPrice.toLocaleString('fa-IR')} تومان</span>
+                <span className="font-heavy text-brand text-lg">{totalPrice.toLocaleString('fa-IR')} <span className="font-bold">تومان</span></span>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { ChevronLeft, MapPin, Calendar, Clock } from 'lucide-react'
+import { ChevronLeft, MapPin, Calendar, Clock } from '@/components/ui/icons'
 import { db } from '@/lib/db'
 import EventGallery from './EventGallery'
 import EventDescriptionExpand from './EventDescriptionExpand'
@@ -11,6 +11,16 @@ export const dynamic = 'force-dynamic'
 
 interface Props {
   params: { slug: string }
+}
+
+const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
+
+function formatTime(time: string): string {
+  if (!time) return ''
+  const [hh, mm] = time.split(':').map(Number)
+  const period = hh >= 12 ? 'بعدازظهر' : 'صبح'
+  const h12 = hh % 12 || 12
+  return `${toFa(h12)}:${toFa(String(mm).padStart(2, '0'))} ${period}`
 }
 
 const typeGradients: Record<string, string> = {
@@ -123,7 +133,7 @@ export default async function EventDetailPage({ params }: Props) {
             <Clock size={16} style={{ color: '#8B1E1E', marginTop: 3, flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', letterSpacing: '0.06em', marginBottom: 2 }}>ساعت</p>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{event.time}</p>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{formatTime(event.time)}</p>
             </div>
           </div>
 

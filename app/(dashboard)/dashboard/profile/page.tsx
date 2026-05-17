@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import { Pencil, Eye, EyeOff, Lock, User, Phone, Mail } from 'lucide-react'
+import { Pencil, Eye, EyeOff, Lock, User, Phone, Mail } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 
 /* ────────────────────────────── helpers ───────────────────────────────── */
@@ -135,30 +135,52 @@ export default function ProfilePage() {
   async function handleSaveProfile() {
     setSaving(true)
     try {
-      let imageUrl: string | undefined
+      let imageUrl: string | null = (session?.user?.image as string | null | undefined) ?? null
+
       if (avatarFile) {
         const fd = new FormData()
         fd.append('file', avatarFile)
-        fd.append('folder', 'avatars')
-        const up = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-        if (up.ok) { const j = await up.json(); imageUrl = j.url }
+        const up = await fetch('/api/user/upload', { method: 'POST', body: fd })
+        if (!up.ok) {
+          const err = await up.json().catch(() => ({}))
+          toast.error(err.error ?? 'خطا در آپلود تصویر')
+          return
+        }
+        const data = await up.json()
+        imageUrl = data.url
       }
 
       const res = await fetch('/api/user/profile', {
         method:  'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ name: name.trim(), phone: phone || undefined, image: imageUrl }),
+        body:    JSON.stringify({
+          name:  name.trim() || session?.user?.name,
+          phone: phone || undefined,
+          image: imageUrl,
+        }),
       })
 
-      if (res.ok) {
-        await update({ name: name.trim(), image: imageUrl })
-        toast.success('اطلاعات با موفقیت ذخیره شد')
-        setEditing(false)
-        setAvatarFile(null)
-      } else {
-        const j = await res.json().catch(() => ({}))
-        toast.error(j.error ?? 'خطا در ذخیره اطلاعات')
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        toast.error(err.error ?? 'خطا در ذخیره اطلاعات')
+        return
       }
+
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          name:  name.trim() || session?.user?.name,
+          image: imageUrl,
+        },
+      })
+
+      toast.success('اطلاعات با موفقیت ذخیره شد')
+      setAvatarFile(null)
+      setEditing(false)
+    } catch (err) {
+      console.error('Save error:', err)
+      toast.error('خطای غیرمنتظره. دوباره تلاش کنید')
     } finally {
       setSaving(false)
     }

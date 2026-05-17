@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { User } from 'lucide-react'
+import { User } from '@/components/ui/icons'
 
 const pageTitles: Record<string, string> = {
   '/admin':                  'خلاصه',

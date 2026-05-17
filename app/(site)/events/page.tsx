@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, ChevronDown } from 'lucide-react'
+import { Search, ChevronDown } from '@/components/ui/icons'
+import PageHero from '@/components/ui/PageHero'
 
 type PublicEvent = {
   id:          string
@@ -130,13 +131,77 @@ export default function EventsPage() {
   const hasFilters = search || selectedTypes.length > 0 || activeOnly
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 32px 80px' }}>
+    <>
+      <PageHero
+        title="رویدادها"
+        subtitle="برای زندگی تازه‌ای که هنوز نزیسته‌ایم"
+      />
 
-      {/* عنوان */}
-      <div style={{ marginBottom: 36 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#171717', marginBottom: 6 }}>رویدادها</h1>
-        <p style={{ fontSize: 14, color: '#717171' }}>رویدادهای فرهنگی و هنری خانه دی</p>
+    {/* ══ موبایل ══ */}
+    <div className="md:hidden">
+      {/* فیلتر بالا */}
+      <div className="sticky z-30 bg-white border-b border-[#F0F0F0]" style={{ top: 60 }}>
+        {/* سرچ */}
+        <div className="px-4 pt-3 pb-2">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid #E5E5E5', borderRadius: 10, padding: '9px 14px', background: 'white' }}
+            onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+            onBlurCapture={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
+          >
+            <Search size={14} style={{ color: '#A0A0A0', flexShrink: 0 }} />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="جستجو رویداد..."
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#171717', background: 'transparent', fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
+            />
+          </div>
+        </div>
+        {/* تب‌های نوع رویداد */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-3">
+          {EVENT_TYPES.map((t) => (
+            <button
+              key={t}
+              onClick={() => toggleType(t)}
+              className="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150"
+              style={{
+                background: selectedTypes.includes(t) ? '#8B1E1E' : 'white',
+                borderColor: selectedTypes.includes(t) ? '#8B1E1E' : '#EFEFEF',
+                color: selectedTypes.includes(t) ? 'white' : '#404040',
+              }}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* تعداد نتایج */}
+      <div className="px-4 pt-4 pb-2">
+        <p style={{ fontSize: 13, color: '#A0A0A0' }}>
+          {loading ? 'در حال بارگذاری...' : `${filtered.length} رویداد`}
+        </p>
+      </div>
+
+      {/* گرید کارت‌ها */}
+      <div className="px-4 pb-10">
+        {loading ? (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+            {[1,2,3,4].map((i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#A0A0A0', fontSize: 14 }}>
+            رویدادی با این فیلترها یافت نشد
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+            {filtered.map((event) => <EventCard key={event.id} event={event} />)}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div className="hidden md:block" style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 32px 80px' }}>
 
       <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 40, alignItems: 'start' }}>
 
@@ -279,5 +344,6 @@ export default function EventsPage() {
 
       </div>
     </div>
+    </>
   )
 }

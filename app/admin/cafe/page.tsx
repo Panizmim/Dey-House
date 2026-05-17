@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2, ImageOff } from 'lucide-react'
+import { Plus, Pencil, Trash2, ImageOff } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import CafeItemModal, { type CafeMenuItem } from '@/components/admin/CafeItemModal'
 

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { User, CalendarDays, CreditCard, LogOut, MessageCircle } from 'lucide-react'
+import { User, CalendarDays, CreditCard, LogOut, MessageCircle } from '@/components/ui/icons'
 
 
 const menuItems = [
@@ -30,15 +30,14 @@ export function DashboardSidebar() {
       top: 20,
     }}>
       {/* لوگو */}
-      <div style={{ marginBottom: 32 }}>
-        <Link href="/" title="بازگشت به سایت">
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
+        <Link href="/">
           <Image
             src="/images/logo.png"
             alt="خانه دی"
-            width={96}
+            width={120}
             height={40}
             className="object-contain"
-            style={{ filter: 'invert(20%) sepia(80%) saturate(500%) hue-rotate(320deg)' }}
           />
         </Link>
       </div>

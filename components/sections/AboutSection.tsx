@@ -28,11 +28,11 @@ export function AboutSection() {
 
           <h2
             style={{
-              fontSize:      'clamp(28px, 3.2vw, 40px)',
+              fontSize:      'clamp(24px, 3vw, 36px)',
               fontWeight:    900,
               color:         '#171717',
-              letterSpacing: '-0.025em',
-              lineHeight:    1.15,
+              letterSpacing: '-0.02em',
+              lineHeight:    1.2,
               marginBottom:  28,
             }}
           >
@@ -50,10 +50,10 @@ export function AboutSection() {
 
           <p
             style={{
-              fontSize:   'clamp(14px, 1.5vw, 16px)',
-              fontWeight: 300,
-              color:      '#717171',
-              lineHeight: 2.3,
+              fontSize:   'clamp(14px, 1.5vw, 17px)',
+              fontWeight: 400,
+              color:      '#404040',
+              lineHeight: 2.0,
             }}
           >
             خانه‌دی، یک خانه‌ی قدیمی‌ست که با احیائ دوباره‌اش، جانی تازه گرفته تا بستری برای جریان هنر، گفت‌وگو و تجربه‌های جمعی باشد؛ جایی که کافه-‌گالری در کنار فضاهای دیگر، امکانِ مواجهه و زیستن در امتداد هنر را فراهم می‌کند. خانه دی در روزهایی متولد شد که ادامه‌دادن، خود شکلی از امید بود؛ و حالا تلاش می‌کند فضایی باشد برای روایت‌های تازه، برای دیدن، بودن و ادامه داشتن، برای زندگی تازه‌ای که هنوز نزیسته‌ایم.

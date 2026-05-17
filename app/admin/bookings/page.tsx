@@ -32,6 +32,8 @@ function PayBadge({ status }: { status: string }) {
     : <span style={{ background: '#F3F4F6', color: '#6B7280', borderRadius: 4, padding: '2px 8px', fontSize: 12, fontWeight: 600 }}>پرداخت نشده</span>
 }
 
+const toFa = (s: string) => s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
+
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading]   = useState(true)
@@ -120,7 +122,7 @@ export default function AdminBookingsPage() {
                     </td>
                     <td style={{ padding: '12px 14px', fontSize: 13, whiteSpace: 'nowrap' }}>{b.studio.name}</td>
                     <td style={{ padding: '12px 14px', fontSize: 13, whiteSpace: 'nowrap' }}>{new Date(b.date).toLocaleDateString('fa-IR')}</td>
-                    <td style={{ padding: '12px 14px', fontSize: 13, whiteSpace: 'nowrap' }}>{b.startTime}–{b.endTime}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 13, whiteSpace: 'nowrap' }}>{toFa(b.startTime)}–{toFa(b.endTime)}</td>
                     <td style={{ padding: '12px 14px', fontSize: 13, whiteSpace: 'nowrap' }}>{b.type}</td>
                     <td style={{ padding: '12px 14px', fontSize: 13, whiteSpace: 'nowrap' }}>{b.totalPrice.toLocaleString('fa-IR')}</td>
                     <td style={{ padding: '12px 14px' }}><PayBadge status={b.paymentStatus} /></td>

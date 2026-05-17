@@ -1,6 +1,6 @@
 'use client'
 
-import { Share2 } from 'lucide-react'
+import { Share2 } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 
 export default function EventShareButton({ title }: { title: string }) {

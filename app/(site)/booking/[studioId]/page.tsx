@@ -1,18 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
   Star, MapPin, Grid2x2, X, ChevronLeft, ChevronRight,
   Lightbulb, Monitor, Scan, Wind, Volume2, Square, Wifi,
-  Maximize2, Armchair, Layers, PaintBucket,
-} from 'lucide-react'
-import { DayPicker } from 'react-day-picker'
-import 'react-day-picker/style.css'
-import { faIR } from 'date-fns/locale'
+  Maximize2, Armchair, Layers, PaintBucket, Calendar,
+  MessageCircle, CheckCircle,
+} from '@/components/ui/icons'
 import toast from 'react-hot-toast'
-import { toPersianNum, toJalali } from '@/lib/utils'
+import DateTimePickerModal from '@/components/ui/DateTimePickerModal'
+import { toPersianNum } from '@/lib/utils'
+import { PERSIAN_MONTHS, toJalali, toPersian, TIME_SLOTS } from '@/lib/jalali'
 
 /* ─── آیکون‌ها ─── */
 const iconMap: Record<string, React.ElementType> = {
@@ -120,7 +120,6 @@ const studiosData = {
 
 type StudioId = keyof typeof studiosData
 
-const TIME_SLOTS = ['۹:۰۰','۱۰:۰۰','۱۱:۰۰','۱۲:۰۰','۱۴:۰۰','۱۵:۰۰','۱۶:۰۰','۱۷:۰۰','۱۸:۰۰','۱۹:۰۰','۲۰:۰۰']
 
 /* ─── ستاره‌ها ─── */
 function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
@@ -138,12 +137,71 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
   const studio = studiosData[params.studioId as StudioId]
   if (!studio) notFound()
 
-  const [descExpanded, setDescExpanded] = useState(false)
-  const [step, setStep]                 = useState<'idle' | 'date' | 'time'>('idle')
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [startTime, setStartTime]       = useState<string | null>(null)
-  const [endTime, setEndTime]           = useState<string | null>(null)
-  const [lightbox, setLightbox]         = useState<{ open: boolean; index: number }>({ open: false, index: 0 })
+  const [descExpanded, setDescExpanded]           = useState(false)
+  const [showPicker, setShowPicker]               = useState(false)
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null)
+  const [selectedEndDate, setSelectedEndDate]     = useState<Date | null>(null)
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null)
+  const [selectedEndTime, setSelectedEndTime]     = useState<string | null>(null)
+  const [isMultiDay, setIsMultiDay]               = useState(false)
+  const [lightbox, setLightbox]                   = useState<{ open: boolean; index: number }>({ open: false, index: 0 })
+  const [usageType, setUsageType]                 = useState<'theater' | 'other' | null>(null)
+  const [loading, setLoading]                     = useState(false)
+  const [showSuccess, setShowSuccess]             = useState(false)
+  const [showUsageSheet, setShowUsageSheet]       = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const galleryScrollRef = useRef<HTMLDivElement>(null)
+
+  const resetSelection = () => {
+    setSelectedStartDate(null)
+    setSelectedEndDate(null)
+    setSelectedStartTime(null)
+    setSelectedEndTime(null)
+    setIsMultiDay(false)
+  }
+
+  const handleBooking = () => {
+    if (!selectedStartDate || !selectedStartTime || !selectedEndTime) return
+    toast.success('در حال انتقال به درگاه پرداخت...')
+  }
+
+  const handleContactRequest = async () => {
+    if (!selectedStartDate) return
+    setLoading(true)
+    try {
+      const j = toJalali(selectedStartDate)
+      const dateStr = `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]} ${toPersian(j.jy)}`
+      const endPart = selectedEndDate
+        ? (() => { const je = toJalali(selectedEndDate); return ` تا ${toPersian(je.jd)} ${PERSIAN_MONTHS[je.jm - 1]}` })()
+        : ''
+
+      const res = await fetch('/api/contact-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'کاربر مهمان',
+          email: '',
+          phone: '',
+          usageType: 'سایر موارد',
+          message: `درخواست رزرو ${studio.name} — تاریخ: ${dateStr}${endPart}`,
+        }),
+      })
+      if (!res.ok) throw new Error()
+      setShowSuccess(true)
+    } catch {
+      toast.error('خطا در ثبت درخواست. لطفاً دوباره تلاش کنید.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleGalleryScroll() {
+    const el = galleryScrollRef.current
+    if (!el || el.clientWidth === 0) return
+    const scrolled = Math.abs(el.scrollLeft)
+    const index = Math.round(scrolled / el.clientWidth)
+    setCurrentImageIndex(Math.min(index, studio.images.length - 1))
+  }
 
   /* body overflow برای lightbox */
   useEffect(() => {
@@ -166,368 +224,821 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
     return () => window.removeEventListener('keydown', handler)
   }, [lightbox, studio.images.length])
 
-  const startIdx   = startTime ? TIME_SLOTS.indexOf(startTime) : -1
-  const endIdx     = endTime   ? TIME_SLOTS.indexOf(endTime)   : -1
-  const hours      = startIdx >= 0 && endIdx > startIdx ? endIdx - startIdx : 0
+  const startIdx   = selectedStartTime ? TIME_SLOTS.indexOf(selectedStartTime) : -1
+  const endIdx     = selectedEndTime   ? TIME_SLOTS.indexOf(selectedEndTime)   : -1
+  const hours      = !isMultiDay && startIdx >= 0 && endIdx > startIdx ? endIdx - startIdx : 0
   const totalPrice = hours * studio.pricePerHour
-
-  const formatDate = (d: Date) => toJalali(d)
 
   return (
     <div style={{ background: 'white', minHeight: '100vh' }}>
 
-      {/* ─── breadcrumb (بالای گالری — navbar روی سفید) ─── */}
-      <div className="bg-white border-b border-[#EFEFEF]" style={{ paddingTop: 68 }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <nav className="flex items-center gap-1 text-sm text-[#717171] py-4">
-            <Link href="/" className="hover:text-[#171717] transition-colors" style={{ textDecoration: 'none', color: 'inherit' }}>
-              خانه
-            </Link>
-            <ChevronLeft size={14} color="#C0C0C0" />
-            <Link href="/#studios" className="hover:text-[#171717] transition-colors" style={{ textDecoration: 'none', color: 'inherit' }}>
-              رزرو فضا
-            </Link>
-            <ChevronLeft size={14} color="#C0C0C0" />
-            <span style={{ color: '#171717', fontWeight: 600 }}>{studio.name}</span>
-          </nav>
+      {/* ══════ موبایل ══════ */}
+      <div className="md:hidden">
+
+        {/* ─── گالری ─── */}
+        <div className="relative w-full overflow-hidden" style={{ height: '70vw' }}>
+          <div
+            ref={galleryScrollRef}
+            dir="ltr"
+            className="flex h-full overflow-x-auto snap-x snap-mandatory no-scrollbar"
+            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' } as React.CSSProperties}
+            onScroll={handleGalleryScroll}
+          >
+            {studio.images.map((img, i) => (
+              <div key={i} className="flex-shrink-0 w-full h-full snap-center relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img} alt={studio.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                <div className="absolute inset-0 -z-10" style={{ background: studio.gradient }} />
+              </div>
+            ))}
+          </div>
+          <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-white font-bold" style={{ fontSize: 12, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}>
+            {toPersian(currentImageIndex + 1)} / {toPersian(studio.images.length)}
+          </div>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {studio.images.map((_, i) => (
+              <div key={i} className="rounded-full transition-all duration-300" style={{ width: i === currentImageIndex ? '16px' : '6px', height: '6px', background: i === currentImageIndex ? 'white' : 'rgba(255,255,255,0.5)' }} />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* ─── گالری تصاویر ─── */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 32px 0' }}>
-        <div style={{
-          position: 'relative', display: 'grid',
-          gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr',
-          gap: 8, height: 480, borderRadius: 12, overflow: 'hidden',
-        }}>
-          {/* تصویر بزرگ */}
-          <div
-            style={{ gridRow: 'span 2', position: 'relative', background: studio.gradient, overflow: 'hidden', cursor: 'pointer' }}
-            onClick={() => setLightbox({ open: true, index: 0 })}
-            title="برای بزرگنمایی کلیک کنید"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={studio.images[0]} alt={studio.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+        {/* ─── تغییر ۳: نام وسط‌چین + امتیاز + متراژ ─── */}
+        <div className="px-4 pt-5 pb-4 border-b border-[#F0F0F0] text-center">
+          <h1 className="text-[24px] font-black text-[#171717] mb-2">{studio.name}</h1>
+          <div className="flex items-center justify-center gap-1.5 mb-2">
+            <Star size={16} fill="#FFB400" color="#FFB400" />
+            <span className="text-[16px] font-bold text-[#171717]">{studio.rating.toLocaleString('fa-IR')}</span>
+            <span className="text-[14px] text-[#A0A0A0]">({toPersian(studio.reviewCount)} نظر)</span>
           </div>
-          {/* تصویر ۲ */}
-          <div
-            style={{ position: 'relative', background: studio.gradient, overflow: 'hidden', cursor: 'pointer' }}
-            onClick={() => setLightbox({ open: true, index: 1 })}
-            title="برای بزرگنمایی کلیک کنید"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={studio.images[1] ?? studio.images[0]} alt={studio.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
-          </div>
-          {/* تصویر ۳ */}
-          <div
-            style={{ position: 'relative', background: studio.gradient, overflow: 'hidden', cursor: 'pointer' }}
-            onClick={() => setLightbox({ open: true, index: 2 })}
-            title="برای بزرگنمایی کلیک کنید"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={studio.images[2] ?? studio.images[0]} alt={studio.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
-          </div>
+          <p className="text-[15px] text-[#717171] font-light">{studio.area}</p>
+        </div>
 
-          {/* دکمه نمایش همه */}
+        {/* ─── تغییر ۴: مشخصات کلی با آیکون ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <h2 className="text-[19px] font-black text-[#171717] mb-4">مشخصات کلی فضا</h2>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <Armchair size={20} color="#717171" style={{ flexShrink: 0 }} />
+              <span className="text-[16px] text-[#404040] font-light">{toPersian(studio.chairCount)} صندلی</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Layers size={20} color="#717171" style={{ flexShrink: 0 }} />
+              <span className="text-[16px] text-[#404040] font-light">جنس کف: {studio.floorType}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <PaintBucket size={20} color="#717171" style={{ flexShrink: 0 }} />
+              <span className="text-[16px] text-[#404040] font-light">جنس دیوار: {studio.wallType}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── توضیحات ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <h2 className="text-[19px] font-black text-[#171717] mb-3">توضیحات</h2>
+          <p className="text-[16px] text-[#404040] font-light leading-loose" style={{ whiteSpace: 'pre-line' }}>
+            {studio.description}
+          </p>
+        </div>
+
+        {/* ─── تغییر ۲: امکانات زیر هم بدون استروک ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <h2 className="text-[19px] font-black text-[#171717] mb-4">امکانات</h2>
+          <div className="flex flex-col gap-4">
+            {studio.amenities.map((amenity, i) => {
+              const AmenityIcon = iconMap[amenity.icon]
+              return (
+                <div key={i} className="flex items-center gap-3">
+                  {AmenityIcon && <AmenityIcon size={20} color="#717171" style={{ flexShrink: 0 }} />}
+                  <span className="text-[16px] text-[#404040] font-light">{amenity.label}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* ─── تاریخ رزرو ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <h2 className="text-[19px] font-black text-[#171717] mb-3">تاریخ رزرو</h2>
           <button
-            onClick={() => setLightbox({ open: true, index: 0 })}
-            style={{
-              position: 'absolute', bottom: 16, left: 16,
-              background: 'white', border: '1px solid #E5E5E5',
-              borderRadius: 8, padding: '8px 16px',
-              fontSize: 13, fontWeight: 700, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 6,
-            }}
+            onClick={() => { if (!usageType) setShowUsageSheet(true); else setShowPicker(true) }}
+            className="w-full flex items-center justify-between px-4 py-4 rounded-xl transition-all active:scale-[0.99]"
+            style={{ border: '1.5px solid #E5E5E5', background: 'white' }}
+            onTouchStart={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+            onTouchEnd={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
           >
-            <Grid2x2 size={14} />
-            نمایش همه تصاویر
+            <div className="text-right">
+              {selectedStartDate ? (
+                <>
+                  <p className="text-[13px] font-bold text-[#8B1E1E] mb-0.5">تاریخ انتخاب‌شده</p>
+                  <p className="text-[16px] font-bold text-[#171717]">
+                    {(() => { const j = toJalali(selectedStartDate); return `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]}` })()}
+                    {selectedStartTime && ` — ${selectedStartTime}`}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[13px] font-bold text-[#B0B0B0] mb-0.5 uppercase tracking-wide">تاریخ و ساعت</p>
+                  <p className="text-[16px] text-[#B0B0B0]">انتخاب کنید</p>
+                </>
+              )}
+            </div>
+            <Calendar size={20} color={selectedStartDate ? '#8B1E1E' : '#C0C0C0'} style={{ flexShrink: 0 }} />
           </button>
         </div>
-      </div>
 
-      {/* ─── layout اصلی ─── */}
-      <div style={{
-        maxWidth: 1200, margin: '0 auto', padding: '32px 32px 80px',
-        display: 'grid', gridTemplateColumns: '1fr 380px', gap: 64, alignItems: 'start',
-      }}>
-
-        {/* ══════ ستون راست — محتوا ══════ */}
-        <div>
-
-          {/* هدر */}
-          <div style={{ paddingBottom: 24, marginBottom: 24, borderBottom: '1px solid #EFEFEF' }}>
-            <h1 style={{ fontSize: 28, fontWeight: 900, color: '#171717', marginBottom: 8 }}>
-              {studio.name}
-            </h1>
-
-            {/* اطلاعات متراژ، صندلی، کف، دیوار */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-              <span className="text-sm text-[#717171] font-light flex items-center gap-1">
-                <Maximize2 size={13} />
-                {studio.area}
-              </span>
-              <span className="text-[#D0D0D0]">·</span>
-              <span className="text-sm text-[#717171] font-light flex items-center gap-1">
-                <Armchair size={13} />
-                {toPersianNum(studio.chairCount)} صندلی
-              </span>
-              <span className="text-[#D0D0D0]">·</span>
-              <span className="text-sm text-[#717171] font-light flex items-center gap-1">
-                <Layers size={13} />
-                کف: {studio.floorType}
-              </span>
-              <span className="text-[#D0D0D0]">·</span>
-              <span className="text-sm text-[#717171] font-light flex items-center gap-1">
-                <PaintBucket size={13} />
-                دیوار: {studio.wallType}
-              </span>
+        {/* ─── موقعیت مکانی ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <h2 className="text-[19px] font-black text-[#171717] mb-3">موقعیت مکانی</h2>
+          <a href="https://nshn.ir/_bvk7KWxiB9q" target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none', borderRadius: 12, overflow: 'hidden', height: 180 }}>
+            <div style={{ height: '100%', background: 'linear-gradient(160deg, #e6ede4 0%, #d4e0d0 40%, #c2d4bc 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'relative' }}>
+              <div style={{ position: 'absolute', inset: 0, opacity: 0.12 }}>
+                <div style={{ position: 'absolute', top: '35%', left: 0, right: 0, height: 7, background: 'white', borderRadius: 4 }} />
+                <div style={{ position: 'absolute', top: '65%', left: 0, right: 0, height: 4, background: 'white', borderRadius: 2 }} />
+                <div style={{ position: 'absolute', top: 0, bottom: 0, left: '45%', width: 5, background: 'white', borderRadius: 3 }} />
+              </div>
+              <div style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
+                <MapPin size={22} color="#8B1E1E" />
+              </div>
+              <p style={{ position: 'relative', fontSize: 14, color: '#444', fontWeight: 500 }}>برای مشاهده مسیر کلیک کنید</p>
             </div>
+          </a>
+        </div>
 
-            {/* امتیاز */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, marginTop: 12 }}>
-              <Stars rating={Math.round(studio.rating)} size={14} />
-              <span style={{ fontWeight: 700, color: '#171717' }}>{studio.rating.toLocaleString('fa-IR')}</span>
-              <span style={{ color: '#717171' }}>({studio.reviewCount.toLocaleString('fa-IR')} نظر)</span>
-            </div>
+        {/* ─── نظرات ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <div className="flex items-center gap-2 mb-5">
+            <Star size={18} fill="#171717" color="#171717" />
+            <span className="text-[19px] font-black text-[#171717]">{studio.rating.toLocaleString('fa-IR')}</span>
+            <span className="text-[15px] text-[#717171]">· {toPersian(studio.reviewCount)} نظر</span>
           </div>
-
-          {/* امکانات */}
-          <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 16 }}>امکانات فضا</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              {studio.amenities.map((a, i) => {
-                const Icon = iconMap[a.icon]
-                return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: '1px solid #EFEFEF', borderRadius: 8 }}>
-                    {Icon && <Icon size={18} color="#404040" />}
-                    <span style={{ fontSize: 14, color: '#171717' }}>{a.label}</span>
+          <div className="flex flex-col gap-5">
+            {studio.reviews.map((review) => (
+              <div key={review.id}>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0" style={{ background: '#8B1E1E', fontSize: 16 }}>
+                    {review.avatar}
                   </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* توضیحات */}
-          <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 16 }}>درباره این فضا</h2>
-            <p
-              style={{
-                fontSize: 15, color: '#404040', lineHeight: 2, whiteSpace: 'pre-line',
-                overflow: 'hidden', display: '-webkit-box',
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: descExpanded ? 'unset' : 4,
-              } as React.CSSProperties}
-            >
-              {studio.description}
-            </p>
-            <button
-              onClick={() => setDescExpanded((v) => !v)}
-              style={{ marginTop: 12, color: '#8B1E1E', fontWeight: 700, fontSize: 14, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-            >
-              {descExpanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
-            </button>
-          </div>
-
-          {/* نظرات */}
-          <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Star size={22} fill="#171717" color="#171717" />
-              <span style={{ fontSize: 20, fontWeight: 900, color: '#171717' }}>
-                {studio.rating.toLocaleString('fa-IR')} · {studio.reviewCount.toLocaleString('fa-IR')} نظر
-              </span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 24 }}>
-              {studio.reviews.map((r) => (
-                <div key={r.id}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#8B1E1E', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
-                      {r.avatar}
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{r.name}</p>
-                      <p style={{ fontSize: 12, color: '#717171' }}>{r.date}</p>
-                    </div>
+                  <div>
+                    <p className="text-[16px] font-bold text-[#171717]">{review.name}</p>
+                    <p className="text-[14px] text-[#A0A0A0]">{review.date}</p>
                   </div>
-                  <Stars rating={r.rating} size={12} />
-                  <p style={{ fontSize: 14, color: '#404040', lineHeight: 1.7, marginTop: 8, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3 } as React.CSSProperties}>
-                    {r.text}
-                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* نقشه */}
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 16 }}>موقعیت مکانی</h2>
-            <div style={{ height: 300, background: '#F5F5F5', border: '1px solid #EFEFEF', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-              <MapPin size={32} color="#8B1E1E" />
-              <span style={{ fontSize: 14, color: '#717171' }}>تهران، خانه دی</span>
-            </div>
-            <p style={{ fontSize: 14, color: '#404040', marginTop: 12 }}>{studio.location}</p>
+                <p className="text-[15px] text-[#404040] font-light leading-relaxed pr-[52px]">{review.text}</p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* ══════ ستون چپ — کارت رزرو sticky ══════ */}
-        <div style={{ position: 'sticky', top: 88, alignSelf: 'start' }}>
-          <div style={{ border: '1px solid #E5E5E5', borderRadius: 16, padding: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
-            {/* قیمت */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                <span style={{ fontSize: 22, fontWeight: 900, color: '#171717' }}>
-                  {studio.pricePerHour.toLocaleString('fa-IR')} تومان
-                </span>
-                <span style={{ fontSize: 14, color: '#717171', fontWeight: 300 }}>/ ساعت</span>
+        {/* ─── قوانین کنسلی (موبایل) ─── */}
+        <div className="px-4 py-5 border-b border-[#F0F0F0]">
+          <h2 className="text-[19px] font-black text-[#171717] mb-4">قوانین کنسلی</h2>
+          <div className="flex flex-col gap-3">
+            {[
+              { range: 'بیش از ۴۸ ساعت قبل از رزرو', refund: 'استرداد کامل', color: '#2F9E44', bg: '#EBFBEE' },
+              { range: '۲۴ تا ۴۸ ساعت قبل از رزرو',  refund: 'استرداد ۵۰٪',  color: '#E67700', bg: '#FFF9DB' },
+              { range: 'کمتر از ۲۴ ساعت قبل از رزرو', refund: 'بدون استرداد', color: '#C92A2A', bg: '#FFF0F0' },
+            ].map(({ range, refund, color, bg }) => (
+              <div key={range} className="flex items-center justify-between gap-3 p-3 rounded-xl" style={{ background: bg }}>
+                <p className="text-[14px] text-[#404040] font-light leading-snug">{range}</p>
+                <span className="text-[13px] font-bold flex-shrink-0" style={{ color }}>{refund}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                <Star size={12} fill="#FFB400" color="#FFB400" />
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>{studio.rating.toLocaleString('fa-IR')}</span>
-                <span style={{ fontSize: 13, color: '#717171' }}>({studio.reviewCount.toLocaleString('fa-IR')} نظر)</span>
-              </div>
-            </div>
+            ))}
+          </div>
+          <p className="text-[12px] text-[#A0A0A0] font-light mt-4 leading-relaxed">
+            استرداد وجه ظرف ۷۲ ساعت کاری از طریق روش پرداخت اولیه انجام می‌شود.
+          </p>
+        </div>
 
-            {/* فرم تاریخ و ساعت */}
-            <div style={{ border: '1px solid #E5E5E5', borderRadius: 8, overflow: 'hidden', marginBottom: 12 }}>
-              <button
-                onClick={() => setStep('date')}
-                style={{ width: '100%', padding: '12px 14px', textAlign: 'right', background: 'white', border: 'none', borderBottom: '1px solid #E5E5E5', cursor: 'pointer', display: 'block' }}
-              >
-                <p style={{ fontSize: 10, fontWeight: 700, color: '#171717', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>تاریخ</p>
-                <p style={{ fontSize: 14, color: selectedDate ? '#171717' : '#9CA3AF' }}>
-                  {selectedDate ? formatDate(selectedDate) : 'انتخاب کنید'}
-                </p>
-              </button>
-              <button
-                onClick={() => {
-                  if (!selectedDate) { toast.error('ابتدا تاریخ را انتخاب کنید'); return }
-                  setStep('time')
-                }}
-                style={{ width: '100%', padding: '12px 14px', textAlign: 'right', background: 'white', border: 'none', cursor: 'pointer', display: 'block' }}
-              >
-                <p style={{ fontSize: 10, fontWeight: 700, color: '#171717', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>ساعت</p>
-                <p style={{ fontSize: 14, color: (startTime && endTime) ? '#171717' : '#9CA3AF' }}>
-                  {(startTime && endTime) ? `${startTime} تا ${endTime}` : 'انتخاب کنید'}
-                </p>
-              </button>
-            </div>
-
-            <button
-              style={{ width: '100%', padding: 14, borderRadius: 8, border: 'none', fontSize: 15, fontWeight: 700, color: 'white', cursor: 'pointer', background: (selectedDate && startTime && endTime) ? '#171717' : '#8B1E1E', transition: 'background 200ms' }}
-            >
-              {(selectedDate && startTime && endTime) ? 'ادامه و پرداخت' : 'رزرو فضا'}
-            </button>
-
-            <p style={{ fontSize: 12, color: '#717171', textAlign: 'center', marginTop: 12 }}>
-              هزینه‌ای دریافت نمی‌شود تا تایید نهایی
-            </p>
-
-            {hours > 0 && (
-              <div style={{ borderTop: '1px solid #EFEFEF', marginTop: 16, paddingTop: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#404040', marginBottom: 8 }}>
-                  <span>{studio.pricePerHour.toLocaleString('fa-IR')} × {hours.toLocaleString('fa-IR')} ساعت</span>
-                  <span>{totalPrice.toLocaleString('fa-IR')} تومان</span>
+        {/* ─── تغییر ۵: فضاهای دیگر — دو کارت کنار هم ─── */}
+        <div className="px-4 py-5 mb-28">
+          <h2 className="text-[19px] font-black text-[#171717] mb-4">فضاهای دیگر</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {Object.values(studiosData).filter(s => s.id !== studio.id).map((other) => (
+              <Link key={other.id} href={`/booking/${other.id}`} style={{ textDecoration: 'none' }}>
+                <div className="border border-[#EFEFEF] rounded-xl overflow-hidden" style={{ transition: 'box-shadow 200ms' }}>
+                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={other.images[0]} alt={other.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                    <div className="absolute inset-0 -z-10" style={{ background: other.gradient }} />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-[15px] font-black text-[#171717] mb-1 leading-tight" style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' } as React.CSSProperties}>
+                      {other.name}
+                    </p>
+                    <p className="text-[12px] text-[#717171] font-light mb-2">{other.area}</p>
+                    <p className="text-[13px] font-bold text-[#8B1E1E]">
+                      {toPersian(other.pricePerHour.toLocaleString('fa-IR'))}
+                      <span className="text-[11px] font-light text-[#A0A0A0] mr-1">ت/ساعت</span>
+                    </p>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, fontWeight: 700, color: '#171717' }}>
-                  <span>جمع کل</span>
-                  <span>{totalPrice.toLocaleString('fa-IR')} تومان</span>
-                </div>
-              </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── sticky bar ─── */}
+        <div
+          className="fixed bottom-0 right-0 left-0 z-50 bg-white border-t border-[#EFEFEF] px-4 flex items-center justify-between gap-3"
+          style={{ paddingTop: 14, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)' }}
+        >
+          <div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[13px] text-[#404040] font-light">شروع از:</span>
+              <span className="text-[19px] font-black text-[#171717]">
+                {toPersian(studio.pricePerHour.toLocaleString('fa-IR'))}
+              </span>
+              <span className="text-[19px] font-black text-[#171717]">تومان</span>
+              <span className="text-[12px] text-[#404040] font-light">/ساعت</span>
+            </div>
+            {selectedStartDate && (
+              <button onClick={() => setShowPicker(true)} className="text-[12px] text-[#8B1E1E] font-bold">
+                ویرایش تاریخ ←
+              </button>
             )}
           </div>
+          <button
+            onClick={() => {
+              if (!usageType) setShowUsageSheet(true)
+              else if (!selectedStartDate) setShowPicker(true)
+              else if (usageType === 'theater') handleBooking()
+              else handleContactRequest()
+            }}
+            className="px-7 py-3 rounded-xl text-white font-bold text-[16px] transition-all active:scale-[0.97] flex-shrink-0"
+            style={{ background: '#8B1E1E' }}
+          >
+            {!usageType ? 'رزرو' : !selectedStartDate ? 'انتخاب تاریخ' : usageType === 'theater' ? 'پرداخت' : 'ثبت درخواست'}
+          </button>
         </div>
+
+        {/* ─── bottom sheet انتخاب نوع ─── */}
+        {showUsageSheet && (
+          <>
+            <div className="fixed inset-0 z-[90] bg-black/40" onClick={() => setShowUsageSheet(false)} />
+            <div className="fixed bottom-0 right-0 left-0 z-[100] bg-white rounded-t-2xl px-5 pt-5" style={{ paddingBottom: 'env(safe-area-inset-bottom, 32px)' }}>
+              <div className="w-10 h-1 bg-[#E0E0E0] rounded-full mx-auto mb-5" />
+              <h3 className="text-[19px] font-black text-[#171717] mb-4 text-right">نوع کاربری را انتخاب کنید</h3>
+              <div className="flex flex-col gap-2 mb-4">
+                <button
+                  onClick={() => { setUsageType('theater'); resetSelection() }}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
+                >
+                  <div className="flex-1 text-right">
+                    <p className={`text-[16px] font-bold ${usageType === 'theater' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>تمرین تئاتر</p>
+                    <p className="text-[14px] text-[#A0A0A0] font-light mt-0.5">رزرو آنلاین با پرداخت مستقیم</p>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                    {usageType === 'theater' && <div className="w-2 h-2 rounded-full bg-white" />}
+                  </div>
+                </button>
+                <button
+                  onClick={() => { setUsageType('other'); resetSelection() }}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
+                >
+                  <div className="flex-1 text-right">
+                    <p className={`text-[16px] font-bold ${usageType === 'other' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>سایر موارد</p>
+                    <p className="text-[14px] text-[#A0A0A0] font-light mt-0.5">ورکشاپ، عکاسی، فیلمبرداری، یوگا و...</p>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                    {usageType === 'other' && <div className="w-2 h-2 rounded-full bg-white" />}
+                  </div>
+                </button>
+              </div>
+              <button
+                onClick={() => { setShowUsageSheet(false); if (usageType) setShowPicker(true) }}
+                disabled={!usageType}
+                className="w-full py-3.5 rounded-xl text-white font-bold text-[16px] disabled:opacity-40 mb-4"
+                style={{ background: '#8B1E1E' }}
+              >
+                ادامه
+              </button>
+            </div>
+          </>
+        )}
+
       </div>
+      {/* ══════ END موبایل ══════ */}
 
-      {/* ══════ Popup تقویم ══════ */}
-      {step === 'date' && (
-        <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.4)' }} onClick={() => setStep('idle')} />
-          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'white', borderRadius: 16, padding: 24, width: 360, zIndex: 101, boxShadow: '0 16px 48px rgba(0,0,0,0.16)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#171717' }}>انتخاب تاریخ</h3>
-              <button onClick={() => setStep('idle')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-                <X size={20} color="#717171" />
+      {/* ══════ دسکتاپ ══════ */}
+      <div className="hidden md:block">
+
+        {/* ─── breadcrumb (بالای گالری — navbar روی سفید) ─── */}
+        <div className="bg-white border-b border-[#EFEFEF]" style={{ paddingTop: 68 }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+            <nav className="flex items-center gap-1 text-sm text-[#717171] py-4">
+              <Link href="/" className="hover:text-[#171717] transition-colors" style={{ textDecoration: 'none', color: 'inherit' }}>
+                خانه
+              </Link>
+              <ChevronLeft size={14} color="#C0C0C0" />
+              <Link href="/#studios" className="hover:text-[#171717] transition-colors" style={{ textDecoration: 'none', color: 'inherit' }}>
+                رزرو فضا
+              </Link>
+              <ChevronLeft size={14} color="#C0C0C0" />
+              <span style={{ color: '#171717', fontWeight: 600 }}>{studio.name}</span>
+            </nav>
+          </div>
+        </div>
+
+        {/* ─── گالری تصاویر ─── */}
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 32px 0' }}>
+          <div style={{
+            position: 'relative', display: 'grid',
+            gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr',
+            gap: 8, height: 480, borderRadius: 12, overflow: 'hidden',
+          }}>
+            {/* تصویر بزرگ */}
+            <div
+              style={{ gridRow: 'span 2', position: 'relative', background: studio.gradient, overflow: 'hidden', cursor: 'pointer' }}
+              onClick={() => setLightbox({ open: true, index: 0 })}
+              title="برای بزرگنمایی کلیک کنید"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={studio.images[0]} alt={studio.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            </div>
+            {/* تصویر ۲ */}
+            <div
+              style={{ position: 'relative', background: studio.gradient, overflow: 'hidden', cursor: 'pointer' }}
+              onClick={() => setLightbox({ open: true, index: 1 })}
+              title="برای بزرگنمایی کلیک کنید"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={studio.images[1] ?? studio.images[0]} alt={studio.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            </div>
+            {/* تصویر ۳ */}
+            <div
+              style={{ position: 'relative', background: studio.gradient, overflow: 'hidden', cursor: 'pointer' }}
+              onClick={() => setLightbox({ open: true, index: 2 })}
+              title="برای بزرگنمایی کلیک کنید"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={studio.images[2] ?? studio.images[0]} alt={studio.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            </div>
+
+            {/* دکمه نمایش همه */}
+            <button
+              onClick={() => setLightbox({ open: true, index: 0 })}
+              style={{
+                position: 'absolute', bottom: 16, left: 16,
+                background: 'white', border: '1px solid #E5E5E5',
+                borderRadius: 8, padding: '8px 16px',
+                fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              <Grid2x2 size={14} />
+              نمایش همه تصاویر
+            </button>
+          </div>
+        </div>
+
+        {/* ─── layout اصلی ─── */}
+        <div style={{
+          maxWidth: 1200, margin: '0 auto', padding: '32px 32px 80px',
+          display: 'grid', gridTemplateColumns: '1fr 380px', gap: 64, alignItems: 'start',
+        }}>
+
+          {/* ══════ ستون راست — محتوا ══════ */}
+          <div>
+
+            {/* هدر */}
+            <div style={{ paddingBottom: 24, marginBottom: 24, borderBottom: '1px solid #EFEFEF' }}>
+              <h1 style={{ fontSize: 28, fontWeight: 900, color: '#171717', marginBottom: 8 }}>
+                {studio.name}
+              </h1>
+
+              {/* اطلاعات متراژ، صندلی، کف، دیوار */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                <span className="text-sm text-[#717171] font-light flex items-center gap-1">
+                  <Maximize2 size={13} />
+                  {studio.area}
+                </span>
+                <span className="text-[#D0D0D0]">·</span>
+                <span className="text-sm text-[#717171] font-light flex items-center gap-1">
+                  <Armchair size={13} />
+                  {toPersianNum(studio.chairCount)} صندلی
+                </span>
+                <span className="text-[#D0D0D0]">·</span>
+                <span className="text-sm text-[#717171] font-light flex items-center gap-1">
+                  <Layers size={13} />
+                  کف: {studio.floorType}
+                </span>
+                <span className="text-[#D0D0D0]">·</span>
+                <span className="text-sm text-[#717171] font-light flex items-center gap-1">
+                  <PaintBucket size={13} />
+                  دیوار: {studio.wallType}
+                </span>
+              </div>
+
+              {/* امتیاز */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, marginTop: 12 }}>
+                <Stars rating={Math.round(studio.rating)} size={14} />
+                <span style={{ fontWeight: 700, color: '#171717' }}>{studio.rating.toLocaleString('fa-IR')}</span>
+                <span style={{ color: '#717171' }}>({studio.reviewCount.toLocaleString('fa-IR')} نظر)</span>
+              </div>
+            </div>
+
+            {/* امکانات */}
+            <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 16 }}>امکانات فضا</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {studio.amenities.map((a, i) => {
+                  const Icon = iconMap[a.icon]
+                  return (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: '1px solid #EFEFEF', borderRadius: 8 }}>
+                      {Icon && <Icon size={18} color="#404040" />}
+                      <span style={{ fontSize: 14, color: '#171717' }}>{a.label}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* توضیحات */}
+            <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 16 }}>درباره این فضا</h2>
+              <p
+                style={{
+                  fontSize: 15, color: '#404040', lineHeight: 2, whiteSpace: 'pre-line',
+                  overflow: 'hidden', display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: descExpanded ? 'unset' : 4,
+                } as React.CSSProperties}
+              >
+                {studio.description}
+              </p>
+              <button
+                onClick={() => setDescExpanded((v) => !v)}
+                style={{ marginTop: 12, color: '#8B1E1E', fontWeight: 700, fontSize: 14, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+              >
+                {descExpanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
               </button>
             </div>
-            <div dir="rtl" style={{ display: 'flex', justifyContent: 'center' }}>
-              <DayPicker
-                mode="single"
-                selected={selectedDate ?? undefined}
-                onSelect={(d) => { if (d) { setSelectedDate(d); setStep('idle') } }}
-                locale={faIR}
-                disabled={{ before: new Date() }}
-                modifiersStyles={{
-                  selected: { background: '#8B1E1E', color: 'white', borderRadius: 8 },
-                  today: { fontWeight: 700, color: '#8B1E1E' },
+
+            {/* نظرات */}
+            <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Star size={22} fill="#171717" color="#171717" />
+                <span style={{ fontSize: 20, fontWeight: 900, color: '#171717' }}>
+                  {studio.rating.toLocaleString('fa-IR')} · {studio.reviewCount.toLocaleString('fa-IR')} نظر
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 24 }}>
+                {studio.reviews.map((r) => (
+                  <div key={r.id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#8B1E1E', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
+                        {r.avatar}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{r.name}</p>
+                        <p style={{ fontSize: 12, color: '#717171' }}>{r.date}</p>
+                      </div>
+                    </div>
+                    <Stars rating={r.rating} size={12} />
+                    <p style={{ fontSize: 14, color: '#404040', lineHeight: 1.7, marginTop: 8, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3 } as React.CSSProperties}>
+                      {r.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* نقشه */}
+            <div>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 16 }}>موقعیت مکانی</h2>
+              <a
+                href="https://nshn.ir/_bvk7KWxiB9q"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'block', textDecoration: 'none' }}
+              >
+                <div style={{
+                  height: 260, borderRadius: 12, border: '1px solid #E0E0E0',
+                  background: 'linear-gradient(160deg, #e6ede4 0%, #d4e0d0 40%, #c2d4bc 100%)',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: 12,
+                  cursor: 'pointer', position: 'relative', overflow: 'hidden',
+                  transition: 'border-color 200ms, box-shadow 200ms',
                 }}
-                style={{ fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
-              />
-            </div>
-            <button
-              onClick={() => setStep('idle')}
-              disabled={!selectedDate}
-              style={{ width: '100%', marginTop: 12, padding: '12px', borderRadius: 8, border: 'none', cursor: selectedDate ? 'pointer' : 'not-allowed', background: selectedDate ? '#8B1E1E' : '#E5E5E5', color: selectedDate ? 'white' : '#9CA3AF', fontSize: 14, fontWeight: 700 }}
-            >
-              تایید تاریخ
-            </button>
-          </div>
-        </>
-      )}
+                  onMouseEnter={(e) => {
+                    const t = e.currentTarget as HTMLDivElement
+                    t.style.borderColor = '#8B1E1E'
+                    t.style.boxShadow = '0 4px 20px rgba(139,30,30,0.12)'
+                  }}
+                  onMouseLeave={(e) => {
+                    const t = e.currentTarget as HTMLDivElement
+                    t.style.borderColor = '#E0E0E0'
+                    t.style.boxShadow = 'none'
+                  }}
+                >
+                  {/* خطوط دکوراتیو شبیه خیابان */}
+                  <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
+                    <div style={{ position: 'absolute', top: '30%', left: 0, right: 0, height: 8, background: 'white', borderRadius: 4 }} />
+                    <div style={{ position: 'absolute', top: '60%', left: 0, right: 0, height: 5, background: 'white', borderRadius: 3 }} />
+                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: '40%', width: 6, background: 'white', borderRadius: 3 }} />
+                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: '70%', width: 4, background: 'white', borderRadius: 2 }} />
+                  </div>
 
-      {/* ══════ Popup ساعت ══════ */}
-      {step === 'time' && (
-        <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.4)' }} onClick={() => setStep('idle')} />
-          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'white', borderRadius: 16, padding: 24, width: 440, zIndex: 101, boxShadow: '0 16px 48px rgba(0,0,0,0.16)', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#171717' }}>انتخاب ساعت</h3>
-              <button onClick={() => setStep('idle')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-                <X size={20} color="#717171" />
-              </button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#171717', marginBottom: 12 }}>ساعت شروع</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {TIME_SLOTS.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => { setStartTime(slot); setEndTime(null) }}
-                      style={{ padding: '10px 14px', border: `1px solid ${startTime === slot ? '#8B1E1E' : '#E5E5E5'}`, borderRadius: 8, fontSize: 14, cursor: 'pointer', textAlign: 'center', background: startTime === slot ? '#8B1E1E' : 'white', color: startTime === slot ? 'white' : '#171717', transition: 'all 0.15s' }}
-                    >
-                      {slot}
-                    </button>
-                  ))}
+                  <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
+                      <MapPin size={26} color="#8B1E1E" />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 }}>خانه دی</p>
+                      <p style={{ fontSize: 12, color: '#555', fontWeight: 400 }}>برای مشاهده مسیر کلیک کنید</p>
+                    </div>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: '#8B1E1E', color: 'white',
+                      padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                    }}>
+                      <MapPin size={11} color="white" />
+                      باز کردن در نشان
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#171717', marginBottom: 12 }}>ساعت پایان</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {TIME_SLOTS.map((slot) => {
-                    const si = startTime ? TIME_SLOTS.indexOf(startTime) : -1
-                    const di = TIME_SLOTS.indexOf(slot)
-                    const disabled = si === -1 || di <= si
-                    return (
-                      <button
-                        key={slot}
-                        onClick={() => { if (!disabled) setEndTime(slot) }}
-                        style={{ padding: '10px 14px', border: `1px solid ${endTime === slot ? '#8B1E1E' : '#E5E5E5'}`, borderRadius: 8, fontSize: 14, cursor: disabled ? 'not-allowed' : 'pointer', textAlign: 'center', background: endTime === slot ? '#8B1E1E' : 'white', color: endTime === slot ? 'white' : '#171717', opacity: disabled ? 0.3 : 1, transition: 'all 0.15s' }}
-                      >
-                        {slot}
-                      </button>
-                    )
-                  })}
+              </a>
+
+              <div className="flex items-start gap-3 mt-4">
+                <MapPin size={18} color="#8B1E1E" style={{ flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <p className="text-[13px] font-bold text-[#171717] mb-1">خانه دی</p>
+                  <p className="text-[13px] text-[#717171] font-light leading-relaxed">
+                    تهران — برای مسیریابی روی نقشه کلیک کنید
+                  </p>
+                  <a
+                    href="https://nshn.ir/_bvk7KWxiB9q"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold hover:opacity-75 transition-opacity"
+                    style={{ color: '#8B1E1E' }}
+                  >
+                    مشاهده در نشان
+                    <ChevronLeft size={12} />
+                  </a>
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => { if (startTime && endTime) setStep('idle') }}
-              disabled={!startTime || !endTime}
-              style={{ width: '100%', marginTop: 20, padding: '12px', borderRadius: 8, border: 'none', cursor: (startTime && endTime) ? 'pointer' : 'not-allowed', background: (startTime && endTime) ? '#8B1E1E' : '#E5E5E5', color: (startTime && endTime) ? 'white' : '#9CA3AF', fontSize: 14, fontWeight: 700 }}
-            >
-              تایید ساعت
-            </button>
           </div>
-        </>
+
+          {/* ══════ ستون چپ — کارت رزرو sticky ══════ */}
+          <div style={{ position: 'sticky', top: 88, alignSelf: 'start' }}>
+            <div style={{ border: '1px solid #E5E5E5', borderRadius: 16, padding: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+
+              {/* قیمت */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: '#171717' }}>
+                    {studio.pricePerHour.toLocaleString('fa-IR')}
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#171717' }}>تومان</span>
+                  <span style={{ fontSize: 14, color: '#717171', fontWeight: 300 }}>/ ساعت</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                  <Star size={12} fill="#FFB400" color="#FFB400" />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>{studio.rating.toLocaleString('fa-IR')}</span>
+                  <span style={{ fontSize: 13, color: '#717171' }}>({studio.reviewCount.toLocaleString('fa-IR')} نظر)</span>
+                </div>
+              </div>
+
+              {/* ── انتخاب نوع کاربری ── */}
+              <div className="mb-5">
+                <p className="text-[12px] font-bold text-[#717171] uppercase tracking-wide mb-3 text-right">
+                  نوع کاربری
+                </p>
+                <div className="flex flex-col gap-2">
+
+                  {/* تمرین تئاتر */}
+                  <button
+                    onClick={() => { setUsageType('theater'); resetSelection() }}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
+                  >
+                    <div className="flex-1 text-right">
+                      <p className={`text-[14px] font-bold ${usageType === 'theater' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>
+                        تمرین تئاتر
+                      </p>
+                      <p className="text-[12px] text-[#A0A0A0] font-light mt-0.5">
+                        رزرو آنلاین با پرداخت مستقیم
+                      </p>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                      {usageType === 'theater' && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
+                  </button>
+
+                  {/* سایر موارد */}
+                  <button
+                    onClick={() => { setUsageType('other'); resetSelection() }}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
+                  >
+                    <div className="flex-1 text-right">
+                      <p className={`text-[14px] font-bold ${usageType === 'other' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>
+                        سایر موارد
+                      </p>
+                      <p className="text-[12px] text-[#A0A0A0] font-light mt-0.5">
+                        ورکشاپ، عکاسی، فیلمبرداری، یوگا و...
+                      </p>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                      {usageType === 'other' && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
+                  </button>
+
+                </div>
+              </div>
+
+              {/* ── دکمه انتخاب تاریخ (فقط بعد از انتخاب نوع) ── */}
+              {usageType && (
+                <div className="mb-4">
+                  <button
+                    onClick={() => setShowPicker(true)}
+                    style={{
+                      width: '100%', border: '1px solid #E5E5E5', borderRadius: 12,
+                      padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      cursor: 'pointer', textAlign: 'right', background: 'white',
+                      transition: 'border-color 200ms',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
+                  >
+                    <div>
+                      {selectedStartDate ? (
+                        <>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2 }}>
+                            {isMultiDay ? 'بازه تاریخی' : 'تاریخ و ساعت'}
+                          </p>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>
+                            {(() => {
+                              const j = toJalali(selectedStartDate)
+                              let text = `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]}`
+                              if (selectedEndDate && isMultiDay) {
+                                const je = toJalali(selectedEndDate)
+                                text += ` تا ${toPersian(je.jd)} ${PERSIAN_MONTHS[je.jm - 1]}`
+                              }
+                              if (!isMultiDay && selectedStartTime) {
+                                text += ` — ${selectedStartTime} تا ${selectedEndTime}`
+                              }
+                              return text
+                            })()}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: '#B0B0B0', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2 }}>
+                            {usageType === 'theater' ? 'تاریخ و ساعت' : 'تاریخ درخواستی'}
+                          </p>
+                          <p style={{ fontSize: 14, color: '#B0B0B0' }}>انتخاب کنید</p>
+                        </>
+                      )}
+                    </div>
+                    <Calendar size={18} color="#A0A0A0" />
+                  </button>
+                </div>
+              )}
+
+              {/* ── پیام توضیحی برای سایر موارد بعد از انتخاب تاریخ ── */}
+              {usageType === 'other' && selectedStartDate && (
+                <div className="p-4 rounded-xl mb-4 text-right" style={{ background: '#FFF9F0', border: '1px solid #FFE4B5' }}>
+                  <div className="flex items-start gap-3">
+                    <MessageCircle size={18} color="#E67700" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <p className="text-[13px] font-bold mb-1" style={{ color: '#E67700' }}>قیمت‌گذاری بر اساس نوع استفاده</p>
+                      <p className="text-[13px] text-[#717171] font-light leading-relaxed">
+                        برای این نوع کاربری، قیمت نهایی بستگی به جزئیات پروژه شما دارد.
+                        پس از ثبت درخواست، تیم خانه دی ظرف ۲۴ ساعت با شما تماس گرفته و هزینه دقیق را هماهنگ خواهد کرد.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── خلاصه قیمت — فقط برای تئاتر ── */}
+              {usageType === 'theater' && hours > 0 && !isMultiDay && (
+                <div className="border-t border-[#F0F0F0] pt-4 mb-4">
+                  <div className="flex justify-between text-[13px] mb-2">
+                    <span className="text-[#717171]">{toPersian(hours)} ساعت × {studio.pricePerHour.toLocaleString('fa-IR')} <span className="font-bold">تومان</span></span>
+                    <span className="font-bold text-[#171717]">{totalPrice.toLocaleString('fa-IR')} <span>تومان</span></span>
+                  </div>
+                  <div className="flex justify-between text-[14px] font-bold text-[#171717] border-t border-[#F0F0F0] pt-2 mt-2">
+                    <span>جمع کل</span>
+                    <span>{totalPrice.toLocaleString('fa-IR')} تومان</span>
+                  </div>
+                </div>
+              )}
+
+              {usageType === 'theater' && isMultiDay && selectedStartDate && (
+                <div style={{ borderTop: '1px solid #EFEFEF', marginTop: 0, paddingTop: 12, marginBottom: 16 }}>
+                  <p style={{ fontSize: 13, color: '#8B1E1E', textAlign: 'right' }}>
+                    قیمت رزرو چند روزه پس از هماهنگی تیم خانه دی اعلام می‌شود.
+                  </p>
+                </div>
+              )}
+
+              {/* ── دکمه اصلی ── */}
+              {!usageType && (
+                <button disabled className="w-full py-3.5 rounded-xl text-[15px] font-bold bg-[#F0F0F0] text-[#A0A0A0] cursor-not-allowed">
+                  ابتدا نوع کاربری را انتخاب کنید
+                </button>
+              )}
+
+              {usageType === 'theater' && (
+                <button
+                  onClick={handleBooking}
+                  disabled={!selectedStartDate || !selectedStartTime || !selectedEndTime}
+                  className="w-full py-3.5 rounded-xl text-[15px] font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: '#8B1E1E' }}
+                >
+                  {!selectedStartDate
+                    ? 'تاریخ و ساعت را انتخاب کنید'
+                    : (!selectedStartTime || !selectedEndTime)
+                    ? 'ساعت را انتخاب کنید'
+                    : 'تایید و پرداخت'}
+                </button>
+              )}
+
+              {usageType === 'other' && (
+                <>
+                  <button
+                    onClick={handleContactRequest}
+                    disabled={!selectedStartDate || loading}
+                    className="w-full py-3.5 rounded-xl text-[15px] font-bold transition-all disabled:cursor-not-allowed"
+                    style={{
+                      background: !selectedStartDate ? '#F0F0F0' : 'white',
+                      color: !selectedStartDate ? '#A0A0A0' : '#8B1E1E',
+                      border: !selectedStartDate ? 'none' : '2px solid #8B1E1E',
+                      opacity: loading ? 0.6 : 1,
+                    }}
+                  >
+                    {loading ? 'در حال ثبت...' : !selectedStartDate ? 'تاریخ را انتخاب کنید' : 'ثبت درخواست رزرو رایگان'}
+                  </button>
+                  <p className="text-[11px] text-[#A0A0A0] text-center mt-2 font-light">
+                    بدون پرداخت — تیم ما با شما تماس می‌گیرد
+                  </p>
+                </>
+              )}
+
+            </div>
+
+            {/* ─── قوانین کنسلی (دسکتاپ) ─── */}
+            <div style={{ marginTop: 16, padding: '16px 20px', border: '1px solid #EFEFEF', borderRadius: 12 }}>
+              <p style={{ fontSize: 13, fontWeight: 800, color: '#171717', marginBottom: 12 }}>قوانین کنسلی</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {[
+                  { range: 'بیش از ۴۸ ساعت قبل', refund: 'استرداد کامل', color: '#2F9E44' },
+                  { range: '۲۴ تا ۴۸ ساعت قبل',  refund: 'استرداد ۵۰٪',  color: '#E67700' },
+                  { range: 'کمتر از ۲۴ ساعت قبل', refund: 'بدون استرداد', color: '#C92A2A' },
+                ].map(({ range, refund, color }) => (
+                  <div key={range} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 12, color: '#717171' }}>{range}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color }}>{refund}</span>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 11, color: '#B0B0B0', marginTop: 10, lineHeight: 1.6 }}>
+                استرداد ظرف ۷۲ ساعت کاری از طریق روش پرداخت اولیه
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      {/* ══════ END دسکتاپ ══════ */}
+
+      {/* ══════ مشترک: مودال انتخاب تاریخ و ساعت ══════ */}
+      <DateTimePickerModal
+        open={showPicker}
+        onClose={() => setShowPicker(false)}
+        onConfirm={({ startDate, endDate, startTime, endTime }) => {
+          setSelectedStartDate(startDate)
+          setSelectedEndDate(endDate)
+          setSelectedStartTime(startTime)
+          setSelectedEndTime(endTime)
+          setIsMultiDay(!!(endDate && endDate.getTime() !== startDate.getTime()))
+        }}
+      />
+
+      {/* ══════ صفحه موفقیت سایر موارد ══════ */}
+      {showSuccess && usageType === 'other' && (
+        <div className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center px-8 text-center">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: '#FDF0F0' }}>
+            <CheckCircle size={36} color="#8B1E1E" />
+          </div>
+          <h2 className="text-[24px] font-black text-[#171717] mb-3">درخواست ثبت شد!</h2>
+          <p className="text-[15px] text-[#717171] font-light leading-relaxed max-w-sm mb-2">
+            تیم خانه دی درخواست رزرو شما را دریافت کرد.
+          </p>
+          <p className="text-[14px] text-[#A0A0A0] font-light leading-relaxed max-w-sm mb-8">
+            ظرف ۲۴ ساعت آینده با شما تماس گرفته می‌شود تا جزئیات رزرو و هزینه نهایی هماهنگ شود.
+          </p>
+          <Link
+            href="/"
+            className="px-8 py-3 text-white rounded-xl font-bold text-[15px]"
+            style={{ background: '#8B1E1E' }}
+          >
+            بازگشت به صفحه اصلی
+          </Link>
+        </div>
       )}
 
       {/* ══════ Lightbox ══════ */}

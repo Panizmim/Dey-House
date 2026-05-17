@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 type Payment = {

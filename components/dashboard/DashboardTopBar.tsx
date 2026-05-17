@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { Search, User, CalendarDays, CreditCard, LogOut } from 'lucide-react'
+import { Search, User, CalendarDays, CreditCard, LogOut } from '@/components/ui/icons'
 
 const profileLinks = [
   { icon: User,        label: 'اطلاعات شخصی', href: '/dashboard/profile'  },
@@ -101,14 +101,19 @@ export function DashboardTopBar() {
             }}>
               <div style={{ padding: '14px 16px', borderBottom: '1px solid #F5F5F5' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: '#8B1E1E', color: 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 14, fontWeight: 700, flexShrink: 0,
-                  }}>
-                    {initials}
-                  </div>
+                  {session?.user?.image ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={session.user.image} alt="آواتار" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      background: '#8B1E1E', color: 'white',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14, fontWeight: 700, flexShrink: 0,
+                    }}>
+                      {initials}
+                    </div>
+                  )}
                   <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#171717', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {session?.user?.name}

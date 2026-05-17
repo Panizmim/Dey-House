@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
-import { SlidersHorizontal, ChevronLeft } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { SlidersHorizontal, ChevronLeft, X, AlertCircle } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 type Booking = {
@@ -29,23 +29,30 @@ const studioImageFallback: Record<string, string> = {
   'اتاق سیاه دو': '/images/studios/black-room2-1.jpg',
 }
 
-function BookingRow({ booking }: { booking: Booking }) {
-  const imgSrc = booking.studio.imageUrl ?? studioImageFallback[booking.studio.name] ?? null
-  const [imgErr, setImgErr] = useState(false)
+function BookingRow({ booking, onCancelled }: { booking: Booking; onCancelled: () => void }) {
+  const imgSrc     = booking.studio.imageUrl ?? studioImageFallback[booking.studio.name] ?? null
+  const [imgErr,       setImgErr]      = useState(false)
+  const [confirming,   setConfirming]  = useState(false)
+  const [cancelling,   setCancelling]  = useState(false)
+
+  const canCancel = booking.status === 'PENDING' || booking.status === 'CONFIRMED'
+
+  async function doCancel() {
+    setCancelling(true)
+    const res = await fetch(`/api/bookings/${booking.id}/cancel`, { method: 'PATCH' })
+    setCancelling(false)
+    if (res.ok) { setConfirming(false); onCancelled() }
+  }
 
   return (
     <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 16,
-      padding: 16,
-      border: '1px solid #F0F0F0',
-      borderRadius: 12,
+      border: '1px solid #F0F0F0', borderRadius: 12, overflow: 'hidden',
       transition: 'border-color 150ms',
     }}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#E0E0E0' }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#F0F0F0' }}
     >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16 }}>
       {/* تصویر */}
       <div style={{
         width: 80, height: 64,
@@ -102,20 +109,85 @@ function BookingRow({ booking }: { booking: Booking }) {
       </div>
 
       {/* جزئیات */}
-      <Link
-        href={`/dashboard/bookings/${booking.id}`}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 4,
-          fontSize: 14, fontWeight: 700, color: '#8B1E1E',
-          flexShrink: 0, textDecoration: 'none',
-          transition: 'opacity 150ms',
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7' }}
-        onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
-      >
-        جزئیات
-        <ChevronLeft size={16} />
-      </Link>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
+        <Link
+          href={`/dashboard/bookings/${booking.id}`}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            fontSize: 14, fontWeight: 700, color: '#8B1E1E',
+            textDecoration: 'none', transition: 'opacity 150ms',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7' }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
+        >
+          جزئیات
+          <ChevronLeft size={16} />
+        </Link>
+
+        {canCancel && (
+          <button
+            onClick={() => setConfirming(true)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              fontSize: 12, fontWeight: 600, color: '#C92A2A',
+              fontFamily: 'YekanBakh, Tahoma, sans-serif',
+              transition: 'opacity 150ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.65' }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
+          >
+            <X size={13} />
+            لغو رزرو
+          </button>
+        )}
+      </div>
+
+      </div>{/* end row */}
+
+      {/* ── تأییدیه لغو ── */}
+      {confirming && (
+        <div style={{
+          borderTop: '1px solid #FEE2E2', background: '#FFF8F8',
+          padding: '14px 16px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <AlertCircle size={16} color="#C92A2A" style={{ flexShrink: 0 }} />
+            <p style={{ fontSize: 13, color: '#C92A2A', fontWeight: 600 }}>
+              آیا مطمئنید می‌خواهید این رزرو را لغو کنید؟
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+            <button
+              onClick={() => setConfirming(false)}
+              disabled={cancelling}
+              style={{
+                padding: '6px 14px', borderRadius: 8,
+                border: '1px solid #E5E5E5', background: 'white',
+                fontSize: 13, fontWeight: 600, color: '#404040',
+                cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
+              }}
+            >
+              خیر
+            </button>
+            <button
+              onClick={doCancel}
+              disabled={cancelling}
+              style={{
+                padding: '6px 14px', borderRadius: 8,
+                border: 'none', background: '#C92A2A',
+                fontSize: 13, fontWeight: 700, color: 'white',
+                cursor: cancelling ? 'not-allowed' : 'pointer',
+                opacity: cancelling ? 0.6 : 1,
+                fontFamily: 'YekanBakh, Tahoma, sans-serif',
+              }}
+            >
+              {cancelling ? 'در حال لغو...' : 'بله، لغو شود'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -124,11 +196,16 @@ const tabs = ['همه', 'در انتظار', 'لغو شده', 'تکمیل شده
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState(0)
+  const qc = useQueryClient()
 
   const { data: bookings = [], isLoading } = useQuery<Booking[]>({
     queryKey: ['user-bookings'],
     queryFn:  () => fetch('/api/user/bookings').then((r) => r.json()),
   })
+
+  function handleCancelled() {
+    qc.invalidateQueries({ queryKey: ['user-bookings'] })
+  }
 
   const pending   = bookings.filter((b) => b.status === 'PENDING').length
   const cancelled = bookings.filter((b) => b.status === 'CANCELLED').length
@@ -194,7 +271,7 @@ export default function BookingsPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {filtered.map((b) => <BookingRow key={b.id} booking={b} />)}
+          {filtered.map((b) => <BookingRow key={b.id} booking={b} onCancelled={handleCancelled} />)}
         </div>
       )}
     </div>

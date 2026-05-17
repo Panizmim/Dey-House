@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import ChairIllustration from '@/components/ui/ChairIllustration'
+import Image from 'next/image'
 import PageHero from '@/components/ui/PageHero'
 
 /* ─── داده‌های منو ─── */
@@ -81,18 +81,18 @@ const menuData: Record<string, { name: string; price: string }[]> = {
 }
 
 const categories = [
-  { id: 'espresso-hot',   title: 'نوشیدنی گرم بر پایه اسپرسو', subtitle: 'Hot espresso drinks' },
-  { id: 'espresso-cold',  title: 'نوشیدنی سرد بر پایه اسپرسو', subtitle: 'Cold espresso drinks' },
-  { id: 'tea',            title: 'چای و دمنوش',                 subtitle: 'Tea and herbal infusions' },
-  { id: 'hot-drinks',     title: 'نوشیدنی گرم',                 subtitle: 'Hot drinks' },
-  { id: 'cold-drinks',    title: 'نوشیدنی سرد',                 subtitle: 'Cold drinks' },
-  { id: 'simple-drinks',  title: 'نوشیدنی ساده',                subtitle: 'Simple drinks' },
-  { id: 'snacks',         title: 'میان وعده',                   subtitle: 'Appetizers' },
-  { id: 'salad',          title: 'سالاد',                       subtitle: 'Salads' },
-  { id: 'sandwich',       title: 'ساندویچ',                     subtitle: 'Sandwiches' },
-  { id: 'pasta',          title: 'پاستا',                       subtitle: 'Pasta' },
-  { id: 'plate',          title: 'بشقاب',                       subtitle: 'Main plates' },
-  { id: 'topping',        title: 'تاپینگ',                      subtitle: 'Toppings' },
+  { id: 'cat-espresso-hot',  title: 'نوشیدنی گرم بر پایه اسپرسو', subtitle: 'Hot espresso drinks' },
+  { id: 'cat-espresso-cold', title: 'نوشیدنی سرد بر پایه اسپرسو', subtitle: 'Cold espresso drinks' },
+  { id: 'cat-tea',           title: 'چای و دمنوش',                 subtitle: 'Tea and herbal infusions' },
+  { id: 'cat-hot',           title: 'نوشیدنی گرم',                 subtitle: 'Hot drinks' },
+  { id: 'cat-cold',          title: 'نوشیدنی سرد',                 subtitle: 'Cold drinks' },
+  { id: 'cat-simple',        title: 'نوشیدنی ساده',                subtitle: 'Simple drinks' },
+  { id: 'cat-snacks',        title: 'میان وعده',                   subtitle: 'Appetizers' },
+  { id: 'cat-salad',         title: 'سالاد',                       subtitle: 'Salads' },
+  { id: 'cat-sandwich',      title: 'ساندویچ',                     subtitle: 'Sandwiches' },
+  { id: 'cat-pasta',         title: 'پاستا',                       subtitle: 'Pasta' },
+  { id: 'cat-plate',         title: 'بشقاب',                       subtitle: 'Main plates' },
+  { id: 'cat-topping',       title: 'تاپینگ',                      subtitle: 'Toppings' },
 ]
 
 const placeholderGradients = [
@@ -106,18 +106,21 @@ const placeholderGradients = [
 
 /* ─── scrollToSection ─── */
 function scrollToSection(id: string) {
-  const el = document.getElementById(id)
-  if (!el) return
-  const offset = 88 + (window.innerWidth < 1024 ? 52 : 0)
-  const top = el.getBoundingClientRect().top + window.scrollY - offset
-  window.scrollTo({ top, behavior: 'smooth' })
+  setTimeout(() => {
+    const el = document.getElementById(id)
+    if (!el) return
+    // navbar: 60px + sticky tab bar موبایل: ~52px = 120px
+    const OFFSET = 120
+    const top = el.getBoundingClientRect().top + window.scrollY - OFFSET
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  }, 50)
 }
 
 /* ─── MenuItemCard ─── */
 function MenuItemCard({ item, index }: { item: { name: string; price: string }; index: number }) {
   const gradient = placeholderGradients[index % 6]
   return (
-    <div className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg hover:shadow-md transition-shadow duration-200 bg-white">
+    <div className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg bg-white">
       <div
         className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
         style={{ background: gradient }}
@@ -130,7 +133,7 @@ function MenuItemCard({ item, index }: { item: { name: string; price: string }; 
       </div>
       <div className="flex-shrink-0 text-left">
         <span className="text-sm font-black text-[#8B1E1E]">{item.price}</span>
-        <span className="text-xs text-[#999] mr-1">تومان</span>
+        <span className="text-xs text-[#999] font-bold mr-1">تومان</span>
       </div>
     </div>
   )
@@ -150,7 +153,10 @@ export default function CafePage() {
           }
         }
       },
-      { threshold: 0.3 }
+      {
+        rootMargin: '-130px 0px -60% 0px',
+        threshold: 0,
+      }
     )
 
     categories.forEach((cat) => {
@@ -177,12 +183,12 @@ export default function CafePage() {
       </div>
 
       {/* ─── ناوبار افقی موبایل ─── */}
-      <div className="lg:hidden sticky z-40 bg-white border-b border-[#EFEFEF]" style={{ top: '68px' }}>
+      <div className="lg:hidden sticky z-40 bg-white border-b border-[#EFEFEF]" style={{ top: '60px' }}>
         <div className="flex gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => scrollToSection(cat.id)}
+              onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all duration-150 ${
                 activeSection === cat.id
                   ? 'bg-[#8B1E1E] border-[#8B1E1E] text-white'
@@ -206,7 +212,7 @@ export default function CafePage() {
               return (
                 <button
                   key={cat.id}
-                  onClick={() => scrollToSection(cat.id)}
+                  onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
                   className="w-full text-right transition-all duration-150 hover:bg-[#FAFAFA]"
                   style={{
                     padding: '10px 14px',
@@ -236,7 +242,7 @@ export default function CafePage() {
         <main style={{ flex: 1, minWidth: 0 }}>
           {categories.map((cat, catIdx) => (
             <div key={cat.id}>
-              <section id={cat.id} className="mb-12 scroll-mt-24">
+              <section id={cat.id} className="mb-12 scroll-mt-36">
 
                 {/* عنوان دسته */}
                 <div className="flex items-center gap-4 mb-6">
@@ -262,7 +268,14 @@ export default function CafePage() {
 
               {/* جداکننده صندلی بین نوشیدنی‌ها و خوراکی‌ها */}
               {catIdx === 5 && (
-                <ChairIllustration color="#8B1E1E" opacity={0.15} className="w-full h-28 my-4" />
+                <div className="relative w-full my-4" style={{ height: 80 }}>
+                  <Image
+                    src="/images/chair.png"
+                    alt=""
+                    fill
+                    className="object-contain object-right"
+                  />
+                </div>
               )}
             </div>
           ))}

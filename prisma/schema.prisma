@@ -13,6 +13,7 @@ model User {
   email     String    @unique
   phone     String?
   password  String?
+  image     String?
   role      String    @default("USER")
   bookings  Booking[]
   createdAt DateTime  @default(now())
@@ -42,6 +43,7 @@ model Booking {
   status        String   @default("PENDING")
   totalPrice    Int
   paymentStatus String   @default("UNPAID")
+  authority     String?
   zarinpalRef   String?
   notes         String?
   user          User     @relation(fields: [userId], references: [id])

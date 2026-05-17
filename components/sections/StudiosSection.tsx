@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Star, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Star, ChevronRight, ChevronLeft } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 const studios = [
@@ -162,7 +162,7 @@ function StudioCard({ studio }: { studio: typeof studios[number] }) {
         </div>
 
         {/* تعداد صندلی */}
-        <p className="text-[12px] text-[#A0A0A0] font-light mb-3" style={{ direction: 'ltr', textAlign: 'left' }}>
+        <p className="text-[12px] text-[#A0A0A0] font-light mb-3">
           {toPersianNum(studio.chairCount)} صندلی
         </p>
 
@@ -171,10 +171,12 @@ function StudioCard({ studio }: { studio: typeof studios[number] }) {
 
         {/* قیمت */}
         <div className="flex items-baseline gap-1">
+          <span className="text-[13px] text-[#717171] font-light">شروع از:</span>
           <span className="text-[15px] font-black text-[#171717]">
             {studio.pricePerHour.toLocaleString('fa-IR')}
           </span>
-          <span className="text-[12px] text-[#A0A0A0] font-light">تومان / ساعت</span>
+          <span className="text-[15px] font-black text-[#171717]">تومان</span>
+          <span className="text-[13px] text-[#717171] font-light">/ ساعت</span>
         </div>
 
       </div>
@@ -190,7 +192,10 @@ export function StudiosSection() {
       {/* هدر */}
       <div className="flex items-end justify-between mb-10">
         <div>
-          <h2 className="text-3xl font-black text-[#171717] tracking-tight">
+          <h2
+            className="font-black text-[#171717]"
+            style={{ fontSize: 'clamp(24px, 3vw, 36px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+          >
             رزرو فضا
           </h2>
         </div>

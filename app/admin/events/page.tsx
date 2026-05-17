@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Archive, ArchiveRestore } from 'lucide-react'
+import { Plus, Pencil, Archive, ArchiveRestore } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import EventModal, { type EventRow } from '@/components/admin/EventModal'
 import DataTable, { type Column } from '@/components/admin/DataTable'

@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ImagePlus, X } from 'lucide-react'
+import { ChevronDown, ImagePlus, X } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
 import ImageUploadZone from './ImageUploadZone'
+import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
+import { jalaliToDisplay } from '@/lib/jalali'
 
 export interface EventRow {
   id: string
@@ -33,6 +35,121 @@ const MAX_GALLERY = 8
 const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#8B1E1E] transition-colors'
 const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
 const eventTypes = ['تئاتر', 'نمایشگاه', 'موسیقی', 'ادبی', 'ورکشاپ', 'سایر']
+
+const toFa = (n: number | string) =>
+  String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
+
+/* ─── TimePicker ─── */
+function TimePickerDropdown({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  const HOURS   = Array.from({ length: 12 }, (_, i) => i + 1)
+  const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+
+  const parse = (v: string): { h: number; m: number; p: 'AM' | 'PM' } => {
+    if (!v) return { h: 12, m: 0, p: 'AM' }
+    const [hh, mm] = v.split(':').map(Number)
+    return { h: hh % 12 || 12, m: mm, p: hh >= 12 ? 'PM' : 'AM' }
+  }
+
+  const { h, m, p } = parse(value)
+
+  const commit = (hour: number, min: number, period: 'AM' | 'PM') => {
+    const h24 = period === 'AM' ? (hour === 12 ? 0 : hour) : (hour === 12 ? 12 : hour + 12)
+    onChange(`${String(h24).padStart(2, '0')}:${String(min).padStart(2, '0')}`)
+  }
+
+  const display = value
+    ? `${toFa(h)}:${toFa(String(m).padStart(2, '0'))} ${p === 'AM' ? 'صبح' : 'بعدازظهر'}`
+    : 'انتخاب ساعت'
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const colStyle: React.CSSProperties = {
+    display: 'flex', flexDirection: 'column', gap: 2,
+    maxHeight: 200, overflowY: 'auto',
+  }
+
+  const btnStyle = (active: boolean): React.CSSProperties => ({
+    padding: '6px 4px', borderRadius: 6, border: 'none', cursor: 'pointer',
+    background: active ? '#8B1E1E' : 'transparent',
+    color: active ? 'white' : '#171717',
+    fontSize: 13, fontWeight: active ? 700 : 400,
+    fontFamily: 'YekanBakh, Tahoma, sans-serif',
+    textAlign: 'center',
+    flexShrink: 0,
+  })
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={inputClass}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+      >
+        <span style={{ color: value ? '#171717' : '#A0A0A0', fontSize: 14 }}>{display}</span>
+        <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: open ? 'rotate(180deg)' : 'rotate(0)' }} />
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60,
+          background: 'white', border: '1px solid #E5E5E5', borderRadius: 12,
+          boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
+          width: 224, padding: '12px 10px',
+        }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+
+            {/* ساعت */}
+            <div>
+              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center', letterSpacing: '0.05em' }}>ساعت</p>
+              <div style={colStyle}>
+                {HOURS.map((hour) => (
+                  <button key={hour} type="button" style={btnStyle(h === hour)} onClick={() => commit(hour, m, p)}>
+                    {toFa(hour)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* دقیقه */}
+            <div>
+              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center', letterSpacing: '0.05em' }}>دقیقه</p>
+              <div style={colStyle}>
+                {MINUTES.map((min) => (
+                  <button key={min} type="button" style={btnStyle(m === min)} onClick={() => commit(h, min, p)}>
+                    {toFa(String(min).padStart(2, '0'))}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* صبح / بعدازظهر */}
+            <div>
+              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center', letterSpacing: '0.05em' }}>دوره</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {(['AM', 'PM'] as const).map((period) => (
+                  <button key={period} type="button" style={{ ...btnStyle(p === period), padding: '10px 4px' }} onClick={() => commit(h, m, period)}>
+                    {period === 'AM' ? 'صبح' : 'بعدازظهر'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 async function uploadImage(file: File): Promise<string> {
   const fd = new FormData()
@@ -116,6 +233,8 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const [imageFile, setImageFile]       = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [gallery, setGallery]           = useState<GallerySlot[]>([])
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [selectedDate, setSelectedDate]     = useState<Date | null>(null)
   const [form, setForm] = useState({
     title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false,
   })
@@ -124,16 +243,24 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
     if (!open) return
     setImageFile(null)
     setImagePreview(null)
+    setShowDatePicker(false)
     if (event) {
+      const isoDate = event.date ? event.date.slice(0, 10) : ''
       setForm({
         title:       event.title,
         type:        event.type,
-        date:        event.date ? event.date.slice(0, 10) : '',
+        date:        isoDate,
         time:        event.time ?? '',
         location:    event.location ?? '',
         description: event.description ?? '',
         isFeatured:  event.isFeatured,
       })
+      if (isoDate) {
+        const [y, m, d] = isoDate.split('-').map(Number)
+        setSelectedDate(new Date(y, m - 1, d))
+      } else {
+        setSelectedDate(null)
+      }
       try {
         const saved: string[] = JSON.parse(event.galleryImages || '[]')
         setGallery(saved.map((url) => ({ url, file: null, preview: null })))
@@ -142,6 +269,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       }
     } else {
       setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false })
+      setSelectedDate(null)
       setGallery([])
     }
   }, [event, open])
@@ -249,13 +377,36 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
 
         {/* تاریخ + ساعت */}
         <div className="grid grid-cols-2 gap-3">
-          <div>
+          <div style={{ position: 'relative' }}>
             <label className={labelClass}>تاریخ *</label>
-            <input type="date" className={inputClass} value={form.date} onChange={(e) => set('date', e.target.value)} />
+            <button
+              type="button"
+              onClick={() => setShowDatePicker((v) => !v)}
+              className={inputClass}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+            >
+              <span style={{ color: selectedDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                {selectedDate ? jalaliToDisplay(selectedDate) : 'انتخاب تاریخ'}
+              </span>
+              <ChevronDown size={14} color="#A0A0A0" />
+            </button>
+            {showDatePicker && (
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 50 }}>
+                <JalaliDatePicker
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date)
+                    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+                    set('date', iso)
+                    setShowDatePicker(false)
+                  }}
+                />
+              </div>
+            )}
           </div>
-          <div>
+          <div style={{ position: 'relative' }}>
             <label className={labelClass}>ساعت *</label>
-            <input type="time" className={inputClass} value={form.time} onChange={(e) => set('time', e.target.value)} />
+            <TimePickerDropdown value={form.time} onChange={(v) => set('time', v)} />
           </div>
         </div>
 

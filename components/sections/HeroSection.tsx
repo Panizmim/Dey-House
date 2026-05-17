@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 
 const heroSlides = [
   { id: 1, image: '/images/hero/slide1', gradient: 'linear-gradient(135deg, #1a0808, #2d1010)' },
@@ -18,9 +18,14 @@ const INTERVAL_MS = 5000
 
 export function HeroSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const touchStartX = useRef<number>(0)
 
   const next = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % heroSlides.length)
+  }, [])
+
+  const prev = useCallback(() => {
+    setCurrentIndex((p) => (p - 1 + heroSlides.length) % heroSlides.length)
   }, [])
 
   useEffect(() => {
@@ -29,7 +34,14 @@ export function HeroSection() {
   }, [next])
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: '100vh' }}>
+    <section
+      className="relative w-full overflow-hidden h-[65vh] md:h-screen"
+      onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
+      onTouchEnd={(e) => {
+        const diff = touchStartX.current - e.changedTouches[0].clientX
+        if (Math.abs(diff) > 50) { if (diff > 0) next(); else prev() }
+      }}
+    >
       <div className="absolute inset-0">
         {heroSlides.map((slide, index) => (
           <div

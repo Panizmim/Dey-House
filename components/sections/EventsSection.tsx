@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { ArrowUpRight } from '@/components/ui/icons'
 
 type PublicEvent = {
   id:          string
@@ -14,6 +15,15 @@ type PublicEvent = {
   description: string
   imageUrl?:   string
   gradient:    string
+}
+
+const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
+
+function formatTime(time: string): string {
+  const [hh, mm] = time.split(':').map(Number)
+  const period = hh >= 12 ? 'بعدازظهر' : 'صبح'
+  const h12 = hh % 12 || 12
+  return `${toFa(h12)}:${toFa(String(mm).padStart(2, '0'))} ${period}`
 }
 
 function EventCard({ event }: { event: PublicEvent }) {
@@ -75,18 +85,15 @@ function EventCard({ event }: { event: PublicEvent }) {
           {event.title}
         </h3>
 
-        {/* ردیف: نوع | مکان | تاریخ */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          fontSize: 12, color: '#909090', gap: 6,
-        }}>
-          <span style={{ fontWeight: 500, flexShrink: 0 }}>{event.type}</span>
-          {event.location && (
-            <span style={{ color: '#B8B8B8', flexShrink: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {event.location}
-            </span>
+        {/* تاریخ و ساعت */}
+        <div style={{ fontSize: 12, color: '#909090', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span>{event.date}</span>
+          {event.time && (
+            <>
+              <span style={{ color: '#D0D0D0' }}>·</span>
+              <span>{formatTime(event.time)}</span>
+            </>
           )}
-          <span style={{ flexShrink: 0 }}>{event.date}</span>
         </div>
       </div>
     </Link>
@@ -129,9 +136,9 @@ export function EventsSection() {
           justifyContent: 'space-between', marginBottom: 32,
         }}>
           <h2 style={{
-            fontSize: 'clamp(24px, 3vw, 32px)',
+            fontSize: 'clamp(24px, 3vw, 36px)',
             fontWeight: 900, color: '#171717',
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.02em', lineHeight: 1.2,
           }}>
             رویدادها
           </h2>
@@ -146,7 +153,7 @@ export function EventsSection() {
             onMouseEnter={(e) => { e.currentTarget.style.color = '#171717' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#909090' }}
           >
-            همه رویدادها ↗
+            همه رویدادها <ArrowUpRight size={14} style={{ display: 'inline', verticalAlign: 'middle' }} />
           </Link>
         </div>
 

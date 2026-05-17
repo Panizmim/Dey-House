@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <PageHero title="درباره ما" />
+      <PageHero title="درباره ما" subtitle="برای زندگی تازه‌ای که هنوز نزیسته‌ایم" />
 
       <div className="max-w-[860px] mx-auto px-8 py-16">
 

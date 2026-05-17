@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useRef, useState } from 'react'
-import { ImagePlus, X } from 'lucide-react'
+import { ImagePlus, X } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 interface UploadMeta {
