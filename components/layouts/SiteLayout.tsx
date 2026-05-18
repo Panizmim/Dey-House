@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ChevronLeft, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone } from '@/components/ui/icons'
+import { Menu, X, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone } from '@/components/ui/icons'
 import { signOut } from 'next-auth/react'
 
 const navLinks = [

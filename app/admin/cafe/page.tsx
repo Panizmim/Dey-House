@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { Plus, Pencil, Trash2, ImageOff } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import CafeItemModal, { type CafeMenuItem } from '@/components/admin/CafeItemModal'
@@ -206,11 +207,9 @@ export default function AdminCafePage() {
                     {/* تصویر */}
                     <td style={{ padding: '12px 16px' }}>
                       {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover', display: 'block' }}
-                        />
+                        <div style={{ position: 'relative', width: 40, height: 40, borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
+                          <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+                        </div>
                       ) : (
                         <div style={{
                           width: 40, height: 40, borderRadius: 6,

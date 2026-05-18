@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { Plus, Pencil, Archive, ArchiveRestore } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import EventModal, { type EventRow } from '@/components/admin/EventModal'
@@ -51,11 +52,9 @@ export default function AdminEventsPage() {
       render: (row) => (
         <div className="flex items-center gap-3">
           {row.imageUrl && (
-            <img
-              src={row.imageUrl}
-              alt={row.title}
-              style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }}
-            />
+            <div style={{ position: 'relative', width: 36, height: 36, borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
+              <Image src={row.imageUrl} alt={row.title} fill className="object-cover" />
+            </div>
           )}
           <span style={{ fontWeight: 600 }}>{row.title}</span>
         </div>
