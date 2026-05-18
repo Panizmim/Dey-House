@@ -181,7 +181,6 @@ export default async function EventDetailPage({ params }: Props) {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={e.imageUrl} alt={e.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 55%)' }} />
                     <span
                       className="absolute top-3 right-3 text-white font-bold"
                       style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(8px)', borderRadius: 6, padding: '3px 10px', fontSize: 11 }}
