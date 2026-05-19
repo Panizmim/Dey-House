@@ -1,19 +1,28 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { z } from 'zod'
 
-export async function POST(request: Request) {
+const schema = z.object({
+  firstName: z.string().min(1),
+  lastName:  z.string().min(1),
+  phone:     z.string().min(1),
+  email:     z.string().email(),
+  artField:  z.string().min(1),
+  instagram: z.string().optional(),
+  website:   z.string().optional(),
+  bio:       z.string().optional(),
+})
+
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json()
-    const {
-      firstName, lastName, phone, email, website, instagram,
-      artField, portfolioUrl, artworkItems,
-    } = body
+    const body = await req.json()
 
-    if (!firstName || !lastName || !phone || !email || !artField) {
-      return NextResponse.json({ error: 'فیلدهای اجباری پر نشده‌اند' }, { status: 400 })
+    const parsed = schema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'اطلاعات ناقص است' }, { status: 400 })
     }
 
-    const bio = [website, instagram].filter(Boolean).join(' | ') || null
+    const { firstName, lastName, phone, email, artField, bio } = parsed.data
 
     await db.artistSubmission.create({
       data: {
@@ -21,15 +30,16 @@ export async function POST(request: Request) {
         email,
         phone,
         artField,
-        bio,
-        resumeUrl:   portfolioUrl ?? null,
-        artworkUrls: JSON.stringify(artworkItems ?? []),
+        bio:         bio || null,
+        artworkUrls: '[]',
+        resumeUrl:   null,
         status:      'PENDING',
       },
     })
 
     return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: 'خطای سرور' }, { status: 500 })
+  } catch (error) {
+    console.error('Artist submission error:', error)
+    return NextResponse.json({ error: 'خطا در ثبت درخواست' }, { status: 500 })
   }
 }

@@ -10,12 +10,17 @@ const loginSchema = z.object({
 })
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
-  session: { strategy: 'jwt' },
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,
+  },
   pages: { signIn: '/login' },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
+        token.id      = user.id
         token.role    = (user as { role?: string }).role
         token.phone   = (user as { phone?: string }).phone
         token.picture = (user as { image?: string | null }).image ?? token.picture
@@ -27,9 +32,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      session.user.id    = token.sub ?? ''
-      session.user.role  = (token.role as string) ?? ''
-      session.user.phone = (token.phone as string) ?? ''
+      session.user.id    = (token.id as string) || token.sub || ''
+      session.user.role  = (token.role as string) || 'USER'
+      session.user.phone = (token.phone as string) || ''
       session.user.image = (token.picture as string | null | undefined) ?? null
       return session
     },
@@ -44,11 +49,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const valid = await bcrypt.compare(parsed.data.password, user.password)
         if (!valid) return null
         return {
-          id: user.id,
-          name: user.name,
+          id:    user.id,
+          name:  user.name,
           email: user.email,
           image: user.image ?? null,
-          role: user.role as string,
+          role:  user.role as string,
           phone: user.phone ?? '',
         }
       },

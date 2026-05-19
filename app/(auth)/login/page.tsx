@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 const loginSchema = z.object({
@@ -16,9 +16,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 
 function LoginForm() {
-  const router       = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl  = searchParams.get('callbackUrl') ?? '/dashboard'
 
   const [showPass, setShowPass] = useState(false)
   const [serverError, setServerError] = useState('')
@@ -31,18 +29,30 @@ function LoginForm() {
 
   async function onSubmit(data: LoginForm) {
     setServerError('')
-    const result = await signIn('credentials', {
-      email:    data.email,
-      password: data.password,
-      redirect: false,
-    })
+    try {
+      const result = await signIn('credentials', {
+        email:    data.email,
+        password: data.password,
+        redirect: false,
+      })
 
-    if (result?.error) {
-      setServerError('ایمیل یا رمز عبور اشتباه است')
-      return
+      if (!result) {
+        setServerError('خطا در ارتباط با سرور')
+        return
+      }
+
+      if (result.error) {
+        setServerError('ایمیل یا رمز عبور اشتباه است')
+        return
+      }
+
+      if (result.ok) {
+        const from = searchParams.get('from') || '/'
+        window.location.href = from
+      }
+    } catch {
+      setServerError('خطای غیرمنتظره. دوباره تلاش کنید')
     }
-    router.push(callbackUrl)
-    router.refresh()
   }
 
   return (
