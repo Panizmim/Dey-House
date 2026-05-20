@@ -120,3 +120,23 @@ model GalleryImage {
   order    Int     @default(0)
   isActive Boolean @default(true)
 }
+
+model Gallery {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  artistName  String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("UPCOMING")
+  coverImage  String?
+  images      String   @default("[]")
+  venueImages String   @default("[]")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+}

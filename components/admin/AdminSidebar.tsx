@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { LayoutDashboard, Calendar, UtensilsCrossed, BookOpen, Phone, Users, Palette, ArrowRight, LogOut } from '@/components/ui/icons'
+import { LayoutDashboard, Calendar, UtensilsCrossed, BookOpen, Phone, Users, Palette, ArrowRight, LogOut, Grid2x2 } from '@/components/ui/icons'
 
 const navGroups = [
   {
@@ -14,8 +14,9 @@ const navGroups = [
   {
     label: 'محتوا',
     items: [
-      { href: '/admin/events', label: 'رویدادها',   icon: Calendar,          exact: false },
-      { href: '/admin/cafe',   label: 'منوی کافه',  icon: UtensilsCrossed,   exact: false },
+      { href: '/admin/events',   label: 'رویدادها',  icon: Calendar,        exact: false },
+      { href: '/admin/gallery',  label: 'گالری',     icon: Grid2x2,         exact: false },
+      { href: '/admin/cafe',     label: 'منوی کافه', icon: UtensilsCrossed, exact: false },
     ],
   },
   {
