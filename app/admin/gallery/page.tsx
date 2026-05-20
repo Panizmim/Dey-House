@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, X } from '@/components/ui/icons'
+import { Plus, Pencil, Trash2, X, ChevronDown } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
@@ -59,9 +59,11 @@ function GalleryModal({
   const [startDate,   setStartDate]   = useState<Date | null>(null)
   const [endDate,     setEndDate]     = useState<Date | null>(null)
   const [status,      setStatus]      = useState('UPCOMING')
-  const [coverFile,   setCoverFile]   = useState<File | null>(null)
-  const [coverPreview,setCoverPreview]= useState<string | null>(null)
-  const [saving,      setSaving]      = useState(false)
+  const [coverFile,        setCoverFile]        = useState<File | null>(null)
+  const [coverPreview,     setCoverPreview]     = useState<string | null>(null)
+  const [showStartPicker,  setShowStartPicker]  = useState(false)
+  const [showEndPicker,    setShowEndPicker]    = useState(false)
+  const [saving,           setSaving]           = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -73,6 +75,8 @@ function GalleryModal({
       setStatus(gallery?.status ?? 'UPCOMING')
       setCoverFile(null)
       setCoverPreview(null)
+      setShowStartPicker(false)
+      setShowEndPicker(false)
     }
   }, [open, gallery])
 
@@ -157,26 +161,53 @@ function GalleryModal({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            {/* تاریخ شروع */}
+            <div style={{ position: 'relative' }}>
               <label className={labelClass}>تاریخ شروع *</label>
-              <JalaliDatePicker
-                selected={startDate}
-                onSelect={setStartDate}
-                disablePast={false}
-              />
-              {startDate && (
-                <p className="text-xs text-[#8B1E1E] mt-1">{jalaliToDisplay(startDate)}</p>
+              <button
+                type="button"
+                onClick={() => { setShowStartPicker((v) => !v); setShowEndPicker(false) }}
+                className={inputClass}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+              >
+                <span style={{ color: startDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                  {startDate ? jalaliToDisplay(startDate) : 'انتخاب تاریخ'}
+                </span>
+                <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showStartPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
+              </button>
+              {showStartPicker && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60 }}>
+                  <JalaliDatePicker
+                    selected={startDate}
+                    onSelect={(date) => { setStartDate(date); setShowStartPicker(false) }}
+                    disablePast={false}
+                  />
+                </div>
               )}
             </div>
-            <div>
+
+            {/* تاریخ پایان */}
+            <div style={{ position: 'relative' }}>
               <label className={labelClass}>تاریخ پایان *</label>
-              <JalaliDatePicker
-                selected={endDate}
-                onSelect={setEndDate}
-                disablePast={false}
-              />
-              {endDate && (
-                <p className="text-xs text-[#8B1E1E] mt-1">{jalaliToDisplay(endDate)}</p>
+              <button
+                type="button"
+                onClick={() => { setShowEndPicker((v) => !v); setShowStartPicker(false) }}
+                className={inputClass}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+              >
+                <span style={{ color: endDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                  {endDate ? jalaliToDisplay(endDate) : 'انتخاب تاریخ'}
+                </span>
+                <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showEndPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
+              </button>
+              {showEndPicker && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60 }}>
+                  <JalaliDatePicker
+                    selected={endDate}
+                    onSelect={(date) => { setEndDate(date); setShowEndPicker(false) }}
+                    disablePast={false}
+                  />
+                </div>
               )}
             </div>
           </div>
