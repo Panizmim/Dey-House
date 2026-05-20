@@ -5,12 +5,18 @@ import { getToken } from 'next-auth/jwt'
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
+  // تشخیص HTTPS بر اساس URL واقعی request (نه NODE_ENV)
+  const secureCookies = req.url.startsWith('https://')
+  const cookieName = secureCookies
+    ? '__Secure-next-auth.session-token'
+    : 'next-auth.session-token'
+
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
-    cookieName: process.env.NODE_ENV === 'production'
-      ? '__Secure-next-auth.session-token'
-      : 'next-auth.session-token',
+    secureCookie: secureCookies,
+    cookieName,
+    salt: cookieName,   // next-auth v5: salt = cookie name برای JWE
   })
 
   if (pathname.startsWith('/dashboard')) {
