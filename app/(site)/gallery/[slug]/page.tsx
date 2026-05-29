@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ChevronLeft } from '@/components/ui/icons'
 import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
 
 type GalleryDetail = {
@@ -65,27 +66,43 @@ export default function GalleryDetailPage() {
   const venueImages: string[] = JSON.parse(gallery.venueImages || '[]')
 
   return (
-    <main className="max-w-[900px] mx-auto px-8 py-16" dir="rtl">
+    <main className="max-w-[900px] mx-auto px-2 py-16" dir="rtl">
 
       {/* breadcrumb */}
-      <nav className="flex items-center gap-2 text-[#A0A0A0] mb-10" style={{ fontSize: 13 }}>
+      <nav className="flex items-center gap-1.5 text-[#A0A0A0] mb-10" style={{ fontSize: 13 }}>
         <Link href="/" className="hover:text-[#8B1E1E] transition-colors">خانه</Link>
-        <span>/</span>
+        <ChevronLeft size={12} color="#C0C0C0" />
         <Link href="/gallery" className="hover:text-[#8B1E1E] transition-colors">گالری</Link>
-        <span>/</span>
+        <ChevronLeft size={12} color="#C0C0C0" />
         <span className="text-[#171717]">{gallery.title}</span>
       </nav>
 
-      {/* ─── header ─── */}
-      <div className="text-right mb-2">
-        <p className="text-[#A0A0A0] font-light mb-1" style={{ fontSize: 13 }}>{gallery.artistName}</p>
-        <h1 className="font-black text-[#171717] mb-1"
-          style={{ fontSize: 'clamp(24px, 4vw, 36px)', letterSpacing: '-0.02em' }}>
-          {gallery.title}
-        </h1>
-        <p className="text-[#A0A0A0] font-light" style={{ fontSize: 14 }}>
-          {formatJalali(gallery.startDate)} — {formatJalali(gallery.endDate)}
-        </p>
+      {/* ─── header + cover ─── */}
+      <div className="flex gap-6 mb-8 items-start">
+        {/* کاور — سمت راست در RTL (اول در DOM) */}
+        {gallery.coverImage && (
+          <div className="relative flex-shrink-0" style={{ width: 200, height: 200 }}>
+            <Image
+              src={gallery.coverImage}
+              alt={gallery.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
+
+        {/* متن — سمت چپ در RTL (دوم در DOM) */}
+        <div className="flex-1 text-right pt-1">
+          <p className="text-[#A0A0A0] font-light mb-2" style={{ fontSize: 13 }}>{gallery.artistName}</p>
+          <h1 className="font-black text-[#171717] mb-3"
+            style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+            {gallery.title}
+          </h1>
+          <p className="text-[#A0A0A0] font-light" style={{ fontSize: 13 }}>
+            {formatJalali(gallery.startDate)} — {formatJalali(gallery.endDate)}
+          </p>
+        </div>
       </div>
 
       <div className="w-full h-px bg-[#EFEFEF] my-8" />
@@ -108,16 +125,11 @@ export default function GalleryDetailPage() {
             <span className="text-[#A0A0A0]" style={{ fontSize: 13 }}>{toPersian(artworks.length)} اثر</span>
           </div>
 
-          {/* ۶ ستون دسکتاپ، ۳ ستون موبایل */}
-          <div
-            className="grid gap-1"
-            style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}
-          >
-            <style>{`@media (min-width: 640px) { .artworks-grid { grid-template-columns: repeat(6, 1fr) !important; } }`}</style>
+          <div className="grid gap-1 grid-cols-3 sm:grid-cols-5">
             {artworks.map((img, i) => (
               <div
                 key={i}
-                className="relative cursor-pointer overflow-hidden artworks-grid"
+                className="relative cursor-pointer overflow-hidden"
                 style={{ aspectRatio: '1/1' }}
                 onClick={() => setLightboxIndex(i)}
               >
@@ -138,53 +150,62 @@ export default function GalleryDetailPage() {
         <div className="mb-16">
           <h2 className="font-black text-[#171717] mb-6 text-right" style={{ fontSize: 20 }}>فضای نمایش</h2>
 
-          <div className="relative overflow-hidden rounded-lg">
-            <div
-              className="flex transition-transform duration-500"
-              style={{ transform: `translateX(${venueSlide * 100}%)` }}
-            >
-              {venueImages.map((img, i) => (
-                <div key={i} className="flex-shrink-0 w-full relative" style={{ aspectRatio: '16/9' }}>
-                  <Image src={img} alt={`فضای نمایش ${toPersian(i + 1)}`} fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-
-            {venueImages.length > 1 && (
-              <>
-                <button
-                  onClick={() => setVenueSlide((s) => s > 0 ? s - 1 : venueImages.length - 1)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-all"
-                  style={{ fontSize: 20 }}
-                >
-                  ›
-                </button>
+          {/* full-bleed: از max-w-[900px] بیرون میاد و کل viewport رو می‌گیره */}
+          <div style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)', width: '100vw', overflow: 'hidden' }}>
+            <div className="flex items-center" style={{ padding: '0 20px', gap: 12 }}>
+              {/* ChevronRight سمت راست = بعدی در RTL */}
+              {venueImages.length > 1 && (
                 <button
                   onClick={() => setVenueSlide((s) => s < venueImages.length - 1 ? s + 1 : 0)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-all"
-                  style={{ fontSize: 20 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, padding: 0, color: '#404040', display: 'flex', alignItems: 'center' }}
                 >
-                  ‹
+                  <ChevronLeft size={24} style={{ transform: 'rotate(180deg)' }} />
                 </button>
+              )}
 
-                {/* dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {venueImages.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setVenueSlide(i)}
-                      className="rounded-full transition-all"
-                      style={{
-                        width: i === venueSlide ? 20 : 6,
-                        height: 6,
-                        background: i === venueSlide ? 'white' : 'rgba(255,255,255,0.5)',
-                      }}
-                    />
+              {/* تصویر — نسبت ۱۴۶۹×۳۶۹ */}
+              <div className="flex-1 overflow-hidden">
+                <div
+                  className="flex transition-transform duration-500"
+                  style={{ transform: `translateX(${venueSlide * 100}%)` }}
+                >
+                  {venueImages.map((img, i) => (
+                    <div key={i} className="flex-shrink-0 w-full relative" style={{ aspectRatio: '16/9' }}>
+                      <Image src={img} alt={`فضای نمایش ${toPersian(i + 1)}`} fill className="object-cover" />
+                    </div>
                   ))}
                 </div>
-              </>
-            )}
+              </div>
+
+              {/* ChevronLeft سمت چپ = قبلی در RTL */}
+              {venueImages.length > 1 && (
+                <button
+                  onClick={() => setVenueSlide((s) => s > 0 ? s - 1 : venueImages.length - 1)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, padding: 0, color: '#404040', display: 'flex', alignItems: 'center' }}
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* dots */}
+          {venueImages.length > 1 && (
+            <div className="flex justify-center gap-1.5 mt-4">
+              {venueImages.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setVenueSlide(i)}
+                  className="rounded-full transition-all"
+                  style={{
+                    width: i === venueSlide ? 20 : 6,
+                    height: 6,
+                    background: i === venueSlide ? '#404040' : '#D0D0D0',
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -213,12 +234,10 @@ export default function GalleryDetailPage() {
               className="object-contain max-h-[85vh] w-full"
             />
 
-            {/* شماره */}
             <div className="absolute top-4 right-4 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
               {toPersian(lightboxIndex + 1)} / {toPersian(artworks.length)}
             </div>
 
-            {/* بستن */}
             <button
               onClick={() => setLightboxIndex(null)}
               className="absolute top-4 left-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-all"
@@ -227,7 +246,6 @@ export default function GalleryDetailPage() {
               ×
             </button>
 
-            {/* قبلی */}
             {lightboxIndex > 0 && (
               <button
                 onClick={() => setLightboxIndex((i) => i! - 1)}
@@ -238,7 +256,6 @@ export default function GalleryDetailPage() {
               </button>
             )}
 
-            {/* بعدی */}
             {lightboxIndex < artworks.length - 1 && (
               <button
                 onClick={() => setLightboxIndex((i) => i! + 1)}

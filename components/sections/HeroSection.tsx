@@ -3,35 +3,53 @@
 import Image from 'next/image'
 import { useEffect, useState, useCallback, useRef } from 'react'
 
-const heroSlides = [
-  { id: 1, image: '/images/hero/slide1', gradient: 'linear-gradient(135deg, #1a0808, #2d1010)' },
-  { id: 2, image: '/images/hero/slide2', gradient: 'linear-gradient(135deg, #0a1a08, #1a2d10)' },
-  { id: 3, image: '/images/hero/slide3', gradient: 'linear-gradient(135deg, #08081a, #10102d)' },
-  { id: 4, image: '/images/hero/slide4', gradient: 'linear-gradient(135deg, #1a1208, #2d2010)' },
-  { id: 5, image: '/images/hero/slide5', gradient: 'linear-gradient(135deg, #0a0a1a, #10182d)' },
-  { id: 6, image: '/images/hero/slide6', gradient: 'linear-gradient(135deg, #1a0a08, #2d1810)' },
-  { id: 7, image: '/images/hero/slide7', gradient: 'linear-gradient(135deg, #081a12, #102d1a)' },
-  { id: 8, image: '/images/hero/slide8', gradient: 'linear-gradient(135deg, #120808, #201010)' },
+type Slide = {
+  id:       string
+  imageUrl: string
+  showText: boolean
+}
+
+const FALLBACK: Slide[] = [
+  { id: 'f1', imageUrl: '/images/hero/slide1.jpg', showText: true },
+  { id: 'f2', imageUrl: '/images/hero/slide2.jpg', showText: true },
+  { id: 'f3', imageUrl: '/images/hero/slide3.jpg', showText: true },
+  { id: 'f4', imageUrl: '/images/hero/slide4.jpg', showText: true },
+  { id: 'f5', imageUrl: '/images/hero/slide5.jpg', showText: true },
+  { id: 'f6', imageUrl: '/images/hero/slide6.jpg', showText: true },
+  { id: 'f7', imageUrl: '/images/hero/slide7.jpg', showText: true },
+  { id: 'f8', imageUrl: '/images/hero/slide8.jpg', showText: true },
 ]
 
 const INTERVAL_MS = 5000
 
 export function HeroSection() {
+  const [slides,       setSlides]       = useState<Slide[]>(FALLBACK)
   const [currentIndex, setCurrentIndex] = useState(0)
   const touchStartX = useRef<number>(0)
 
-  const next = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % heroSlides.length)
+  useEffect(() => {
+    fetch('/api/hero-banners')
+      .then((r) => r.json())
+      .then((data: Slide[]) => {
+        if (Array.isArray(data) && data.length > 0) setSlides(data)
+      })
+      .catch(() => {})
   }, [])
 
+  const next = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % slides.length)
+  }, [slides.length])
+
   const prev = useCallback(() => {
-    setCurrentIndex((p) => (p - 1 + heroSlides.length) % heroSlides.length)
-  }, [])
+    setCurrentIndex((p) => (p - 1 + slides.length) % slides.length)
+  }, [slides.length])
 
   useEffect(() => {
     const timer = setInterval(next, INTERVAL_MS)
     return () => clearInterval(timer)
   }, [next])
+
+  const currentSlide = slides[currentIndex]
 
   return (
     <section
@@ -43,19 +61,14 @@ export function HeroSection() {
       }}
     >
       <div className="absolute inset-0">
-        {heroSlides.map((slide, index) => (
+        {slides.map((slide, index) => (
           <div
             key={slide.id}
             className="absolute inset-0 transition-opacity duration-1000"
             style={{ opacity: index === currentIndex ? 1 : 0 }}
           >
-            {/* gradient همیشه نمایش داده می‌شود */}
-            <div
-              className="absolute inset-0"
-              style={{ background: slide.gradient }}
-            />
             <Image
-              src={`${slide.image}.jpg`}
+              src={slide.imageUrl}
               alt=""
               fill
               className="object-cover"
@@ -67,8 +80,11 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-black/40 z-10" />
       </div>
 
-      {/* متن مرکزی */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
+      {/* متن — فقط وقتی اسلاید جاری showText: true داشته باشه */}
+      <div
+        className="absolute inset-0 z-20 flex items-center justify-center px-6 transition-opacity duration-700"
+        style={{ opacity: currentSlide?.showText ? 1 : 0, pointerEvents: 'none' }}
+      >
         <p
           className="text-white text-center leading-tight"
           style={{
@@ -83,7 +99,7 @@ export function HeroSection() {
 
       {/* dots */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-        {heroSlides.map((slide, idx) => (
+        {slides.map((slide, idx) => (
           <button
             key={slide.id}
             onClick={() => setCurrentIndex(idx)}

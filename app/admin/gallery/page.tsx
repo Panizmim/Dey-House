@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, X, ChevronDown } from '@/components/ui/icons'
+import { Plus, Pencil, Trash2, X, ChevronDown, ImagePlus } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
@@ -18,6 +18,8 @@ type Gallery = {
   endDate:     string
   status:      string
   coverImage:  string | null
+  images:      string
+  venueImages: string
   isActive:    boolean
 }
 
@@ -44,6 +46,91 @@ function Badge({ status }: { status: string }) {
   )
 }
 
+/* ─── Multi-image picker row ─── */
+function MultiImagePicker({
+  label,
+  existingUrls,
+  newFiles,
+  onRemoveUrl,
+  onAddFiles,
+  onRemoveFile,
+}: {
+  label: string
+  existingUrls: string[]
+  newFiles: { file: File; preview: string }[]
+  onRemoveUrl: (i: number) => void
+  onAddFiles: (files: FileList) => void
+  onRemoveFile: (i: number) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+      <div className="flex flex-wrap gap-2 mt-1">
+        {existingUrls.map((url, i) => (
+          <div key={`url-${i}`} style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+            <Image src={url} alt="" fill className="object-cover rounded-lg" />
+            <button
+              type="button"
+              onClick={() => onRemoveUrl(i)}
+              style={{
+                position: 'absolute', top: 2, right: 2,
+                width: 18, height: 18, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.6)', border: 'none',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <X size={10} color="white" />
+            </button>
+          </div>
+        ))}
+        {newFiles.map(({ preview }, i) => (
+          <div key={`new-${i}`} style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={preview} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8 }} />
+            <button
+              type="button"
+              onClick={() => onRemoveFile(i)}
+              style={{
+                position: 'absolute', top: 2, right: 2,
+                width: 18, height: 18, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.6)', border: 'none',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <X size={10} color="white" />
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          style={{
+            width: 72, height: 72, flexShrink: 0,
+            border: '1px dashed #E5E5E5', borderRadius: 8,
+            cursor: 'pointer', background: 'white',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.background = '#FAFAFA' }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.background = 'white' }}
+        >
+          <ImagePlus size={18} color="#B0B0B0" />
+          <span style={{ fontSize: 10, color: '#B0B0B0' }}>افزودن</span>
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: 'none' }}
+          onChange={(e) => { if (e.target.files?.length) { onAddFiles(e.target.files); e.target.value = '' } }}
+        />
+      </div>
+    </div>
+  )
+}
+
 /* ─── Modal ─── */
 function GalleryModal({
   open, gallery, onClose, onSaved,
@@ -59,11 +146,22 @@ function GalleryModal({
   const [startDate,   setStartDate]   = useState<Date | null>(null)
   const [endDate,     setEndDate]     = useState<Date | null>(null)
   const [status,      setStatus]      = useState('UPCOMING')
-  const [coverFile,        setCoverFile]        = useState<File | null>(null)
-  const [coverPreview,     setCoverPreview]     = useState<string | null>(null)
-  const [showStartPicker,  setShowStartPicker]  = useState(false)
-  const [showEndPicker,    setShowEndPicker]    = useState(false)
-  const [saving,           setSaving]           = useState(false)
+  const [coverFile,       setCoverFile]       = useState<File | null>(null)
+  const [coverPreview,    setCoverPreview]    = useState<string | null>(null)
+  const [showStartPicker, setShowStartPicker] = useState(false)
+  const [showEndPicker,   setShowEndPicker]   = useState(false)
+  const [startStyle,      setStartStyle]      = useState<React.CSSProperties>({})
+  const [endStyle,        setEndStyle]        = useState<React.CSSProperties>({})
+  const [saving,          setSaving]          = useState(false)
+
+  /* multi-image state */
+  const [artworkUrls,  setArtworkUrls]  = useState<string[]>([])
+  const [artworkFiles, setArtworkFiles] = useState<{ file: File; preview: string }[]>([])
+  const [venueUrls,    setVenueUrls]    = useState<string[]>([])
+  const [venueFiles,   setVenueFiles]   = useState<{ file: File; preview: string }[]>([])
+
+  const startBtnRef = useRef<HTMLButtonElement>(null)
+  const endBtnRef   = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (open) {
@@ -77,14 +175,53 @@ function GalleryModal({
       setCoverPreview(null)
       setShowStartPicker(false)
       setShowEndPicker(false)
+      setArtworkUrls(gallery ? JSON.parse(gallery.images || '[]') : [])
+      setArtworkFiles([])
+      setVenueUrls(gallery ? JSON.parse(gallery.venueImages || '[]') : [])
+      setVenueFiles([])
     }
   }, [open, gallery])
 
-  async function uploadCover(): Promise<string | null> {
-    if (!coverFile) return gallery?.coverImage ?? null
+  function openStart() {
+    if (startBtnRef.current) {
+      const r = startBtnRef.current.getBoundingClientRect()
+      setStartStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999 })
+    }
+    setShowStartPicker((v) => !v)
+    setShowEndPicker(false)
+  }
+
+  function openEnd() {
+    if (endBtnRef.current) {
+      const r = endBtnRef.current.getBoundingClientRect()
+      setEndStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999 })
+    }
+    setShowEndPicker((v) => !v)
+    setShowStartPicker(false)
+  }
+
+  function addArtworkFiles(files: FileList) {
+    const items = Array.from(files).map((f) => ({ file: f, preview: URL.createObjectURL(f) }))
+    setArtworkFiles((p) => [...p, ...items])
+  }
+  function removeArtworkUrl(i: number) { setArtworkUrls((p) => p.filter((_, j) => j !== i)) }
+  function removeArtworkFile(i: number) {
+    setArtworkFiles((p) => { URL.revokeObjectURL(p[i].preview); return p.filter((_, j) => j !== i) })
+  }
+
+  function addVenueFiles(files: FileList) {
+    const items = Array.from(files).map((f) => ({ file: f, preview: URL.createObjectURL(f) }))
+    setVenueFiles((p) => [...p, ...items])
+  }
+  function removeVenueUrl(i: number) { setVenueUrls((p) => p.filter((_, j) => j !== i)) }
+  function removeVenueFile(i: number) {
+    setVenueFiles((p) => { URL.revokeObjectURL(p[i].preview); return p.filter((_, j) => j !== i) })
+  }
+
+  async function uploadFile(file: File, folder: string): Promise<string> {
     const fd = new FormData()
-    fd.append('file', coverFile)
-    fd.append('folder', 'galleries')
+    fd.append('file', file)
+    fd.append('folder', folder)
     const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
     if (!res.ok) throw new Error('خطا در آپلود تصویر')
     const { url } = await res.json()
@@ -98,24 +235,35 @@ function GalleryModal({
     }
     setSaving(true)
     try {
-      const coverImage = await uploadCover()
+      const coverImage = coverFile
+        ? await uploadFile(coverFile, 'galleries')
+        : (gallery?.coverImage ?? null)
+
+      const newArtworkUrls = await Promise.all(artworkFiles.map(({ file }) => uploadFile(file, 'galleries/artworks')))
+      const newVenueUrls   = await Promise.all(venueFiles.map(({ file }) => uploadFile(file, 'galleries/venue')))
+
       const body = {
         title, artistName, description,
-        startDate: startDate.toISOString(),
-        endDate:   endDate.toISOString(),
-        status, coverImage,
+        startDate:   startDate.toISOString(),
+        endDate:     endDate.toISOString(),
+        status,      coverImage,
+        images:      JSON.stringify([...artworkUrls, ...newArtworkUrls]),
+        venueImages: JSON.stringify([...venueUrls,   ...newVenueUrls]),
       }
 
       const res = gallery
         ? await fetch(`/api/admin/galleries/${gallery.id}`, { method: 'PUT',  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
         : await fetch('/api/admin/galleries',               { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error((err as { error?: string }).error || 'خطا در ذخیره‌سازی')
+      }
       toast.success(gallery ? 'نمایشگاه ویرایش شد' : 'نمایشگاه اضافه شد')
       onSaved()
       onClose()
-    } catch {
-      toast.error('خطا در ذخیره‌سازی')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'خطا در ذخیره‌سازی')
     } finally {
       setSaving(false)
     }
@@ -124,150 +272,177 @@ function GalleryModal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.45)' }}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        {/* header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F0]">
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#171717' }}>
-            {gallery ? 'ویرایش نمایشگاه' : 'افزودن نمایشگاه جدید'}
-          </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#717171' }}>
-            <X size={20} />
-          </button>
-        </div>
+    <>
+      {/* overlay closes pickers */}
+      {(showStartPicker || showEndPicker) && (
+        <div
+          className="fixed inset-0 z-[9998]"
+          onClick={() => { setShowStartPicker(false); setShowEndPicker(false) }}
+        />
+      )}
 
-        {/* body */}
-        <div className="px-6 py-5 flex flex-col gap-4">
-          <div>
-            <label className={labelClass}>عنوان نمایشگاه *</label>
-            <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="نام نمایشگاه" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.45)' }}>
+        <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          {/* header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F0]">
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#171717' }}>
+              {gallery ? 'ویرایش نمایشگاه' : 'افزودن نمایشگاه جدید'}
+            </h2>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#717171' }}>
+              <X size={20} />
+            </button>
           </div>
 
-          <div>
-            <label className={labelClass}>نام هنرمند *</label>
-            <input className={inputClass} value={artistName} onChange={(e) => setArtistName(e.target.value)} placeholder="نام هنرمند" />
-          </div>
+          {/* body */}
+          <div className="px-6 py-5 flex flex-col gap-4">
+            <div>
+              <label className={labelClass}>عنوان نمایشگاه *</label>
+              <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="نام نمایشگاه" />
+            </div>
 
-          <div>
-            <label className={labelClass}>توضیحات (گزاره)</label>
-            <textarea
-              className={inputClass}
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="درباره این نمایشگاه بنویسید..."
-              style={{ resize: 'vertical' }}
+            <div>
+              <label className={labelClass}>نام هنرمند *</label>
+              <input className={inputClass} value={artistName} onChange={(e) => setArtistName(e.target.value)} placeholder="نام هنرمند" />
+            </div>
+
+            <div>
+              <label className={labelClass}>توضیحات (گزاره)</label>
+              <textarea
+                className={inputClass}
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="درباره این نمایشگاه بنویسید..."
+                style={{ resize: 'vertical' }}
+              />
+            </div>
+
+            {/* date pickers — fixed positioning to escape overflow clipping */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>تاریخ شروع *</label>
+                <button
+                  ref={startBtnRef}
+                  type="button"
+                  onClick={openStart}
+                  className={inputClass}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+                >
+                  <span style={{ color: startDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                    {startDate ? jalaliToDisplay(startDate) : 'انتخاب تاریخ'}
+                  </span>
+                  <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showStartPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
+                </button>
+              </div>
+
+              <div>
+                <label className={labelClass}>تاریخ پایان *</label>
+                <button
+                  ref={endBtnRef}
+                  type="button"
+                  onClick={openEnd}
+                  className={inputClass}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+                >
+                  <span style={{ color: endDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                    {endDate ? jalaliToDisplay(endDate) : 'انتخاب تاریخ'}
+                  </span>
+                  <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showEndPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>وضعیت</label>
+              <select className={inputClass} value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="UPCOMING">به زودی</option>
+                <option value="ACTIVE">در حال برگزاری</option>
+                <option value="PAST">برگزار شده</option>
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>تصویر کاور</label>
+              <ImageUploadZone
+                currentUrl={gallery?.coverImage}
+                preview={coverPreview}
+                onFileSelect={(f) => {
+                  setCoverFile(f)
+                  const reader = new FileReader()
+                  reader.onload = (e) => setCoverPreview(e.target?.result as string)
+                  reader.readAsDataURL(f)
+                }}
+                onClear={() => { setCoverFile(null); setCoverPreview(null) }}
+              />
+            </div>
+
+            <MultiImagePicker
+              label="گزیده آثار"
+              existingUrls={artworkUrls}
+              newFiles={artworkFiles}
+              onRemoveUrl={removeArtworkUrl}
+              onAddFiles={addArtworkFiles}
+              onRemoveFile={removeArtworkFile}
+            />
+
+            <MultiImagePicker
+              label="فضای نمایش"
+              existingUrls={venueUrls}
+              newFiles={venueFiles}
+              onRemoveUrl={removeVenueUrl}
+              onAddFiles={addVenueFiles}
+              onRemoveFile={removeVenueFile}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {/* تاریخ شروع */}
-            <div style={{ position: 'relative' }}>
-              <label className={labelClass}>تاریخ شروع *</label>
-              <button
-                type="button"
-                onClick={() => { setShowStartPicker((v) => !v); setShowEndPicker(false) }}
-                className={inputClass}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
-              >
-                <span style={{ color: startDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
-                  {startDate ? jalaliToDisplay(startDate) : 'انتخاب تاریخ'}
-                </span>
-                <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showStartPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
-              </button>
-              {showStartPicker && (
-                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60 }}>
-                  <JalaliDatePicker
-                    selected={startDate}
-                    onSelect={(date) => { setStartDate(date); setShowStartPicker(false) }}
-                    disablePast={false}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* تاریخ پایان */}
-            <div style={{ position: 'relative' }}>
-              <label className={labelClass}>تاریخ پایان *</label>
-              <button
-                type="button"
-                onClick={() => { setShowEndPicker((v) => !v); setShowStartPicker(false) }}
-                className={inputClass}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
-              >
-                <span style={{ color: endDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
-                  {endDate ? jalaliToDisplay(endDate) : 'انتخاب تاریخ'}
-                </span>
-                <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showEndPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
-              </button>
-              {showEndPicker && (
-                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60 }}>
-                  <JalaliDatePicker
-                    selected={endDate}
-                    onSelect={(date) => { setEndDate(date); setShowEndPicker(false) }}
-                    disablePast={false}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className={labelClass}>وضعیت</label>
-            <select
-              className={inputClass}
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
+          {/* footer */}
+          <div className="px-6 py-4 border-t border-[#F0F0F0] flex justify-end gap-3">
+            <button
+              onClick={onClose}
+              style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 13, cursor: 'pointer' }}
             >
-              <option value="UPCOMING">به زودی</option>
-              <option value="ACTIVE">در حال برگزاری</option>
-              <option value="PAST">برگزار شده</option>
-            </select>
+              انصراف
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}
+            >
+              {saving ? 'در حال ذخیره...' : 'ذخیره'}
+            </button>
           </div>
-
-          <div>
-            <label className={labelClass}>تصویر کاور</label>
-            <ImageUploadZone
-              currentUrl={gallery?.coverImage}
-              preview={coverPreview}
-              onFileSelect={(f) => {
-                setCoverFile(f)
-                const reader = new FileReader()
-                reader.onload = (e) => setCoverPreview(e.target?.result as string)
-                reader.readAsDataURL(f)
-              }}
-              onClear={() => { setCoverFile(null); setCoverPreview(null) }}
-            />
-          </div>
-        </div>
-
-        {/* footer */}
-        <div className="px-6 py-4 border-t border-[#F0F0F0] flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 13, cursor: 'pointer' }}
-          >
-            انصراف
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}
-          >
-            {saving ? 'در حال ذخیره...' : 'ذخیره'}
-          </button>
         </div>
       </div>
-    </div>
+
+      {/* pickers rendered outside modal scroll container */}
+      {showStartPicker && (
+        <div style={startStyle}>
+          <JalaliDatePicker
+            selected={startDate}
+            onSelect={(date) => { setStartDate(date); setShowStartPicker(false) }}
+            disablePast={false}
+          />
+        </div>
+      )}
+      {showEndPicker && (
+        <div style={endStyle}>
+          <JalaliDatePicker
+            selected={endDate}
+            onSelect={(date) => { setEndDate(date); setShowEndPicker(false) }}
+            disablePast={false}
+          />
+        </div>
+      )}
+    </>
   )
 }
 
 /* ─── Page ─── */
 export default function AdminGalleryPage() {
-  const [galleries,  setGalleries]  = useState<Gallery[]>([])
-  const [loading,    setLoading]    = useState(true)
-  const [modalOpen,  setModalOpen]  = useState(false)
-  const [editGallery,setEditGallery]= useState<Gallery | null>(null)
+  const [galleries,   setGalleries]   = useState<Gallery[]>([])
+  const [loading,     setLoading]     = useState(true)
+  const [modalOpen,   setModalOpen]   = useState(false)
+  const [editGallery, setEditGallery] = useState<Gallery | null>(null)
 
   async function fetchGalleries() {
     setLoading(true)

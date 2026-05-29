@@ -121,6 +121,18 @@ model GalleryImage {
   isActive Boolean @default(true)
 }
 
+model HeroBanner {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  showText  Boolean  @default(true)
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([isActive])
+  @@index([order])
+}
+
 model Gallery {
   id          String   @id @default(cuid())
   title       String

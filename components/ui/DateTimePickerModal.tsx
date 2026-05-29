@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { X, ChevronRight, ChevronLeft, ChevronDown } from '@/components/ui/icons'
 import {
   PERSIAN_MONTHS, PERSIAN_DAYS,
@@ -9,11 +9,21 @@ import {
   TIME_SLOTS,
 } from '@/lib/jalali'
 
+const persianTimeToAscii = (persian: string): string => {
+  const ascii = persian.replace(/[۰-۹]/g, (d) =>
+    String.fromCharCode(d.charCodeAt(0) - 0x06f0 + 0x30)
+  )
+  const [h, m] = ascii.split(':')
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`
+}
+
 interface JD { jy: number; jm: number; jd: number }
 
 interface Props {
   open: boolean
   onClose: () => void
+  studioId?: string
+  mode?: 'single' | 'range'
   onConfirm: (result: {
     startDate: Date
     endDate: Date | null
@@ -27,7 +37,7 @@ const RANGE_BG = 'rgba(139,30,30,0.10)'
 const CELL_H   = 36
 const BTN_SIZE = 28
 
-export default function DateTimePickerModal({ open, onClose, onConfirm }: Props) {
+export default function DateTimePickerModal({ open, onClose, studioId, mode = 'range', onConfirm }: Props) {
   const today = todayJalali()
 
   const [leftYear, setLeftYear]   = useState(today.jy)
@@ -47,6 +57,9 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
   const [endTime, setEndTime]             = useState<string | null>(null)
   const [showStartList, setShowStartList] = useState(false)
   const [showEndList, setShowEndList]     = useState(false)
+  const [busyDaysMap, setBusyDaysMap]     = useState<Record<string, number[]>>({})
+  const [bookedSlots, setBookedSlots]     = useState<Set<string>>(new Set())
+  const fetchedMonths                     = useRef<Set<string>>(new Set())
 
   const isMultiDay = !!(startDate && endDate &&
     !(startDate.jy === endDate.jy && startDate.jm === endDate.jm && startDate.jd === endDate.jd))
@@ -59,6 +72,47 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  useEffect(() => {
+    if (!studioId || !open) return
+    const months = isMobile
+      ? [{ y: rightYear, m: rightMonth }]
+      : [{ y: rightYear, m: rightMonth }, { y: leftNextYear, m: leftNextMonth }]
+    months.forEach(({ y, m }) => {
+      const key = `${y}-${m}`
+      if (fetchedMonths.current.has(key)) return
+      fetchedMonths.current.add(key)
+      fetch(`/api/bookings/busy-days?studioId=${studioId}&year=${y}&month=${m}`)
+        .then((r) => r.json())
+        .then((data: { busyDays?: number[] }) => {
+          if (Array.isArray(data.busyDays)) {
+            setBusyDaysMap((p) => ({ ...p, [key]: data.busyDays as number[] }))
+          }
+        })
+        .catch(() => { fetchedMonths.current.delete(key) })
+    })
+  }, [studioId, open, leftYear, leftMonth, isMobile])
+
+  useEffect(() => {
+    if (!studioId || !startDate || mode !== 'single') {
+      setBookedSlots(new Set())
+      return
+    }
+    const g = fromJalali(startDate.jy, startDate.jm, startDate.jd)
+    const dateStr = [
+      g.getFullYear(),
+      String(g.getMonth() + 1).padStart(2, '0'),
+      String(g.getDate()).padStart(2, '0'),
+    ].join('-')
+    fetch(`/api/bookings/slots?studioId=${studioId}&date=${dateStr}`)
+      .then((r) => r.json())
+      .then((data: { slots?: Array<{ time: string; available: boolean }> }) => {
+        if (Array.isArray(data.slots)) {
+          setBookedSlots(new Set(data.slots.filter((s) => !s.available).map((s) => s.time)))
+        }
+      })
+      .catch(() => {})
+  }, [studioId, startDate, mode])
 
   if (!open) return null
 
@@ -97,6 +151,13 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
     const clicked: JD = { jy, jm, jd }
     setShowStartList(false)
     setShowEndList(false)
+    if (mode === 'single') {
+      setStartDate(clicked)
+      setEndDate(null)
+      setStartTime(null)
+      setEndTime(null)
+      return
+    }
     if (selecting === 'start' || !startDate) {
       setStartDate(clicked); setEndDate(null)
       setSelecting('end'); setStartTime(null); setEndTime(null)
@@ -137,6 +198,7 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
     showList: boolean,
     onToggle: () => void,
     disabled?: boolean,
+    bookedTimes?: Set<string>,
   ) => {
     const isEndPicker = label === 'ساعت پایان'
     const slots = isEndPicker && startTime
@@ -177,25 +239,31 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
         {showList && (
           <div style={{ border: '1.5px solid #EBEBEB', borderRadius: 10, maxHeight: 150, overflowY: 'auto', overscrollBehavior: 'contain', background: 'white', boxShadow: '0 4px 14px rgba(0,0,0,0.07)' }}>
             {slots.map((slot) => {
-              const isSel = selected === slot
+              const asciiTime = persianTimeToAscii(slot)
+              const isBooked  = !!(bookedTimes?.has(asciiTime))
+              const isSel     = selected === slot && !isBooked
               return (
                 <button
                   key={slot}
-                  onClick={() => onSelect(slot)}
+                  onClick={() => { if (!isBooked) onSelect(slot) }}
+                  disabled={isBooked}
                   style={{
-                    width: '100%', padding: '9px 14px', textAlign: 'right',
+                    width: '100%', padding: '9px 14px',
                     border: 'none', borderBottom: '1px solid #F5F5F5',
-                    fontSize: 13, cursor: 'pointer',
-                    background: isSel ? BRAND : 'white',
-                    color: isSel ? 'white' : '#1a1a2e',
+                    fontSize: 13, cursor: isBooked ? 'not-allowed' : 'pointer',
+                    background: isSel ? BRAND : isBooked ? '#FEF2F2' : 'white',
+                    color: isSel ? 'white' : isBooked ? '#C08080' : '#1a1a2e',
                     fontWeight: isSel ? 700 : 400,
                     fontFamily: 'YekanBakh, Tahoma, sans-serif',
                     transition: 'background 100ms',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    textAlign: 'right',
                   }}
-                  onMouseEnter={(e) => { if (!isSel) { e.currentTarget.style.background = '#FDF0F0'; e.currentTarget.style.color = BRAND } }}
-                  onMouseLeave={(e) => { if (!isSel) { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#1a1a2e' } }}
+                  onMouseEnter={(e) => { if (!isSel && !isBooked) { e.currentTarget.style.background = '#FDF0F0'; e.currentTarget.style.color = BRAND } }}
+                  onMouseLeave={(e) => { if (!isSel && !isBooked) { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#1a1a2e' } }}
                 >
-                  {slot}
+                  <span style={{ textDecoration: isBooked ? 'line-through' : 'none' }}>{slot}</span>
+                  {isBooked && <span style={{ fontSize: 10, color: '#C07070', fontWeight: 700, flexShrink: 0 }}>پر</span>}
                 </button>
               )
             })}
@@ -236,6 +304,7 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
             const end     = isEnd(jy, jm, day)
             const inRange = isInRange(jy, jm, day)
             const isToday = today.jy === jy && today.jm === jm && today.jd === day
+            const isBusy  = busyDaysMap[`${jy}-${jm}`]?.includes(day) ?? false
 
             const showStartBand = start && hasRange
             const showEndBand   = end && hasRange
@@ -245,7 +314,7 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
               <div
                 key={day}
                 style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: CELL_H, cursor: past ? 'default' : 'pointer' }}
-                onMouseEnter={() => { if (selecting === 'end' && startDate && !past) setHoverDate({ jy, jm, jd: day }) }}
+                onMouseEnter={() => { if (mode !== 'single' && selecting === 'end' && startDate && !past) setHoverDate({ jy, jm, jd: day }) }}
                 onMouseLeave={() => setHoverDate(null)}
                 onClick={() => handleDayClick(jy, jm, day)}
               >
@@ -279,6 +348,15 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
                 >
                   {toPersian(day)}
                 </button>
+                {isBusy && !past && (
+                  <div style={{
+                    position: 'absolute', bottom: 3, left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 4, height: 4, borderRadius: '50%', zIndex: 1,
+                    background: (start || end) ? 'rgba(255,255,255,0.75)' : '#D97070',
+                    pointerEvents: 'none',
+                  }} />
+                )}
               </div>
             )
           })}
@@ -364,6 +442,8 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
                 (t) => { setStartTime(t); setEndTime(null); setShowStartList(false) },
                 showStartList,
                 () => { setShowStartList((v) => !v); setShowEndList(false) },
+                undefined,
+                bookedSlots,
               )}
               {renderTimePicker(
                 'ساعت پایان', endTime,
@@ -377,7 +457,7 @@ export default function DateTimePickerModal({ open, onClose, onConfirm }: Props)
         )}
 
         {/* multi-day note */}
-        {isMultiDay && (
+        {isMultiDay && mode === 'range' && (
           <div style={{ margin: '12px 20px 0', padding: '10px 14px', background: '#FDF0F0', borderRadius: 10, border: `1px solid rgba(139,30,30,0.15)` }}>
             <p style={{ fontSize: 12, color: BRAND, fontWeight: 500, textAlign: 'right' }}>
               برای رزرو چند روزه، نیازی به انتخاب ساعت نیست. تیم خانه دی با شما هماهنگ خواهد کرد.
