@@ -1009,6 +1009,8 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
       <DateTimePickerModal
         open={showPicker}
         onClose={() => setShowPicker(false)}
+        studioId={params.studioId}
+        mode={usageType === 'theater' ? 'single' : 'range'}
         onConfirm={({ startDate, endDate, startTime, endTime }) => {
           setSelectedStartDate(startDate)
           setSelectedEndDate(endDate)

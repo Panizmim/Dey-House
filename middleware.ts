@@ -1,20 +1,13 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { auth } from '@/lib/auth-middleware'
 
-export async function middleware(req: NextRequest) {
+export default auth((req) => {
   const { pathname } = req.nextUrl
-
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-    cookieName: process.env.NODE_ENV === 'production'
-      ? '__Secure-next-auth.session-token'
-      : 'next-auth.session-token',
-  })
+  const session = req.auth
 
   if (pathname.startsWith('/dashboard')) {
-    if (!token) {
+    if (!session) {
       const url = new URL('/login', req.url)
       url.searchParams.set('from', pathname)
       return NextResponse.redirect(url)
@@ -22,13 +15,13 @@ export async function middleware(req: NextRequest) {
   }
 
   if (pathname.startsWith('/admin')) {
-    if (!token || token.role !== 'ADMIN') {
+    if (!session || (session.user as { role?: string })?.role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/', req.url))
     }
   }
 
   return NextResponse.next()
-}
+})
 
 export const config = {
   matcher: ['/dashboard/:path*', '/admin/:path*'],

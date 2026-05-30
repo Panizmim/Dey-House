@@ -1,0 +1,34 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
+
+async function checkAdmin() {
+  const session = await auth()
+  return !!(session && session.user.role === 'ADMIN')
+}
+
+export async function GET() {
+  if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+  const banners = await db.heroBanner.findMany({
+    orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+  })
+  return NextResponse.json(banners)
+}
+
+export async function POST(req: NextRequest) {
+  if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+  try {
+    const { imageUrl, showText, order } = await req.json()
+    const banner = await db.heroBanner.create({
+      data: {
+        imageUrl,
+        showText: showText ?? true,
+        order:    order    ?? 0,
+      },
+    })
+    return NextResponse.json(banner)
+  } catch (error) {
+    console.error('HeroBanner create error:', error)
+    return NextResponse.json({ error: 'خطا در ایجاد بنر' }, { status: 500 })
+  }
+}
