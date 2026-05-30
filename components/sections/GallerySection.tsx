@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { ArrowUpRight } from '@/components/ui/icons'
 import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
 

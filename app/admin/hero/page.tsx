@@ -80,6 +80,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
 
             {preview ? (
               <div style={{ position: 'relative' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={preview} alt="" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: 8 }} />
                 <button
                   onClick={() => { setFile(null); setPreview(null) }}
