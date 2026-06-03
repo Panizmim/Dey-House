@@ -466,7 +466,8 @@ export default function AdminBookingsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #E5E5E5', fontSize: 14, background: 'white', minWidth: 140 }}
+            className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors bg-white"
+            style={{ minWidth: 140 }}
           >
             <option value="all">همه وضعیت‌ها</option>
             <option value="PENDING">در انتظار</option>
