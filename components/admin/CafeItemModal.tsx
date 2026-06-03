@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
 import ImageUploadZone from './ImageUploadZone'
+import { ChevronDown } from '@/components/ui/icons'
 
 export interface CafeMenuItem {
   id: string
@@ -167,9 +168,17 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
           </div>
           <div>
             <label className={labelClass}>دسته‌بندی *</label>
-            <select className={inputClass} style={{ height: 38 }} value={form.category} onChange={(e) => set('category', e.target.value)}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <div style={{ position: 'relative' }}>
+              <select
+                className={inputClass}
+                style={{ height: 38, appearance: 'none', WebkitAppearance: 'none', paddingLeft: 28 }}
+                value={form.category}
+                onChange={(e) => set('category', e.target.value)}
+              >
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <ChevronDown size={14} color="#A0A0A0" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            </div>
           </div>
         </div>
 
