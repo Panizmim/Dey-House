@@ -16,9 +16,9 @@ model User {
   password  String?
   image     String?
   role      String    @default("USER")
-  bookings  Booking[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  bookings  Booking[]
 }
 
 model Studio {
@@ -47,10 +47,10 @@ model Booking {
   authority     String?
   zarinpalRef   String?
   notes         String?
-  user          User     @relation(fields: [userId], references: [id])
-  studio        Studio   @relation(fields: [studioId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  studio        Studio   @relation(fields: [studioId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([studioId])
