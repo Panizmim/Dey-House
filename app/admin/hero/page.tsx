@@ -35,8 +35,13 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
       const fd = new FormData()
       fd.append('file', file)
       fd.append('folder', 'hero')
+      toast.loading('در حال آپلود تصویر...', { id: 'hero-upload' })
       const uploadRes = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-      if (!uploadRes.ok) throw new Error('خطا در آپلود')
+      toast.dismiss('hero-upload')
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}))
+        throw new Error((errData as { error?: string }).error || 'خطا در آپلود تصویر')
+      }
       const { url } = await uploadRes.json()
 
       const res = await fetch('/api/admin/hero-banners', {

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, ImagePlus, X } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
-import ImageUploadZone from './ImageUploadZone'
+import ImageUploadZone, { type UploadStatus } from './ImageUploadZone'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
 
@@ -230,8 +230,9 @@ function GallerySlotCard({
 
 export default function EventModal({ open, event, onClose, onSaved }: EventModalProps) {
   const [loading, setLoading]           = useState(false)
-  const [imageFile, setImageFile]       = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageUrl,     setImageUrl]     = useState<string | null>(null)
+  const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
   const [gallery, setGallery]           = useState<GallerySlot[]>([])
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [selectedDate, setSelectedDate]     = useState<Date | null>(null)
@@ -241,8 +242,9 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
 
   useEffect(() => {
     if (!open) return
-    setImageFile(null)
     setImagePreview(null)
+    setImageUrl(null)
+    setImageStatus('idle')
     setShowDatePicker(false)
     if (event) {
       const isoDate = event.date ? event.date.slice(0, 10) : ''
@@ -296,10 +298,10 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       toast.error('عنوان، تاریخ و ساعت الزامی هستند')
       return
     }
+    if (imageStatus === 'uploading') { toast.error('لطفاً صبر کنید تا آپلود تصویر تمام شود'); return }
     setLoading(true)
     try {
-      let imageUrl: string | null = event?.imageUrl ?? null
-      if (imageFile) imageUrl = await uploadImage(imageFile)
+      let finalImageUrl: string | null = imageUrl ?? event?.imageUrl ?? null
 
       const galleryUrls: string[] = []
       for (const slot of gallery) {
@@ -315,7 +317,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, imageUrl, galleryImages: galleryUrls }),
+        body: JSON.stringify({ ...form, imageUrl: finalImageUrl, galleryImages: galleryUrls }),
       })
       if (!res.ok) throw new Error()
       toast.success(event ? 'رویداد با موفقیت ویرایش شد' : 'رویداد با موفقیت ایجاد شد')
@@ -429,8 +431,16 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           <ImageUploadZone
             currentUrl={event?.imageUrl}
             preview={imagePreview}
-            onFileSelect={(file) => { setImageFile(file); setImagePreview(URL.createObjectURL(file)) }}
-            onClear={() => { setImageFile(null); setImagePreview(null) }}
+            status={imageStatus}
+            onFileSelect={(file) => {
+              setImagePreview(URL.createObjectURL(file))
+              setImageUrl(null)
+              setImageStatus('uploading')
+              uploadImage(file)
+                .then((url) => { setImageUrl(url); setImageStatus('success') })
+                .catch(() => setImageStatus('error'))
+            }}
+            onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
           />
         </div>
 

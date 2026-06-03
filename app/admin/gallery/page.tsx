@@ -6,7 +6,7 @@ import { Plus, Pencil, Trash2, X, ChevronDown, ImagePlus } from '@/components/ui
 import toast from 'react-hot-toast'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
-import ImageUploadZone from '@/components/admin/ImageUploadZone'
+import ImageUploadZone, { type UploadStatus } from '@/components/admin/ImageUploadZone'
 
 type Gallery = {
   id:          string
@@ -46,21 +46,19 @@ function Badge({ status }: { status: string }) {
   )
 }
 
+type ImageSlot = { id: string; preview: string; url?: string; status: UploadStatus; error?: string }
+
 /* ─── Multi-image picker row ─── */
 function MultiImagePicker({
-  label,
-  existingUrls,
-  newFiles,
-  onRemoveUrl,
-  onAddFiles,
-  onRemoveFile,
+  label, existingUrls, slots,
+  onRemoveUrl, onAddFiles, onRemoveSlot,
 }: {
   label: string
   existingUrls: string[]
-  newFiles: { file: File; preview: string }[]
+  slots: ImageSlot[]
   onRemoveUrl: (i: number) => void
   onAddFiles: (files: FileList) => void
-  onRemoveFile: (i: number) => void
+  onRemoveSlot: (id: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -71,36 +69,38 @@ function MultiImagePicker({
         {existingUrls.map((url, i) => (
           <div key={`url-${i}`} style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
             <Image src={url} alt="" fill className="object-cover rounded-lg" />
-            <button
-              type="button"
-              onClick={() => onRemoveUrl(i)}
-              style={{
-                position: 'absolute', top: 2, right: 2,
-                width: 18, height: 18, borderRadius: '50%',
-                background: 'rgba(0,0,0,0.6)', border: 'none',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
+            <button type="button" onClick={() => onRemoveUrl(i)} style={{ position: 'absolute', top: 2, right: 2, width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <X size={10} color="white" />
             </button>
           </div>
         ))}
-        {newFiles.map(({ preview }, i) => (
-          <div key={`new-${i}`} style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+        {slots.map((slot) => (
+          <div key={slot.id} style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8 }} />
-            <button
-              type="button"
-              onClick={() => onRemoveFile(i)}
-              style={{
-                position: 'absolute', top: 2, right: 2,
-                width: 18, height: 18, borderRadius: '50%',
-                background: 'rgba(0,0,0,0.6)', border: 'none',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <X size={10} color="white" />
-            </button>
+            <img src={slot.preview} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, opacity: slot.status === 'uploading' ? 0.6 : 1 }} />
+
+            {/* status overlay */}
+            {slot.status === 'uploading' && (
+              <div style={{ position: 'absolute', inset: 0, borderRadius: 8, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.8s linear infinite' }} />
+              </div>
+            )}
+            {slot.status === 'success' && (
+              <div style={{ position: 'absolute', bottom: 2, left: 2, background: '#16A34A', borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l3 3 4-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+            )}
+            {slot.status === 'error' && (
+              <div style={{ position: 'absolute', inset: 0, borderRadius: 8, background: 'rgba(220,38,38,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ color: 'white', fontSize: 9, fontWeight: 700, textAlign: 'center', padding: '0 2px' }}>خطا</span>
+              </div>
+            )}
+
+            {slot.status !== 'uploading' && (
+              <button type="button" onClick={() => onRemoveSlot(slot.id)} style={{ position: 'absolute', top: 2, right: 2, width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X size={10} color="white" />
+              </button>
+            )}
           </div>
         ))}
         <button
@@ -146,8 +146,9 @@ function GalleryModal({
   const [startDate,   setStartDate]   = useState<Date | null>(null)
   const [endDate,     setEndDate]     = useState<Date | null>(null)
   const [status,      setStatus]      = useState('UPCOMING')
-  const [coverFile,       setCoverFile]       = useState<File | null>(null)
   const [coverPreview,    setCoverPreview]    = useState<string | null>(null)
+  const [coverUrl,        setCoverUrl]        = useState<string | null>(null)
+  const [coverStatus,     setCoverStatus]     = useState<UploadStatus>('idle')
   const [showStartPicker, setShowStartPicker] = useState(false)
   const [showEndPicker,   setShowEndPicker]   = useState(false)
   const [startStyle,      setStartStyle]      = useState<React.CSSProperties>({})
@@ -156,9 +157,9 @@ function GalleryModal({
 
   /* multi-image state */
   const [artworkUrls,  setArtworkUrls]  = useState<string[]>([])
-  const [artworkFiles, setArtworkFiles] = useState<{ file: File; preview: string }[]>([])
+  const [artworkSlots, setArtworkSlots] = useState<ImageSlot[]>([])
   const [venueUrls,    setVenueUrls]    = useState<string[]>([])
-  const [venueFiles,   setVenueFiles]   = useState<{ file: File; preview: string }[]>([])
+  const [venueSlots,   setVenueSlots]   = useState<ImageSlot[]>([])
 
   const startBtnRef = useRef<HTMLButtonElement>(null)
   const endBtnRef   = useRef<HTMLButtonElement>(null)
@@ -171,14 +172,15 @@ function GalleryModal({
       setStartDate(gallery ? new Date(gallery.startDate) : null)
       setEndDate(gallery ? new Date(gallery.endDate) : null)
       setStatus(gallery?.status ?? 'UPCOMING')
-      setCoverFile(null)
       setCoverPreview(null)
+      setCoverUrl(null)
+      setCoverStatus('idle')
       setShowStartPicker(false)
       setShowEndPicker(false)
       setArtworkUrls(gallery ? JSON.parse(gallery.images || '[]') : [])
-      setArtworkFiles([])
+      setArtworkSlots([])
       setVenueUrls(gallery ? JSON.parse(gallery.venueImages || '[]') : [])
-      setVenueFiles([])
+      setVenueSlots([])
     }
   }, [open, gallery])
 
@@ -200,53 +202,93 @@ function GalleryModal({
     setShowStartPicker(false)
   }
 
-  function addArtworkFiles(files: FileList) {
-    const items = Array.from(files).map((f) => ({ file: f, preview: URL.createObjectURL(f) }))
-    setArtworkFiles((p) => [...p, ...items])
-  }
-  function removeArtworkUrl(i: number) { setArtworkUrls((p) => p.filter((_, j) => j !== i)) }
-  function removeArtworkFile(i: number) {
-    setArtworkFiles((p) => { URL.revokeObjectURL(p[i].preview); return p.filter((_, j) => j !== i) })
-  }
-
-  function addVenueFiles(files: FileList) {
-    const items = Array.from(files).map((f) => ({ file: f, preview: URL.createObjectURL(f) }))
-    setVenueFiles((p) => [...p, ...items])
-  }
-  function removeVenueUrl(i: number) { setVenueUrls((p) => p.filter((_, j) => j !== i)) }
-  function removeVenueFile(i: number) {
-    setVenueFiles((p) => { URL.revokeObjectURL(p[i].preview); return p.filter((_, j) => j !== i) })
-  }
-
-  async function uploadFile(file: File, folder: string): Promise<string> {
+  async function doUpload(file: File, folder: string): Promise<string> {
     const fd = new FormData()
     fd.append('file', file)
     fd.append('folder', folder)
     const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    if (!res.ok) throw new Error('خطا در آپلود تصویر')
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'خطا در آپلود')
+    }
     const { url } = await res.json()
     return url as string
   }
+
+  function handleCoverFile(file: File) {
+    const preview = URL.createObjectURL(file)
+    setCoverPreview(preview)
+    setCoverUrl(null)
+    setCoverStatus('uploading')
+    doUpload(file, 'galleries')
+      .then((url) => { setCoverUrl(url); setCoverStatus('success') })
+      .catch(() => { setCoverStatus('error') })
+  }
+
+  function addArtworkFiles(files: FileList) {
+    Array.from(files).forEach((file) => {
+      const id      = `${Date.now()}-${Math.random()}`
+      const preview = URL.createObjectURL(file)
+      const slot: ImageSlot = { id, preview, status: 'uploading' }
+      setArtworkSlots((p) => [...p, slot])
+      doUpload(file, 'galleries/artworks')
+        .then((url) => setArtworkSlots((p) => p.map((s) => s.id === id ? { ...s, url, status: 'success' } : s)))
+        .catch((e) => setArtworkSlots((p) => p.map((s) => s.id === id ? { ...s, status: 'error', error: e.message } : s)))
+    })
+  }
+
+  function addVenueFiles(files: FileList) {
+    Array.from(files).forEach((file) => {
+      const id      = `${Date.now()}-${Math.random()}`
+      const preview = URL.createObjectURL(file)
+      const slot: ImageSlot = { id, preview, status: 'uploading' }
+      setVenueSlots((p) => [...p, slot])
+      doUpload(file, 'galleries/venue')
+        .then((url) => setVenueSlots((p) => p.map((s) => s.id === id ? { ...s, url, status: 'success' } : s)))
+        .catch((e) => setVenueSlots((p) => p.map((s) => s.id === id ? { ...s, status: 'error', error: e.message } : s)))
+    })
+  }
+
+  function removeArtworkUrl(i: number) { setArtworkUrls((p) => p.filter((_, j) => j !== i)) }
+  function removeArtworkSlot(id: string) { setArtworkSlots((p) => p.filter((s) => s.id !== id)) }
+  function removeVenueUrl(i: number)    { setVenueUrls((p) => p.filter((_, j) => j !== i)) }
+  function removeVenueSlot(id: string)  { setVenueSlots((p) => p.filter((s) => s.id !== id)) }
 
   async function handleSave() {
     if (!title || !artistName || !startDate || !endDate) {
       toast.error('عنوان، نام هنرمند و تاریخ‌ها اجباری هستند')
       return
     }
+    const pendingUploads = [
+      coverStatus === 'uploading',
+      artworkSlots.some((s) => s.status === 'uploading'),
+      venueSlots.some((s) => s.status === 'uploading'),
+    ]
+    if (pendingUploads.some(Boolean)) {
+      toast.error('لطفاً صبر کنید تا آپلود تصاویر تمام شود')
+      return
+    }
+    const failedUploads = [
+      coverStatus === 'error',
+      artworkSlots.some((s) => s.status === 'error'),
+      venueSlots.some((s) => s.status === 'error'),
+    ]
+    if (failedUploads.some(Boolean)) {
+      toast.error('برخی تصاویر آپلود نشدند — تصاویر خطادار را حذف و دوباره انتخاب کنید')
+      return
+    }
+
     setSaving(true)
     try {
-      const coverImage = coverFile
-        ? await uploadFile(coverFile, 'galleries')
-        : (gallery?.coverImage ?? null)
-
-      const newArtworkUrls = await Promise.all(artworkFiles.map(({ file }) => uploadFile(file, 'galleries/artworks')))
-      const newVenueUrls   = await Promise.all(venueFiles.map(({ file }) => uploadFile(file, 'galleries/venue')))
+      const coverImage = coverUrl ?? gallery?.coverImage ?? null
+      const newArtworkUrls = artworkSlots.filter((s) => s.url).map((s) => s.url!)
+      const newVenueUrls   = venueSlots.filter((s) => s.url).map((s) => s.url!)
 
       const body = {
         title, artistName, description,
         startDate:   startDate.toISOString(),
         endDate:     endDate.toISOString(),
-        status,      coverImage,
+        status, coverImage,
         images:      JSON.stringify([...artworkUrls, ...newArtworkUrls]),
         venueImages: JSON.stringify([...venueUrls,   ...newVenueUrls]),
       }
@@ -366,32 +408,28 @@ function GalleryModal({
               <ImageUploadZone
                 currentUrl={gallery?.coverImage}
                 preview={coverPreview}
-                onFileSelect={(f) => {
-                  setCoverFile(f)
-                  const reader = new FileReader()
-                  reader.onload = (e) => setCoverPreview(e.target?.result as string)
-                  reader.readAsDataURL(f)
-                }}
-                onClear={() => { setCoverFile(null); setCoverPreview(null) }}
+                status={coverStatus}
+                onFileSelect={handleCoverFile}
+                onClear={() => { setCoverPreview(null); setCoverUrl(null); setCoverStatus('idle') }}
               />
             </div>
 
             <MultiImagePicker
               label="گزیده آثار"
               existingUrls={artworkUrls}
-              newFiles={artworkFiles}
+              slots={artworkSlots}
               onRemoveUrl={removeArtworkUrl}
               onAddFiles={addArtworkFiles}
-              onRemoveFile={removeArtworkFile}
+              onRemoveSlot={removeArtworkSlot}
             />
 
             <MultiImagePicker
               label="فضای نمایش"
               existingUrls={venueUrls}
-              newFiles={venueFiles}
+              slots={venueSlots}
               onRemoveUrl={removeVenueUrl}
               onAddFiles={addVenueFiles}
-              onRemoveFile={removeVenueFile}
+              onRemoveSlot={removeVenueSlot}
             />
           </div>
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
-import ImageUploadZone from './ImageUploadZone'
+import ImageUploadZone, { type UploadStatus } from './ImageUploadZone'
 import { ChevronDown } from '@/components/ui/icons'
 
 export interface CafeMenuItem {
@@ -39,17 +39,19 @@ async function uploadImage(file: File, folder: string): Promise<string> {
 
 export default function CafeItemModal({ open, item, categories = [], onClose, onSave }: CafeItemModalProps) {
   const CATEGORIES = categories
-  const [loading, setLoading]   = useState(false)
-  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [loading, setLoading]       = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageUrl,     setImageUrl]     = useState<string | null>(null)
+  const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
   const [form, setForm] = useState({
     name: '', price: '', category: CATEGORIES[0], description: '', isAvailable: true,
   })
 
   useEffect(() => {
     if (!open) return
-    setImageFile(null)
     setImagePreview(null)
+    setImageUrl(null)
+    setImageStatus('idle')
     if (item) {
       setForm({
         name:        item.name,
@@ -66,14 +68,10 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
   const set = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }))
 
-  function handleFileSelect(file: File) {
-    setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
-  }
-
   function handleClearImage() {
-    setImageFile(null)
     setImagePreview(null)
+    setImageUrl(null)
+    setImageStatus('idle')
   }
 
   async function handleSubmit() {
@@ -86,15 +84,15 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
 
     setLoading(true)
     try {
-      let imageUrl: string | null = item?.imageUrl ?? null
-      if (imageFile) imageUrl = await uploadImage(imageFile, 'cafe-menu')
+      if (imageStatus === 'uploading') { toast.error('لطفاً صبر کنید تا آپلود تصویر تمام شود'); return }
+      const finalImageUrl: string | null = imageUrl ?? item?.imageUrl ?? null
 
       const body = {
         name:        form.name,
         price,
         category:    form.category,
         description: form.description || null,
-        imageUrl,
+        imageUrl:    finalImageUrl,
         isAvailable: form.isAvailable,
       }
 
@@ -201,8 +199,16 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
           <ImageUploadZone
             currentUrl={item?.imageUrl}
             preview={imagePreview}
-            onFileSelect={handleFileSelect}
-            onClear={handleClearImage}
+            status={imageStatus}
+            onFileSelect={(file) => {
+              setImagePreview(URL.createObjectURL(file))
+              setImageUrl(null)
+              setImageStatus('uploading')
+              uploadImage(file, 'cafe-menu')
+                .then((url) => { setImageUrl(url); setImageStatus('success') })
+                .catch(() => setImageStatus('error'))
+            }}
+            onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
           />
         </div>
 
