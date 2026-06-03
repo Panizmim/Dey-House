@@ -211,7 +211,7 @@ export default function CafePage() {
 
         {/* محتوای اصلی */}
         <main style={{ flex: 1, minWidth: 0 }}>
-          {visibleCategories.map((cat, _catIdx) => {
+          {visibleCategories.map((cat) => {
             const catItems = loading
               ? Array.from({ length: 4 })
               : itemsByCategory(cat.title)
