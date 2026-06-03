@@ -7,7 +7,7 @@ export default function PageHero({ title, subtitle }: PageHeroProps) {
   return (
     <div
       className="relative overflow-hidden flex flex-col items-center justify-center text-center px-8 h-[260px] lg:h-[320px]"
-      style={{ background: '#8B1E1E' }}
+      style={{ background: '#801A00' }}
     >
       {/* صندلی تزئینی */}
       <div className="absolute bottom-0 right-0 w-[65%] max-w-[640px] h-full pointer-events-none">

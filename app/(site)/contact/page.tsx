@@ -24,7 +24,7 @@ export default function ContactPage() {
             style={{ textDecoration: 'none' }}
           >
             <div
-              className="rounded-xl border border-[#E0E0E0] transition-all duration-200 hover:border-[#8B1E1E] hover:shadow-lg"
+              className="rounded-xl border border-[#E0E0E0] transition-all duration-200 hover:border-[#801A00] hover:shadow-lg"
               style={{
                 height: 260,
                 background: 'linear-gradient(160deg, #e6ede4 0%, #d4e0d0 40%, #c2d4bc 100%)',
@@ -41,13 +41,13 @@ export default function ContactPage() {
               </div>
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
-                  <MapPin size={26} color="#8B1E1E" />
+                  <MapPin size={26} color="#801A00" />
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 }}>خانه دی</p>
                   <p style={{ fontSize: 12, color: '#555', fontWeight: 400 }}>برای مشاهده مسیر کلیک کنید</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#8B1E1E', color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#801A00', color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
                   <MapPin size={11} color="white" />
                   باز کردن در نشان
                 </div>
@@ -55,7 +55,7 @@ export default function ContactPage() {
             </div>
           </a>
           <div className="flex items-start gap-3 mt-4">
-            <MapPin size={18} color="#8B1E1E" className="flex-shrink-0 mt-0.5" />
+            <MapPin size={18} color="#801A00" className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-[13px] font-bold text-[#171717] mb-1">خانه دی</p>
               <p className="text-[13px] text-[#717171] font-light leading-relaxed">
@@ -66,7 +66,7 @@ export default function ContactPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold hover:opacity-75 transition-opacity"
-                style={{ color: '#8B1E1E' }}
+                style={{ color: '#801A00' }}
               >
                 مشاهده در نشان
               </a>

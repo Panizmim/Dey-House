@@ -76,7 +76,7 @@ export default function JalaliDatePicker({ selected, onSelect, disablePast = tru
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', transition: 'all 150ms',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.color = '#8B1E1E' }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.color = '#801A00' }}
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.color = 'inherit' }}
         >
           <ChevronRight size={14} />
@@ -99,7 +99,7 @@ export default function JalaliDatePicker({ selected, onSelect, disablePast = tru
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', transition: 'all 150ms',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.color = '#8B1E1E' }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.color = '#801A00' }}
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.color = 'inherit' }}
         >
           <ChevronLeft size={14} />
@@ -134,24 +134,24 @@ export default function JalaliDatePicker({ selected, onSelect, disablePast = tru
               disabled={past}
               style={{
                 aspectRatio: '1', borderRadius: '50%',
-                border: tod && !sel ? '1.5px solid #8B1E1E' : 'none',
+                border: tod && !sel ? '1.5px solid #801A00' : 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: sel || tod ? 700 : 400,
                 cursor: past ? 'not-allowed' : 'pointer',
-                background: sel ? '#8B1E1E' : 'transparent',
-                color: sel ? 'white' : past ? '#D0D0D0' : tod ? '#8B1E1E' : '#171717',
+                background: sel ? '#801A00' : 'transparent',
+                color: sel ? 'white' : past ? '#D0D0D0' : tod ? '#801A00' : '#171717',
                 transition: 'all 150ms',
               }}
               onMouseEnter={(e) => {
                 if (!past && !sel) {
                   e.currentTarget.style.background = '#FDF0F0'
-                  e.currentTarget.style.color = '#8B1E1E'
+                  e.currentTarget.style.color = '#801A00'
                 }
               }}
               onMouseLeave={(e) => {
                 if (!past && !sel) {
                   e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = tod ? '#8B1E1E' : '#171717'
+                  e.currentTarget.style.color = tod ? '#801A00' : '#171717'
                 }
               }}
             >
@@ -164,7 +164,7 @@ export default function JalaliDatePicker({ selected, onSelect, disablePast = tru
       {/* تاریخ انتخابی */}
       {selectedJ && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #F0F0F0', textAlign: 'center' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#8B1E1E' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#801A00' }}>
             {toPersian(selectedJ.jd)} {PERSIAN_MONTHS[selectedJ.jm - 1]} {toPersian(selectedJ.jy)}
           </span>
         </div>

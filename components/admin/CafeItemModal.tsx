@@ -28,7 +28,7 @@ const CATEGORIES = [
   'میان وعده', 'سالاد', 'ساندویچ', 'پاستا', 'بشقاب', 'تاپینگ',
 ]
 
-const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#8B1E1E] transition-colors'
+const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
 const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
 
 async function uploadImage(file: File, folder: string): Promise<string> {
@@ -136,7 +136,7 @@ export default function CafeItemModal({ open, item, onClose, onSave }: CafeItemM
           <button
             onClick={handleSubmit}
             disabled={loading}
-            style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
+            style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
           >
             {loading ? 'در حال ذخیره...' : item ? 'ذخیره تغییرات' : 'افزودن آیتم'}
           </button>
@@ -205,7 +205,7 @@ export default function CafeItemModal({ open, item, onClose, onSave }: CafeItemM
             type="checkbox"
             checked={form.isAvailable}
             onChange={(e) => set('isAvailable', e.target.checked)}
-            className="w-4 h-4 accent-[#8B1E1E]"
+            className="w-4 h-4 accent-[#801A00]"
           />
           موجود است
         </label>

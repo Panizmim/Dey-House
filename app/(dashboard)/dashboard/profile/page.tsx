@@ -45,7 +45,7 @@ function Field({
             outline: 'none', boxSizing: 'border-box', transition: 'border-color 150ms',
             fontFamily: 'YekanBakh, Tahoma, sans-serif',
           }}
-          onFocus={(e) => { if (!disabled) e.currentTarget.style.borderColor = '#8B1E1E' }}
+          onFocus={(e) => { if (!disabled) e.currentTarget.style.borderColor = '#801A00' }}
           onBlur={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
         />
       </div>
@@ -78,7 +78,7 @@ function PasswordField({ label, value, onChange, placeholder }: {
             background: 'white', outline: 'none', boxSizing: 'border-box',
             transition: 'border-color 150ms', fontFamily: 'monospace',
           }}
-          onFocus={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
           onBlur={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
         />
         <button
@@ -239,7 +239,7 @@ export default function ProfilePage() {
               ) : (
                 <div style={{
                   width: 64, height: 64, borderRadius: '50%',
-                  background: '#8B1E1E', color: 'white',
+                  background: '#801A00', color: 'white',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 24, fontWeight: 700,
                 }}>
@@ -279,7 +279,7 @@ export default function ProfilePage() {
               fontSize: 13, fontWeight: 600,
               padding: editing ? '9px 20px' : '9px 16px',
               borderRadius: 8,
-              background: editing ? '#8B1E1E' : 'transparent',
+              background: editing ? '#801A00' : 'transparent',
               color: editing ? 'white' : '#717171',
               border: editing ? 'none' : 'none',
               cursor: saving ? 'wait' : 'pointer',
@@ -344,7 +344,7 @@ export default function ProfilePage() {
               onClick={handleSaveProfile}
               disabled={saving}
               style={{
-                padding: '10px 28px', background: '#8B1E1E',
+                padding: '10px 28px', background: '#801A00',
                 border: 'none', borderRadius: 10,
                 fontSize: 13, fontWeight: 700, color: 'white',
                 cursor: saving ? 'wait' : 'pointer',
@@ -392,7 +392,7 @@ export default function ProfilePage() {
             onClick={handleChangePassword}
             disabled={pwSaving || !currentPw || !newPw || !confirmPw}
             style={{
-              padding: '10px 28px', background: '#8B1E1E',
+              padding: '10px 28px', background: '#801A00',
               border: 'none', borderRadius: 10,
               fontSize: 13, fontWeight: 700, color: 'white',
               cursor: pwSaving ? 'wait' : 'pointer',

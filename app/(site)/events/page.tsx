@@ -145,7 +145,7 @@ export default function EventsPage() {
         <div className="px-4 pt-3 pb-2">
           <div
             style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid #E5E5E5', borderRadius: 10, padding: '9px 14px', background: 'white' }}
-            onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+            onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
             onBlurCapture={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
           >
             <Search size={14} style={{ color: '#A0A0A0', flexShrink: 0 }} />
@@ -165,8 +165,8 @@ export default function EventsPage() {
               onClick={() => toggleType(t)}
               className="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150"
               style={{
-                background: selectedTypes.includes(t) ? '#8B1E1E' : 'white',
-                borderColor: selectedTypes.includes(t) ? '#8B1E1E' : '#EFEFEF',
+                background: selectedTypes.includes(t) ? '#801A00' : 'white',
+                borderColor: selectedTypes.includes(t) ? '#801A00' : '#EFEFEF',
                 color: selectedTypes.includes(t) ? 'white' : '#404040',
               }}
             >
@@ -216,7 +216,7 @@ export default function EventsPage() {
                 border: '1px solid #E5E5E5', borderRadius: 10,
                 padding: '10px 14px', background: 'white', transition: 'border-color 150ms',
               }}
-              onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+              onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
               onBlurCapture={(e)  => { e.currentTarget.style.borderColor = '#E5E5E5' }}
             >
               <Search size={15} style={{ color: '#A0A0A0', flexShrink: 0 }} />
@@ -261,7 +261,7 @@ export default function EventsPage() {
                       type="checkbox"
                       checked={selectedTypes.includes(t)}
                       onChange={() => toggleType(t)}
-                      style={{ accentColor: '#8B1E1E', width: 15, height: 15, cursor: 'pointer' }}
+                      style={{ accentColor: '#801A00', width: 15, height: 15, cursor: 'pointer' }}
                     />
                     <span style={{ fontSize: 13, color: '#404040' }}>{t}</span>
                   </label>
@@ -281,7 +281,7 @@ export default function EventsPage() {
               aria-checked={activeOnly}
               style={{
                 width: 42, height: 24, borderRadius: 12,
-                background: activeOnly ? '#8B1E1E' : '#D0D0D0',
+                background: activeOnly ? '#801A00' : '#D0D0D0',
                 border: 'none', cursor: 'pointer', position: 'relative',
                 transition: 'background 200ms', flexShrink: 0,
               }}
@@ -306,7 +306,7 @@ export default function EventsPage() {
                 fontSize: 12, color: '#717171', cursor: 'pointer', transition: 'all 150ms',
                 fontFamily: 'YekanBakh, Tahoma, sans-serif',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.color = '#8B1E1E' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.color = '#801A00' }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.color = '#717171' }}
             >
               پاک‌کردن فیلترها

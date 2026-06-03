@@ -32,7 +32,7 @@ interface Props {
   }) => void
 }
 
-const BRAND    = '#8B1E1E'
+const BRAND    = '#801A00'
 const RANGE_BG = 'rgba(139,30,30,0.10)'
 const CELL_H   = 36
 const BTN_SIZE = 28

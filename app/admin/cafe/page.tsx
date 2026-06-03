@@ -113,7 +113,7 @@ export default function AdminCafePage() {
           className="flex items-center gap-2"
           style={{
             padding: '9px 18px', borderRadius: 8, border: 'none',
-            background: '#8B1E1E', color: 'white', fontSize: 14,
+            background: '#801A00', color: 'white', fontSize: 14,
             fontWeight: 600, cursor: 'pointer',
           }}
         >
@@ -135,7 +135,7 @@ export default function AdminCafePage() {
               flexShrink: 0, padding: '6px 14px', borderRadius: 20,
               fontSize: 13, fontWeight: activeTab === cat ? 700 : 400,
               cursor: 'pointer', transition: 'all 0.15s',
-              background: activeTab === cat ? '#8B1E1E' : 'white',
+              background: activeTab === cat ? '#801A00' : 'white',
               color:      activeTab === cat ? 'white' : '#404040',
               border:     activeTab === cat ? 'none' : '1px solid #E5E5E5',
             }}
@@ -236,7 +236,7 @@ export default function AdminCafePage() {
 
                     {/* قیمت */}
                     <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: '#8B1E1E' }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#801A00' }}>
                         {item.price.toLocaleString('fa-IR')} تومان
                       </span>
                     </td>
@@ -259,7 +259,7 @@ export default function AdminCafePage() {
                             fontSize: 12, color: '#717171', cursor: 'pointer',
                             transition: 'all 0.15s',
                           }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = '#8B1E1E'; e.currentTarget.style.borderColor = '#8B1E1E' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#801A00'; e.currentTarget.style.borderColor = '#801A00' }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#717171'; e.currentTarget.style.borderColor = '#E5E5E5' }}
                         >
                           <Pencil size={13} />

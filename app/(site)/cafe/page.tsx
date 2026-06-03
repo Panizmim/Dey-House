@@ -132,7 +132,7 @@ function MenuItemCard({ item, index }: { item: { name: string; price: string }; 
         <p className="text-xs text-[#B0B0B0] font-light">خانه دی</p>
       </div>
       <div className="flex-shrink-0 text-left">
-        <span className="text-sm font-black text-[#8B1E1E]">{item.price}</span>
+        <span className="text-sm font-black text-[#801A00]">{item.price}</span>
         <span className="text-xs text-[#999] font-bold mr-1">تومان</span>
       </div>
     </div>
@@ -177,7 +177,7 @@ export default function CafePage() {
 
       {/* نکته حساسیت غذایی */}
       <div className="bg-[#FDF5F5] border-b border-[#F0D5D5] py-3 px-6 text-center">
-        <p className="text-xs text-[#8B1E1E]">
+        <p className="text-xs text-[#801A00]">
           در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید
         </p>
       </div>
@@ -191,7 +191,7 @@ export default function CafePage() {
               onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all duration-150 ${
                 activeSection === cat.id
-                  ? 'bg-[#8B1E1E] border-[#8B1E1E] text-white'
+                  ? 'bg-[#801A00] border-[#801A00] text-white'
                   : 'bg-white border-[#EFEFEF] text-[#404040]'
               }`}
             >
@@ -222,11 +222,11 @@ export default function CafePage() {
                     flexDirection: 'column',
                     gap: '2px',
                     background: isActive ? '#FDF5F5' : 'transparent',
-                    borderRight: isActive ? '3px solid #8B1E1E' : '3px solid transparent',
+                    borderRight: isActive ? '3px solid #801A00' : '3px solid transparent',
                     border: 'none',
                   }}
                 >
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: isActive ? '#8B1E1E' : '#171717' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: isActive ? '#801A00' : '#171717' }}>
                     {cat.title}
                   </span>
                   <span style={{ fontSize: '11px', color: '#B0B0B0', fontWeight: 300, direction: 'ltr', textAlign: 'right' }}>

@@ -63,9 +63,9 @@ export default async function EventDetailPage({ params }: Props) {
 
       {/* ─── breadcrumb ─── */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#A0A0A0', marginBottom: 32 }}>
-        <Link href="/" className="hover:text-[#8B1E1E] transition-colors">خانه</Link>
+        <Link href="/" className="hover:text-[#801A00] transition-colors">خانه</Link>
         <ChevronLeft size={13} style={{ color: '#C0C0C0' }} />
-        <Link href="/events" className="hover:text-[#8B1E1E] transition-colors">رویدادها</Link>
+        <Link href="/events" className="hover:text-[#801A00] transition-colors">رویدادها</Link>
         <ChevronLeft size={13} style={{ color: '#C0C0C0' }} />
         <span style={{ color: '#171717' }}>{event.title}</span>
       </nav>
@@ -101,7 +101,7 @@ export default async function EventDetailPage({ params }: Props) {
               display: 'inline-flex', alignItems: 'center',
               background: '#FDF0F0', border: '1px solid #F0D5D5',
               borderRadius: 6, padding: '5px 14px',
-              fontSize: 13, fontWeight: 700, color: '#8B1E1E',
+              fontSize: 13, fontWeight: 700, color: '#801A00',
             }}>
               {event.type}
             </span>
@@ -111,9 +111,9 @@ export default async function EventDetailPage({ params }: Props) {
           {/* مکان */}
           {event.location && (
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
-              <MapPin size={16} style={{ color: '#8B1E1E', marginTop: 3, flexShrink: 0 }} />
+              <MapPin size={16} style={{ color: '#801A00', marginTop: 3, flexShrink: 0 }} />
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', letterSpacing: '0.06em', marginBottom: 2 }}>مکان</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', letterSpacing: '0.06em', marginBottom: 2 }}>مکان</p>
                 <p style={{ fontSize: 14, color: '#404040' }}>{event.location}</p>
               </div>
             </div>
@@ -121,18 +121,18 @@ export default async function EventDetailPage({ params }: Props) {
 
           {/* تاریخ */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
-            <Calendar size={16} style={{ color: '#8B1E1E', marginTop: 3, flexShrink: 0 }} />
+            <Calendar size={16} style={{ color: '#801A00', marginTop: 3, flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', letterSpacing: '0.06em', marginBottom: 2 }}>تاریخ</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', letterSpacing: '0.06em', marginBottom: 2 }}>تاریخ</p>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{dateStr}</p>
             </div>
           </div>
 
           {/* ساعت */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
-            <Clock size={16} style={{ color: '#8B1E1E', marginTop: 3, flexShrink: 0 }} />
+            <Clock size={16} style={{ color: '#801A00', marginTop: 3, flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', letterSpacing: '0.06em', marginBottom: 2 }}>ساعت</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', letterSpacing: '0.06em', marginBottom: 2 }}>ساعت</p>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{formatTime(event.time)}</p>
             </div>
           </div>

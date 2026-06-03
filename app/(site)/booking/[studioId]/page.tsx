@@ -323,13 +323,13 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
             onClick={() => { if (!usageType) setShowUsageSheet(true); else setShowPicker(true) }}
             className="w-full flex items-center justify-between px-4 py-4 rounded-xl transition-all active:scale-[0.99]"
             style={{ border: '1.5px solid #E5E5E5', background: 'white' }}
-            onTouchStart={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+            onTouchStart={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
             onTouchEnd={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
           >
             <div className="text-right">
               {selectedStartDate ? (
                 <>
-                  <p className="text-[13px] font-bold text-[#8B1E1E] mb-0.5">تاریخ انتخاب‌شده</p>
+                  <p className="text-[13px] font-bold text-[#801A00] mb-0.5">تاریخ انتخاب‌شده</p>
                   <p className="text-[16px] font-bold text-[#171717]">
                     {(() => { const j = toJalali(selectedStartDate); return `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]}` })()}
                     {selectedStartTime && ` — ${selectedStartTime}`}
@@ -342,7 +342,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 </>
               )}
             </div>
-            <Calendar size={20} color={selectedStartDate ? '#8B1E1E' : '#C0C0C0'} style={{ flexShrink: 0 }} />
+            <Calendar size={20} color={selectedStartDate ? '#801A00' : '#C0C0C0'} style={{ flexShrink: 0 }} />
           </button>
         </div>
 
@@ -357,7 +357,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 <div style={{ position: 'absolute', top: 0, bottom: 0, left: '45%', width: 5, background: 'white', borderRadius: 3 }} />
               </div>
               <div style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
-                <MapPin size={22} color="#8B1E1E" />
+                <MapPin size={22} color="#801A00" />
               </div>
               <p style={{ position: 'relative', fontSize: 14, color: '#444', fontWeight: 500 }}>برای مشاهده مسیر کلیک کنید</p>
             </div>
@@ -375,7 +375,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
             {studio.reviews.map((review) => (
               <div key={review.id}>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0" style={{ background: '#8B1E1E', fontSize: 16 }}>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0" style={{ background: '#801A00', fontSize: 16 }}>
                     {review.avatar}
                   </div>
                   <div>
@@ -426,7 +426,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                       {other.name}
                     </p>
                     <p className="text-[12px] text-[#717171] font-light mb-2">{other.area}</p>
-                    <p className="text-[13px] font-bold text-[#8B1E1E]">
+                    <p className="text-[13px] font-bold text-[#801A00]">
                       {toPersian(other.pricePerHour.toLocaleString('fa-IR'))}
                       <span className="text-[11px] font-light text-[#A0A0A0] mr-1">ت/ساعت</span>
                     </p>
@@ -452,7 +452,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               <span className="text-[12px] text-[#404040] font-light">/ساعت</span>
             </div>
             {selectedStartDate && (
-              <button onClick={() => setShowPicker(true)} className="text-[12px] text-[#8B1E1E] font-bold">
+              <button onClick={() => setShowPicker(true)} className="text-[12px] text-[#801A00] font-bold">
                 ویرایش تاریخ ←
               </button>
             )}
@@ -465,7 +465,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               else handleContactRequest()
             }}
             className="px-7 py-3 rounded-xl text-white font-bold text-[16px] transition-all active:scale-[0.97] flex-shrink-0"
-            style={{ background: '#8B1E1E' }}
+            style={{ background: '#801A00' }}
           >
             {!usageType ? 'رزرو' : !selectedStartDate ? 'انتخاب تاریخ' : usageType === 'theater' ? 'پرداخت' : 'ثبت درخواست'}
           </button>
@@ -481,25 +481,25 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               <div className="flex flex-col gap-2 mb-4">
                 <button
                   onClick={() => { setUsageType('theater'); resetSelection() }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
                 >
                   <div className="flex-1 text-right">
-                    <p className={`text-[16px] font-bold ${usageType === 'theater' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>تمرین تئاتر</p>
+                    <p className={`text-[16px] font-bold ${usageType === 'theater' ? 'text-[#801A00]' : 'text-[#171717]'}`}>تمرین تئاتر</p>
                     <p className="text-[14px] text-[#A0A0A0] font-light mt-0.5">رزرو آنلاین با پرداخت مستقیم</p>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#801A00] bg-[#801A00]' : 'border-[#D0D0D0] bg-white'}`}>
                     {usageType === 'theater' && <div className="w-2 h-2 rounded-full bg-white" />}
                   </div>
                 </button>
                 <button
                   onClick={() => { setUsageType('other'); resetSelection() }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
                 >
                   <div className="flex-1 text-right">
-                    <p className={`text-[16px] font-bold ${usageType === 'other' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>سایر موارد</p>
+                    <p className={`text-[16px] font-bold ${usageType === 'other' ? 'text-[#801A00]' : 'text-[#171717]'}`}>سایر موارد</p>
                     <p className="text-[14px] text-[#A0A0A0] font-light mt-0.5">ورکشاپ، عکاسی، فیلمبرداری، یوگا و...</p>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'other' ? 'border-[#801A00] bg-[#801A00]' : 'border-[#D0D0D0] bg-white'}`}>
                     {usageType === 'other' && <div className="w-2 h-2 rounded-full bg-white" />}
                   </div>
                 </button>
@@ -508,7 +508,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 onClick={() => { setShowUsageSheet(false); if (usageType) setShowPicker(true) }}
                 disabled={!usageType}
                 className="w-full py-3.5 rounded-xl text-white font-bold text-[16px] disabled:opacity-40 mb-4"
-                style={{ background: '#8B1E1E' }}
+                style={{ background: '#801A00' }}
               >
                 ادامه
               </button>
@@ -668,7 +668,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               </p>
               <button
                 onClick={() => setDescExpanded((v) => !v)}
-                style={{ marginTop: 12, color: '#8B1E1E', fontWeight: 700, fontSize: 14, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                style={{ marginTop: 12, color: '#801A00', fontWeight: 700, fontSize: 14, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
               >
                 {descExpanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
               </button>
@@ -686,7 +686,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 {studio.reviews.map((r) => (
                   <div key={r.id}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#8B1E1E', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#801A00', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
                         {r.avatar}
                       </div>
                       <div>
@@ -722,7 +722,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 }}
                   onMouseEnter={(e) => {
                     const t = e.currentTarget as HTMLDivElement
-                    t.style.borderColor = '#8B1E1E'
+                    t.style.borderColor = '#801A00'
                     t.style.boxShadow = '0 4px 20px rgba(139,30,30,0.12)'
                   }}
                   onMouseLeave={(e) => {
@@ -741,7 +741,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
 
                   <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
-                      <MapPin size={26} color="#8B1E1E" />
+                      <MapPin size={26} color="#801A00" />
                     </div>
                     <div style={{ textAlign: 'center' }}>
                       <p style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 }}>خانه دی</p>
@@ -749,7 +749,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                     </div>
                     <div style={{
                       display: 'flex', alignItems: 'center', gap: 6,
-                      background: '#8B1E1E', color: 'white',
+                      background: '#801A00', color: 'white',
                       padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
                     }}>
                       <MapPin size={11} color="white" />
@@ -760,7 +760,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               </a>
 
               <div className="flex items-start gap-3 mt-4">
-                <MapPin size={18} color="#8B1E1E" style={{ flexShrink: 0, marginTop: 2 }} />
+                <MapPin size={18} color="#801A00" style={{ flexShrink: 0, marginTop: 2 }} />
                 <div>
                   <p className="text-[13px] font-bold text-[#171717] mb-1">خانه دی</p>
                   <p className="text-[13px] text-[#717171] font-light leading-relaxed">
@@ -771,7 +771,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold hover:opacity-75 transition-opacity"
-                    style={{ color: '#8B1E1E' }}
+                    style={{ color: '#801A00' }}
                   >
                     مشاهده در نشان
                     <ChevronLeft size={12} />
@@ -811,17 +811,17 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                   {/* تمرین تئاتر */}
                   <button
                     onClick={() => { setUsageType('theater'); resetSelection() }}
-                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
                   >
                     <div className="flex-1 text-right">
-                      <p className={`text-[14px] font-bold ${usageType === 'theater' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>
+                      <p className={`text-[14px] font-bold ${usageType === 'theater' ? 'text-[#801A00]' : 'text-[#171717]'}`}>
                         تمرین تئاتر
                       </p>
                       <p className="text-[12px] text-[#A0A0A0] font-light mt-0.5">
                         رزرو آنلاین با پرداخت مستقیم
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#801A00] bg-[#801A00]' : 'border-[#D0D0D0] bg-white'}`}>
                       {usageType === 'theater' && <div className="w-2 h-2 rounded-full bg-white" />}
                     </div>
                   </button>
@@ -829,17 +829,17 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                   {/* سایر موارد */}
                   <button
                     onClick={() => { setUsageType('other'); resetSelection() }}
-                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
                   >
                     <div className="flex-1 text-right">
-                      <p className={`text-[14px] font-bold ${usageType === 'other' ? 'text-[#8B1E1E]' : 'text-[#171717]'}`}>
+                      <p className={`text-[14px] font-bold ${usageType === 'other' ? 'text-[#801A00]' : 'text-[#171717]'}`}>
                         سایر موارد
                       </p>
                       <p className="text-[12px] text-[#A0A0A0] font-light mt-0.5">
                         ورکشاپ، عکاسی، فیلمبرداری، یوگا و...
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'other' ? 'border-[#8B1E1E] bg-[#8B1E1E]' : 'border-[#D0D0D0] bg-white'}`}>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'other' ? 'border-[#801A00] bg-[#801A00]' : 'border-[#D0D0D0] bg-white'}`}>
                       {usageType === 'other' && <div className="w-2 h-2 rounded-full bg-white" />}
                     </div>
                   </button>
@@ -858,13 +858,13 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                       cursor: 'pointer', textAlign: 'right', background: 'white',
                       transition: 'border-color 200ms',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
                   >
                     <div>
                       {selectedStartDate ? (
                         <>
-                          <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2 }}>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2 }}>
                             {isMultiDay ? 'بازه تاریخی' : 'تاریخ و ساعت'}
                           </p>
                           <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>
@@ -928,7 +928,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
 
               {usageType === 'theater' && isMultiDay && selectedStartDate && (
                 <div style={{ borderTop: '1px solid #EFEFEF', marginTop: 0, paddingTop: 12, marginBottom: 16 }}>
-                  <p style={{ fontSize: 13, color: '#8B1E1E', textAlign: 'right' }}>
+                  <p style={{ fontSize: 13, color: '#801A00', textAlign: 'right' }}>
                     قیمت رزرو چند روزه پس از هماهنگی تیم خانه دی اعلام می‌شود.
                   </p>
                 </div>
@@ -946,7 +946,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                   onClick={handleBooking}
                   disabled={!selectedStartDate || !selectedStartTime || !selectedEndTime}
                   className="w-full py-3.5 rounded-xl text-[15px] font-bold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: '#8B1E1E' }}
+                  style={{ background: '#801A00' }}
                 >
                   {!selectedStartDate
                     ? 'تاریخ و ساعت را انتخاب کنید'
@@ -964,8 +964,8 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                     className="w-full py-3.5 rounded-xl text-[15px] font-bold transition-all disabled:cursor-not-allowed"
                     style={{
                       background: !selectedStartDate ? '#F0F0F0' : 'white',
-                      color: !selectedStartDate ? '#A0A0A0' : '#8B1E1E',
-                      border: !selectedStartDate ? 'none' : '2px solid #8B1E1E',
+                      color: !selectedStartDate ? '#A0A0A0' : '#801A00',
+                      border: !selectedStartDate ? 'none' : '2px solid #801A00',
                       opacity: loading ? 0.6 : 1,
                     }}
                   >
@@ -1024,7 +1024,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
       {showSuccess && usageType === 'other' && (
         <div className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center px-8 text-center">
           <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: '#FDF0F0' }}>
-            <CheckCircle size={36} color="#8B1E1E" />
+            <CheckCircle size={36} color="#801A00" />
           </div>
           <h2 className="text-[24px] font-black text-[#171717] mb-3">درخواست ثبت شد!</h2>
           <p className="text-[15px] text-[#717171] font-light leading-relaxed max-w-sm mb-2">
@@ -1036,7 +1036,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
           <Link
             href="/"
             className="px-8 py-3 text-white rounded-xl font-bold text-[15px]"
-            style={{ background: '#8B1E1E' }}
+            style={{ background: '#801A00' }}
           >
             بازگشت به صفحه اصلی
           </Link>

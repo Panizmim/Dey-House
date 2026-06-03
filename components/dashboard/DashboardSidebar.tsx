@@ -58,16 +58,16 @@ export function DashboardSidebar() {
                 borderRadius: active ? 0 : 12,
                 fontSize: 14,
                 fontWeight: active ? 700 : 400,
-                color: active ? '#8B1E1E' : '#404040',
+                color: active ? '#801A00' : '#404040',
                 background: active ? '#FDF0F0' : 'transparent',
-                borderRight: active ? '3px solid #8B1E1E' : '3px solid transparent',
+                borderRight: active ? '3px solid #801A00' : '3px solid transparent',
                 textDecoration: 'none',
                 transition: 'all 150ms',
               }}
               onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#F5F5F5' }}
               onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
             >
-              <Icon size={18} style={{ color: active ? '#8B1E1E' : '#A0A0A0', flexShrink: 0 }} />
+              <Icon size={18} style={{ color: active ? '#801A00' : '#A0A0A0', flexShrink: 0 }} />
               {label}
             </Link>
           )
@@ -132,8 +132,8 @@ export function DashboardSidebar() {
               transition: 'all 150ms',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#8B1E1E'
-              e.currentTarget.style.color = '#8B1E1E'
+              e.currentTarget.style.borderColor = '#801A00'
+              e.currentTarget.style.color = '#801A00'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = '#E0E0E0'

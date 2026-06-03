@@ -73,7 +73,7 @@ export default function ImageUploadZone({ currentUrl, preview, onFileSelect, onC
             if (file) handleFile(file)
           }}
           style={{
-            border: `1px dashed ${dragging ? '#8B1E1E' : '#E5E5E5'}`,
+            border: `1px dashed ${dragging ? '#801A00' : '#E5E5E5'}`,
             borderRadius: 8,
             padding: 24,
             textAlign: 'center',
@@ -82,7 +82,7 @@ export default function ImageUploadZone({ currentUrl, preview, onFileSelect, onC
             transition: 'all 0.15s',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#8B1E1E'
+            e.currentTarget.style.borderColor = '#801A00'
             e.currentTarget.style.background  = '#FAFAFA'
           }}
           onMouseLeave={(e) => {

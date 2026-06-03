@@ -128,7 +128,7 @@ export default function PaymentSuccessPage({ searchParams }: Props) {
             href="/dashboard/bookings"
             style={{
               display: 'block', textAlign: 'center',
-              background: '#8B1E1E', color: 'white',
+              background: '#801A00', color: 'white',
               borderRadius: 12, padding: '14px',
               fontSize: 15, fontWeight: 700, textDecoration: 'none',
             }}

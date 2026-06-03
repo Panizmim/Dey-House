@@ -43,7 +43,7 @@ export function AboutSection() {
             style={{
               width:        48,
               height:       2,
-              background:   '#8B1E1E',
+              background:   '#801A00',
               marginBottom: 28,
             }}
           />

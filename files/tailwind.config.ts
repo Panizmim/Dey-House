@@ -9,11 +9,11 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          red:          '#8C2020',
-          'red-hover':  '#A82828',
-          'red-dark':   '#6E1818',
+          red:          '#801A00',
+          'red-hover':  '#9C2200',
+          'red-dark':   '#5C1300',
           'red-bg':     '#F9F0F0',
-          'red-border': 'rgba(140,32,32,0.2)',
+          'red-border': 'rgba(128,26,0,0.2)',
         },
         gray: {
           50:  '#F7F7F7',

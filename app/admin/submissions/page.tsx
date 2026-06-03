@@ -95,7 +95,7 @@ export default function AdminSubmissionsPage() {
             onClick={() => setFilter(f.value)}
             style={{
               padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer',
-              background: filter === f.value ? '#8B1E1E' : 'white',
+              background: filter === f.value ? '#801A00' : 'white',
               color:      filter === f.value ? 'white' : '#404040',
               border:     filter === f.value ? 'none' : '1px solid #EFEFEF',
               fontWeight: filter === f.value ? 600 : 400,
@@ -137,7 +137,7 @@ export default function AdminSubmissionsPage() {
                       {/* آواتار */}
                       <div style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: '#8B1E1E', color: 'white', flexShrink: 0,
+                        background: '#801A00', color: 'white', flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 18, fontWeight: 700,
                       }}>
@@ -190,8 +190,8 @@ export default function AdminSubmissionsPage() {
                           style={{
                             display: 'flex', alignItems: 'center', gap: 6,
                             padding: '5px 12px', borderRadius: 6,
-                            border: '1px solid #8B1E1E', fontSize: 12,
-                            color: '#8B1E1E', textDecoration: 'none', fontWeight: 600,
+                            border: '1px solid #801A00', fontSize: 12,
+                            color: '#801A00', textDecoration: 'none', fontWeight: 600,
                           }}
                         >
                           <Download size={12} />

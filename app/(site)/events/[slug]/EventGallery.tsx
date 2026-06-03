@@ -45,7 +45,7 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
             background: 'white', cursor: 'pointer', transition: 'all 150ms',
             fontFamily: 'YekanBakh, Tahoma, sans-serif',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.color = '#8B1E1E' }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.color = '#801A00' }}
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.color = '#717171' }}
         >
           همه عکس‌ها

@@ -73,7 +73,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
           <div>
             <div className="flex items-center justify-between mb-1">
               <label style={{ fontSize: 13, fontWeight: 600, color: '#404040' }}>تصویر بنر *</label>
-              <span style={{ fontSize: 11, color: '#8B1E1E', background: '#FDF5F5', padding: '2px 8px', borderRadius: 4 }}>
+              <span style={{ fontSize: 11, color: '#801A00', background: '#FDF5F5', padding: '2px 8px', borderRadius: 4 }}>
                 {BANNER_SIZE_HINT}
               </span>
             </div>
@@ -102,7 +102,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
                   aspectRatio: '16/9', cursor: 'pointer',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.background = '#FAFAFA' }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.background = '#FAFAFA' }}
                 onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.background = 'white' }}
               >
                 <ImagePlus size={28} color="#B0B0B0" />
@@ -125,13 +125,13 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 14px', borderRadius: 10,
-              border: `1px solid ${showText ? '#8B1E1E' : '#E5E5E5'}`,
+              border: `1px solid ${showText ? '#801A00' : '#E5E5E5'}`,
               background: showText ? '#FDF5F5' : 'white',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
           >
             <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: showText ? '#8B1E1E' : '#404040', margin: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: showText ? '#801A00' : '#404040', margin: 0 }}>
                 {showText ? 'نمایش متن روی عکس' : 'فقط عکس (بدون متن)'}
               </p>
               <p style={{ fontSize: 11, color: '#A0A0A0', margin: '2px 0 0' }}>
@@ -143,7 +143,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
             {/* toggle */}
             <div style={{
               width: 40, height: 22, borderRadius: 11,
-              background: showText ? '#8B1E1E' : '#D0D0D0',
+              background: showText ? '#801A00' : '#D0D0D0',
               position: 'relative', transition: 'background 0.2s', flexShrink: 0,
             }}>
               <div style={{
@@ -163,7 +163,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
           <button
             onClick={handleSave}
             disabled={saving || !file}
-            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: (saving || !file) ? 0.5 : 1 }}
+            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: (saving || !file) ? 0.5 : 1 }}
           >
             {saving ? 'در حال ذخیره...' : 'ذخیره'}
           </button>
@@ -213,13 +213,13 @@ export default function AdminHeroPage() {
           <h1 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 4 }}>هیرو سکشن</h1>
           <p style={{ fontSize: 13, color: '#717171' }}>
             بنرهای اسلایدر صفحه اصلی را مدیریت کنید —{' '}
-            <span style={{ color: '#8B1E1E', fontWeight: 600 }}>سایز توصیه‌شده: {BANNER_SIZE_HINT}</span>
+            <span style={{ color: '#801A00', fontWeight: 600 }}>سایز توصیه‌شده: {BANNER_SIZE_HINT}</span>
           </p>
         </div>
         <button
           onClick={() => setModalOpen(true)}
           className="flex items-center gap-2"
-          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           <Plus size={16} />
           افزودن بنر
@@ -289,7 +289,7 @@ export default function AdminHeroPage() {
                     flex: 1, minWidth: 80,
                     padding: '5px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer',
                     border: '1px solid #E5E5E5', background: banner.showText ? '#FDF5F5' : 'white',
-                    color: banner.showText ? '#8B1E1E' : '#717171',
+                    color: banner.showText ? '#801A00' : '#717171',
                   }}
                 >
                   {banner.showText ? 'با متن ✓' : 'بدون متن'}
