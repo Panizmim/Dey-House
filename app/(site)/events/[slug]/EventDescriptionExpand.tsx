@@ -26,7 +26,7 @@ export default function EventDescriptionExpand({ description }: { description: s
             marginTop: 10,
             fontSize: 13,
             fontWeight: 700,
-            color: '#8B1E1E',
+            color: '#801A00',
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',

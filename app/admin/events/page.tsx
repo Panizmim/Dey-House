@@ -105,7 +105,7 @@ export default function AdminEventsPage() {
         <button
           onClick={openAdd}
           className="flex items-center gap-2"
-          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
         >
           <Plus size={16} />
           افزودن رویداد جدید

@@ -89,7 +89,7 @@ export default function AdminSidebar() {
                     margin: '2px 12px',
                     fontSize: 14,
                     fontWeight: active ? 700 : 400,
-                    color: active ? '#8B1E1E' : '#404040',
+                    color: active ? '#801A00' : '#404040',
                     background: active ? '#FDF5F5' : 'transparent',
                     display: 'flex',
                     alignItems: 'center',
@@ -97,7 +97,7 @@ export default function AdminSidebar() {
                   onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#F5F5F5' }}
                   onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
                 >
-                  <Icon size={16} color={active ? '#8B1E1E' : '#717171'} />
+                  <Icon size={16} color={active ? '#801A00' : '#717171'} />
                   {item.label}
                 </Link>
               )

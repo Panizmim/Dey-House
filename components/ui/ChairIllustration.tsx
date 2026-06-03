@@ -5,7 +5,7 @@ interface ChairIllustrationProps {
 }
 
 const ChairIllustration = ({
-  color = '#8B1E1E',
+  color = '#801A00',
   opacity = 1,
   className = '',
 }: ChairIllustrationProps) => (

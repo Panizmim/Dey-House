@@ -39,7 +39,7 @@ export function ArtistSubmissionCTA() {
                          transition-all duration-200 hover:opacity-90
                          hover:-translate-y-px"
               style={{
-                background:   '#8B1E1E',
+                background:   '#801A00',
                 borderRadius: '8px',
                 fontSize:     '15px',
               }}

@@ -74,7 +74,7 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderBottom: '1px solid #F5F5F5' }}>
             <div style={{
               width: 44, height: 44, borderRadius: '50%',
-              background: '#8B1E1E', color: 'white',
+              background: '#801A00', color: 'white',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18, fontWeight: 700, flexShrink: 0,
             }}>
@@ -120,7 +120,7 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
                 gap: 10, padding: '11px 20px',
                 background: 'transparent', border: 'none', cursor: 'pointer',
-                fontSize: 13, fontWeight: 600, color: '#8B1E1E',
+                fontSize: 13, fontWeight: 600, color: '#801A00',
                 fontFamily: 'YekanBakh, Tahoma, sans-serif',
                 transition: 'background 150ms',
               }}
@@ -324,7 +324,7 @@ function Navbar() {
                 onClick={close}
                 style={{
                   display: 'block', textAlign: 'center',
-                  background: '#8B1E1E', color: 'white',
+                  background: '#801A00', color: 'white',
                   borderRadius: 10, padding: '13px',
                   fontSize: 15, fontWeight: 700, textDecoration: 'none',
                 }}
@@ -338,7 +338,7 @@ function Navbar() {
                   style={{
                     background: 'transparent', border: '1px solid #E5E5E5',
                     borderRadius: 10, padding: '13px',
-                    fontSize: 14, fontWeight: 600, color: '#8B1E1E',
+                    fontSize: 14, fontWeight: 600, color: '#801A00',
                     cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
                     width: '100%',
                   }}

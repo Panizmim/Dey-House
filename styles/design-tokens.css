@@ -6,11 +6,11 @@
 
 :root {
   /* ─── BRAND COLORS ─── */
-  --color-brand-red:        #8C2020;
-  --color-brand-red-hover:  #A82828;
-  --color-brand-red-dark:   #6E1818;
+  --color-brand-red:        #801A00;
+  --color-brand-red-hover:  #9C2200;
+  --color-brand-red-dark:   #5C1300;
   --color-brand-red-bg:     #F9F0F0;
-  --color-brand-red-border: rgba(140, 32, 32, 0.2);
+  --color-brand-red-border: rgba(128, 26, 0, 0.2);
 
   /* ─── NEUTRAL PALETTE ─── */
   --color-black:      #111111;

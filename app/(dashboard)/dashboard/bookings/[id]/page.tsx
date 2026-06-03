@@ -79,7 +79,7 @@ export default function BookingDetailPage() {
           <div style={{ position: 'relative', width: 80, height: 80, marginBottom: 24 }}>
             <div style={{
               width: 80, height: 80, borderRadius: '50%',
-              background: '#8B1E1E',
+              background: '#801A00',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <Check size={32} color="white" />
@@ -91,7 +91,7 @@ export default function BookingDetailPage() {
                   position: 'absolute',
                   width: 8, height: 8,
                   borderRadius: '50%',
-                  background: '#8B1E1E',
+                  background: '#801A00',
                   opacity: 0.3,
                   top: '50%', left: '50%',
                   transform: `rotate(${i * 45}deg) translateY(-48px) translate(-50%, -50%)`,
@@ -99,7 +99,7 @@ export default function BookingDetailPage() {
               />
             ))}
           </div>
-          <h2 style={{ fontSize: 24, fontWeight: 900, color: '#8B1E1E', marginBottom: 12 }}>انجام شد!</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 900, color: '#801A00', marginBottom: 12 }}>انجام شد!</h2>
           <p style={{ fontSize: 16, fontWeight: 700, color: '#404040', marginBottom: 8 }}>
             رزرو شما با موفقیت لغو شد.
           </p>
@@ -111,7 +111,7 @@ export default function BookingDetailPage() {
             style={{
               marginTop: 32,
               padding: '12px 32px',
-              background: '#8B1E1E',
+              background: '#801A00',
               color: 'white',
               borderRadius: 12,
               fontSize: 14, fontWeight: 700,
@@ -119,7 +119,7 @@ export default function BookingDetailPage() {
               transition: 'background 150ms',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = '#A02424' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '#8B1E1E' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#801A00' }}
           >
             بازگشت به رزروها
           </Link>
@@ -158,7 +158,7 @@ export default function BookingDetailPage() {
         href="/dashboard/bookings"
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          fontSize: 14, fontWeight: 700, color: '#8B1E1E',
+          fontSize: 14, fontWeight: 700, color: '#801A00',
           textDecoration: 'none', marginBottom: 24,
           transition: 'opacity 150ms',
         }}
@@ -202,9 +202,9 @@ export default function BookingDetailPage() {
                   { icon: User,        label: 'نوع کاربری', value: typeLabel[booking.type] ?? booking.type },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                    <Icon size={16} style={{ color: '#8B1E1E', marginTop: 2, flexShrink: 0 }} />
+                    <Icon size={16} style={{ color: '#801A00', marginTop: 2, flexShrink: 0 }} />
                     <div>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#8B1E1E', marginBottom: 2 }}>{label}</p>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', marginBottom: 2 }}>{label}</p>
                       <p style={{ fontSize: 14, color: '#404040' }}>{value}</p>
                     </div>
                   </div>

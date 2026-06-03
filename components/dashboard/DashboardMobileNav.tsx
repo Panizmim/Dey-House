@@ -35,7 +35,7 @@ export function DashboardMobileNav() {
               gap: 4,
               padding: '10px 0',
               textDecoration: 'none',
-              color: active ? '#8B1E1E' : '#A0A0A0',
+              color: active ? '#801A00' : '#A0A0A0',
               fontSize: 11,
               fontWeight: active ? 700 : 400,
               transition: 'color 150ms',

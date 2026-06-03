@@ -50,10 +50,10 @@ function Field({
 }
 
 const inputClass =
-  'w-full bg-white border border-[#E5E5E5] rounded-lg px-4 py-3 text-sm text-[#171717] placeholder:text-[#B0B0B0] outline-none focus:border-[#8B1E1E] transition-colors duration-200 font-[family-name:var(--font-yekan)]'
+  'w-full bg-white border border-[#E5E5E5] rounded-lg px-4 py-3 text-sm text-[#171717] placeholder:text-[#B0B0B0] outline-none focus:border-[#801A00] transition-colors duration-200 font-[family-name:var(--font-yekan)]'
 
 const textareaClass =
-  'w-full bg-white border border-[#E5E5E5] rounded-lg px-4 py-3 text-[13px] text-[#171717] placeholder:text-[#B0B0B0] outline-none focus:border-[#8B1E1E] transition-colors duration-200 resize-none font-[family-name:var(--font-yekan)]'
+  'w-full bg-white border border-[#E5E5E5] rounded-lg px-4 py-3 text-[13px] text-[#171717] placeholder:text-[#B0B0B0] outline-none focus:border-[#801A00] transition-colors duration-200 resize-none font-[family-name:var(--font-yekan)]'
 
 /* ─── Upload Zone ─── */
 function UploadZone({
@@ -72,7 +72,7 @@ function UploadZone({
     <div>
       <div
         onClick={() => ref.current?.click()}
-        className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:border-[#8B1E1E] hover:bg-[#FAFAFA] p-10"
+        className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:border-[#801A00] hover:bg-[#FAFAFA] p-10"
       >
         <Upload size={28} className="text-[#B0B0B0]" />
         <span className="text-[13px] text-[#717171]">
@@ -97,7 +97,7 @@ function ArtworkUploadZone({ fileName, onFile }: { fileName?: string; onFile: (f
   return (
     <div
       onClick={() => ref.current?.click()}
-      className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200 hover:border-[#8B1E1E] hover:bg-[#FAFAFA]"
+      className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200 hover:border-[#801A00] hover:bg-[#FAFAFA]"
       style={{ height: '160px' }}
     >
       <span className="text-[13px] text-[#717171]">{fileName ? fileName : 'Files +/↑'}</span>
@@ -287,7 +287,7 @@ export default function ArtistPage() {
                   key={field}
                   className="flex items-center justify-between cursor-pointer rounded-lg transition-all duration-200"
                   style={{
-                    border: `1px solid ${isSelected ? '#8B1E1E' : '#E5E5E5'}`,
+                    border: `1px solid ${isSelected ? '#801A00' : '#E5E5E5'}`,
                     background: isSelected ? '#FDF5F5' : '#FFFFFF',
                     padding: '16px 20px',
                   }}
@@ -300,7 +300,7 @@ export default function ArtistPage() {
                     value={field}
                     checked={isSelected}
                     onChange={() => setValue('artField', field, { shouldValidate: true })}
-                    className="w-5 h-5 cursor-pointer accent-[#8B1E1E]"
+                    className="w-5 h-5 cursor-pointer accent-[#801A00]"
                   />
                 </label>
               )

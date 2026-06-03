@@ -38,7 +38,7 @@ export default function TimePicker({ label, slots, selected, onSelect, disabledS
                 textAlign: 'right', border: 'none',
                 fontSize: 14, fontWeight: isSelected ? 700 : 400,
                 cursor: disabled ? 'not-allowed' : 'pointer',
-                background: isSelected ? '#8B1E1E' : 'transparent',
+                background: isSelected ? '#801A00' : 'transparent',
                 color: isSelected ? 'white' : disabled ? '#D0D0D0' : '#171717',
                 transition: 'all 100ms',
                 fontFamily: 'YekanBakh, Tahoma, sans-serif',
@@ -46,7 +46,7 @@ export default function TimePicker({ label, slots, selected, onSelect, disabledS
               onMouseEnter={(e) => {
                 if (!disabled && !isSelected) {
                   e.currentTarget.style.background = '#FDF0F0'
-                  e.currentTarget.style.color = '#8B1E1E'
+                  e.currentTarget.style.color = '#801A00'
                 }
               }}
               onMouseLeave={(e) => {

@@ -71,7 +71,7 @@ export function DashboardTopBar() {
           ) : (
             <div style={{
               width: 40, height: 40, borderRadius: '50%',
-              background: '#8B1E1E', color: 'white',
+              background: '#801A00', color: 'white',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 14, fontWeight: 700, flexShrink: 0,
             }}>
@@ -107,7 +107,7 @@ export function DashboardTopBar() {
                   ) : (
                     <div style={{
                       width: 36, height: 36, borderRadius: '50%',
-                      background: '#8B1E1E', color: 'white',
+                      background: '#801A00', color: 'white',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 14, fontWeight: 700, flexShrink: 0,
                     }}>

@@ -37,3 +37,7 @@ next-env.d.ts
 
 # logs
 /logs/*.log
+
+# dev server
+.dev.pid
+logs/*.log

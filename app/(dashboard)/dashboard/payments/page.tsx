@@ -80,7 +80,7 @@ function PaymentRow({ payment }: { payment: Payment }) {
         href={`/dashboard/bookings/${payment.id}`}
         style={{
           display: 'flex', alignItems: 'center', gap: 4,
-          fontSize: 14, fontWeight: 700, color: '#8B1E1E',
+          fontSize: 14, fontWeight: 700, color: '#801A00',
           flexShrink: 0, textDecoration: 'none', transition: 'opacity 150ms',
         }}
         onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7' }}

@@ -84,7 +84,7 @@ export default function AdminUsersPage() {
                       <span style={{
                         borderRadius: 4, padding: '2px 8px', fontSize: 12, fontWeight: 600,
                         background: u.role === 'ADMIN' ? '#FDF5F5' : '#F3F4F6',
-                        color:      u.role === 'ADMIN' ? '#8B1E1E' : '#6B7280',
+                        color:      u.role === 'ADMIN' ? '#801A00' : '#6B7280',
                       }}>
                         {u.role === 'ADMIN' ? 'ادمین' : 'کاربر'}
                       </span>

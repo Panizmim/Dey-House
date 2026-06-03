@@ -10,7 +10,7 @@ const sizeMap = { sm: 32, md: 40, lg: 64 }
 
 export function Logo({ size = 'md', className, light = false }: LogoProps) {
   const px = sizeMap[size]
-  const bg = light ? 'rgba(255,255,255,0.1)' : '#8B1E1E'
+  const bg = light ? 'rgba(255,255,255,0.1)' : '#801A00'
   const fg = light ? 'rgba(255,255,255,0.88)' : '#C8C0BC'
 
   return (

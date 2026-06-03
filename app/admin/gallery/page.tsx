@@ -29,7 +29,7 @@ const statusLabel: Record<string, string> = {
   PAST:     'برگزار شده',
 }
 
-const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#8B1E1E] transition-colors'
+const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
 const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
 
 function Badge({ status }: { status: string }) {
@@ -112,7 +112,7 @@ function MultiImagePicker({
             cursor: 'pointer', background: 'white',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#8B1E1E'; e.currentTarget.style.background = '#FAFAFA' }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.background = '#FAFAFA' }}
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.background = 'white' }}
         >
           <ImagePlus size={18} color="#B0B0B0" />
@@ -406,7 +406,7 @@ function GalleryModal({
             <button
               onClick={handleSave}
               disabled={saving}
-              style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}
+              style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}
             >
               {saving ? 'در حال ذخیره...' : 'ذخیره'}
             </button>
@@ -468,7 +468,7 @@ export default function AdminGalleryPage() {
         <button
           onClick={() => { setEditGallery(null); setModalOpen(true) }}
           className="flex items-center gap-2"
-          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1E1E', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
         >
           <Plus size={16} />
           افزودن نمایشگاه جدید

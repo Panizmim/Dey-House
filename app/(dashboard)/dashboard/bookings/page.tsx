@@ -114,7 +114,7 @@ function BookingRow({ booking, onCancelled }: { booking: Booking; onCancelled: (
           href={`/dashboard/bookings/${booking.id}`}
           style={{
             display: 'flex', alignItems: 'center', gap: 4,
-            fontSize: 14, fontWeight: 700, color: '#8B1E1E',
+            fontSize: 14, fontWeight: 700, color: '#801A00',
             textDecoration: 'none', transition: 'opacity 150ms',
           }}
           onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7' }}
@@ -239,12 +239,12 @@ export default function BookingsPage() {
               border: '1px solid',
               cursor: 'pointer',
               transition: 'all 150ms',
-              background: activeTab === i ? '#8B1E1E' : 'white',
-              borderColor: activeTab === i ? '#8B1E1E' : '#E5E5E5',
+              background: activeTab === i ? '#801A00' : 'white',
+              borderColor: activeTab === i ? '#801A00' : '#E5E5E5',
               color: activeTab === i ? 'white' : '#404040',
             }}
             onMouseEnter={(e) => {
-              if (activeTab !== i) e.currentTarget.style.borderColor = '#8B1E1E'
+              if (activeTab !== i) e.currentTarget.style.borderColor = '#801A00'
             }}
             onMouseLeave={(e) => {
               if (activeTab !== i) e.currentTarget.style.borderColor = '#E5E5E5'
