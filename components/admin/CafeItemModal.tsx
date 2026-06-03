@@ -161,13 +161,13 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
               dir="ltr"
               className={inputClass}
               value={form.price}
-              onChange={(e) => set('price', e.target.value.replace(/[^0-9]/g, ''))}
+              onChange={(e) => set('price', e.target.value)}
               placeholder="350000"
             />
           </div>
           <div>
             <label className={labelClass}>دسته‌بندی *</label>
-            <select className={inputClass} value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <select className={inputClass} style={{ height: 38 }} value={form.category} onChange={(e) => set('category', e.target.value)}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
