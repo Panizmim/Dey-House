@@ -156,11 +156,13 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
           <div>
             <label className={labelClass}>قیمت (تومان) *</label>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              dir="ltr"
               className={inputClass}
               value={form.price}
-              onChange={(e) => set('price', e.target.value)}
-              placeholder="مثال: 350000"
+              onChange={(e) => set('price', e.target.value.replace(/[^0-9]/g, ''))}
+              placeholder="350000"
             />
           </div>
           <div>
