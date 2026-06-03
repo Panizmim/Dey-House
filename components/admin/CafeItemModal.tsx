@@ -175,15 +175,15 @@ export default function CafeItemModal({ open, item, onClose, onSave }: CafeItemM
           </div>
         </div>
 
-        {/* توضیحات */}
+        {/* محتویات غذا */}
         <div>
-          <label className={labelClass}>توضیحات (اختیاری)</label>
+          <label className={labelClass}>محتویات غذا (اختیاری)</label>
           <textarea
             className={inputClass}
             rows={2}
             value={form.description}
             onChange={(e) => set('description', e.target.value)}
-            placeholder="توضیح کوتاه..."
+            placeholder="مثال: قهوه، شیر، شکر — یا مواد اولیه..."
             style={{ resize: 'vertical' }}
           />
         </div>

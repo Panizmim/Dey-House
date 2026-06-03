@@ -4,6 +4,38 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import sharp from 'sharp'
 
+// ── Supabase Storage upload (برای محیط production / Vercel) ──
+async function uploadToSupabase(buffer: Buffer, folder: string, filename: string): Promise<string> {
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  const path        = `${folder}/${filename}`
+
+  const res = await fetch(`${supabaseUrl}/storage/v1/object/uploads/${path}`, {
+    method:  'POST',
+    headers: {
+      Authorization:  `Bearer ${serviceKey}`,
+      'Content-Type': 'image/webp',
+      'x-upsert':     'true',
+    },
+    body: new Uint8Array(buffer),
+  })
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`Supabase Storage error: ${res.status} ${text}`)
+  }
+
+  return `${supabaseUrl}/storage/v1/object/public/uploads/${path}`
+}
+
+// ── Local filesystem upload (برای محیط development) ──
+async function uploadToLocal(buffer: Buffer, folder: string, filename: string): Promise<string> {
+  const uploadDir = join(process.cwd(), 'public', 'uploads', folder)
+  await mkdir(uploadDir, { recursive: true })
+  await writeFile(join(uploadDir, filename), buffer)
+  return `/uploads/${folder}/${filename}`
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session || session.user.role !== 'ADMIN') {
@@ -11,8 +43,8 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData()
-  const file   = formData.get('file') as File
-  const folder = (formData.get('folder') as string) || 'uploads'
+  const file     = formData.get('file') as File
+  const folder   = (formData.get('folder') as string) || 'uploads'
 
   if (!file) {
     return NextResponse.json({ error: 'فایلی انتخاب نشده' }, { status: 400 })
@@ -20,17 +52,11 @@ export async function POST(req: NextRequest) {
 
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
   if (!allowedTypes.includes(file.type)) {
-    return NextResponse.json(
-      { error: 'فقط فایل‌های JPG، PNG و WebP مجاز هستند' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'فقط فایل‌های JPG، PNG و WebP مجاز هستند' }, { status: 400 })
   }
 
   if (file.size > 20 * 1024 * 1024) {
-    return NextResponse.json(
-      { error: 'حجم فایل نباید بیشتر از ۲۰MB باشد' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'حجم فایل نباید بیشتر از ۲۰MB باشد' }, { status: 400 })
   }
 
   try {
@@ -38,33 +64,32 @@ export async function POST(req: NextRequest) {
     const inputBuffer = Buffer.from(bytes)
 
     const optimizedBuffer = await sharp(inputBuffer)
-      .resize({
-        width:            1920,
-        height:           1920,
-        fit:              'inside',
-        withoutEnlargement: true,
-      })
+      .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 82, effort: 4 })
       .toBuffer()
 
-    const filename  = `${Date.now()}.webp`
-    const uploadDir = join(process.cwd(), 'public', 'uploads', folder)
-    await mkdir(uploadDir, { recursive: true })
-    await writeFile(join(uploadDir, filename), optimizedBuffer)
+    const filename = `${Date.now()}.webp`
+
+    // اگر SUPABASE_SERVICE_ROLE_KEY تنظیم شده باشد (production) از Supabase Storage استفاده کن
+    // در غیر این صورت (development) روی filesystem محلی ذخیره کن
+    const useSupabase = !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+    const url = useSupabase
+      ? await uploadToSupabase(optimizedBuffer, folder, filename)
+      : await uploadToLocal(optimizedBuffer, folder, filename)
 
     const originalKB  = Math.round(file.size / 1024)
     const optimizedKB = Math.round(optimizedBuffer.length / 1024)
     const savings     = Math.round((1 - optimizedBuffer.length / file.size) * 100)
 
-    console.log(`Image optimized: ${originalKB}KB → ${optimizedKB}KB (${savings}% saved)`)
+    console.log(`Image uploaded [${useSupabase ? 'supabase' : 'local'}]: ${originalKB}KB → ${optimizedKB}KB (${savings}% saved) → ${url}`)
 
     return NextResponse.json({
       success: true,
-      url: `/uploads/${folder}/${filename}`,
+      url,
       meta: { originalSize: originalKB, optimizedSize: optimizedKB, savings: `${savings}%` },
     })
   } catch (error) {
-    console.error('Image optimization error:', error)
-    return NextResponse.json({ error: 'خطا در پردازش تصویر' }, { status: 500 })
+    console.error('Image upload error:', error)
+    return NextResponse.json({ error: 'خطا در پردازش یا آپلود تصویر' }, { status: 500 })
   }
 }
