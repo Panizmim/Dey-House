@@ -7,13 +7,13 @@ import sharp from 'sharp'
 // ── Supabase Storage upload (برای محیط production / Vercel) ──
 async function uploadToSupabase(buffer: Buffer, folder: string, filename: string): Promise<string> {
   const supabaseUrl = process.env.SUPABASE_URL!
-  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  const anonKey     = process.env.SUPABASE_ANON_KEY!
   const path        = `${folder}/${filename}`
 
   const res = await fetch(`${supabaseUrl}/storage/v1/object/uploads/${path}`, {
     method:  'POST',
     headers: {
-      Authorization:  `Bearer ${serviceKey}`,
+      Authorization:  `Bearer ${anonKey}`,
       'Content-Type': 'image/webp',
       'x-upsert':     'true',
     },
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     // اگر SUPABASE_SERVICE_ROLE_KEY تنظیم شده باشد (production) از Supabase Storage استفاده کن
     // در غیر این صورت (development) روی filesystem محلی ذخیره کن
-    const useSupabase = !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+    const useSupabase = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
     const url = useSupabase
       ? await uploadToSupabase(optimizedBuffer, folder, filename)
       : await uploadToLocal(optimizedBuffer, folder, filename)
