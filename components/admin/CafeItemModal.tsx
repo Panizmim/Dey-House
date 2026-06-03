@@ -68,11 +68,6 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
   const set = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }))
 
-  function handleClearImage() {
-    setImagePreview(null)
-    setImageUrl(null)
-    setImageStatus('idle')
-  }
 
   async function handleSubmit() {
     if (!form.name || !form.price || !form.category) {

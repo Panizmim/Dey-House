@@ -301,7 +301,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
     if (imageStatus === 'uploading') { toast.error('لطفاً صبر کنید تا آپلود تصویر تمام شود'); return }
     setLoading(true)
     try {
-      let finalImageUrl: string | null = imageUrl ?? event?.imageUrl ?? null
+      const finalImageUrl: string | null = imageUrl ?? event?.imageUrl ?? null
 
       const galleryUrls: string[] = []
       for (const slot of gallery) {
