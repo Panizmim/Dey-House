@@ -80,7 +80,7 @@ function MenuItemCard({ item, index }: { item: MenuItem; index: number }) {
           {item.name}
         </p>
         {item.description && (
-          <p className="text-xs text-[#B0B0B0] font-light truncate">{item.description}</p>
+          <p className="text-xs text-[#717171] font-light" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{item.description}</p>
         )}
       </div>
       <div className="flex-shrink-0 text-left">
