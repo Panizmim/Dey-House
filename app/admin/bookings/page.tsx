@@ -35,30 +35,15 @@ function dateToISO(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/* ── TimePickerDropdown — دقیقاً مثل EventModal ── */
-function TimePickerDropdown({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
+/* ── HourPicker — فقط ساعت (بدون دقیقه) ── */
+const BOOKING_HOURS = [9,10,11,12,13,14,15,16,17,18,19,20,21]
+
+function HourPicker({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  const HOURS   = Array.from({ length: 12 }, (_, i) => i + 1)
-  const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-
-  const parse = (v: string): { h: number; m: number; p: 'AM' | 'PM' } => {
-    if (!v) return { h: 8, m: 0, p: 'AM' }
-    const [hh, mm] = v.split(':').map(Number)
-    return { h: hh % 12 || 12, m: mm, p: hh >= 12 ? 'PM' : 'AM' }
-  }
-
-  const { h, m, p } = parse(value)
-
-  const commit = (hour: number, min: number, period: 'AM' | 'PM') => {
-    const h24 = period === 'AM' ? (hour === 12 ? 0 : hour) : (hour === 12 ? 12 : hour + 12)
-    onChange(`${String(h24).padStart(2, '0')}:${String(min).padStart(2, '0')}`)
-  }
-
-  const display = value
-    ? `${toFaNum(h)}:${toFaNum(String(m).padStart(2, '0'))} ${p === 'AM' ? 'صبح' : 'بعدازظهر'}`
-    : label ?? 'انتخاب ساعت'
+  const selectedHour = value ? parseInt(value.split(':')[0], 10) : null
+  const display = selectedHour !== null ? `${toFaNum(selectedHour)}:۰۰` : placeholder
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -68,20 +53,7 @@ function TimePickerDropdown({ value, onChange, label }: { value: string; onChang
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
-
-  const colStyle: React.CSSProperties = {
-    display: 'flex', flexDirection: 'column', gap: 2,
-    maxHeight: 200, overflowY: 'auto',
-  }
-  const btnStyle = (active: boolean): React.CSSProperties => ({
-    padding: '6px 4px', borderRadius: 6, border: 'none', cursor: 'pointer',
-    background: active ? '#801A00' : 'transparent',
-    color: active ? 'white' : '#171717',
-    fontSize: 13, fontWeight: active ? 700 : 400,
-    fontFamily: 'YekanBakh, Tahoma, sans-serif',
-    textAlign: 'center', flexShrink: 0,
-  })
+  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -89,10 +61,10 @@ function TimePickerDropdown({ value, onChange, label }: { value: string; onChang
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={inputClass}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+        style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
       >
         <span style={{ color: value ? '#171717' : '#A0A0A0', fontSize: 14 }}>{display}</span>
-        <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: open ? 'rotate(180deg)' : 'rotate(0)' }} />
+        <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: open ? 'rotate(180deg)' : 'rotate(0)', flexShrink: 0 }} />
       </button>
 
       {open && (
@@ -100,42 +72,31 @@ function TimePickerDropdown({ value, onChange, label }: { value: string; onChang
           position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60,
           background: 'white', border: '1px solid #E5E5E5', borderRadius: 12,
           boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
-          width: 224, padding: '12px 10px',
+          padding: '8px', minWidth: 120,
         }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-            {/* ساعت */}
-            <div>
-              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center' }}>ساعت</p>
-              <div style={colStyle}>
-                {HOURS.map((hour) => (
-                  <button key={hour} type="button" style={btnStyle(h === hour)} onClick={() => commit(hour, m, p)}>
-                    {toFaNum(hour)}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {/* دقیقه */}
-            <div>
-              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center' }}>دقیقه</p>
-              <div style={colStyle}>
-                {MINUTES.map((min) => (
-                  <button key={min} type="button" style={btnStyle(m === min)} onClick={() => commit(h, min, p)}>
-                    {toFaNum(String(min).padStart(2, '0'))}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {/* صبح/بعدازظهر */}
-            <div>
-              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center' }}>دوره</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {(['AM', 'PM'] as const).map((period) => (
-                  <button key={period} type="button" style={btnStyle(p === period)} onClick={() => commit(h, m, period)}>
-                    {period === 'AM' ? 'صبح' : 'عصر'}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+            {BOOKING_HOURS.map((hour) => {
+              const active = selectedHour === hour
+              return (
+                <button
+                  key={hour}
+                  type="button"
+                  onClick={() => { onChange(`${String(hour).padStart(2, '0')}:00`); setOpen(false) }}
+                  style={{
+                    padding: '7px 4px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    background: active ? '#801A00' : 'transparent',
+                    color: active ? 'white' : '#171717',
+                    fontSize: 13, fontWeight: active ? 700 : 400,
+                    fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                    textAlign: 'center',
+                  }}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#F5F5F5' }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
+                >
+                  {toFaNum(hour)}:۰۰
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
@@ -173,7 +134,7 @@ function JalaliDateButton({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={inputClass}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+        style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
       >
         <span style={{ color: value ? '#171717' : '#A0A0A0', fontSize: 14 }}>
           {value ? jalaliToDisplay(value) : placeholder}
@@ -286,8 +247,9 @@ function AdminBookingModal({ onClose, onSaved }: { onClose: () => void; onSaved:
     return d > 0 ? d : null
   })()
 
-  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
+  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
   const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
+  const inputH: React.CSSProperties = { height: 38 }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.45)' }}>
@@ -309,7 +271,7 @@ function AdminBookingModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           {/* پلاتو */}
           <div>
             <label className={labelClass}>پلاتو *</label>
-            <select value={studioId} onChange={(e) => setStudioId(e.target.value)} className={inputClass}>
+            <select value={studioId} onChange={(e) => setStudioId(e.target.value)} className={inputClass} style={inputH}>
               {studios.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
@@ -322,7 +284,7 @@ function AdminBookingModal({ onClose, onSaved }: { onClose: () => void; onSaved:
                 type="button"
                 onClick={() => setShowCal((v) => !v)}
                 className={inputClass}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+                style={{ ...inputH, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
               >
                 <span style={{ color: selDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
                   {selDate ? jalaliToDisplay(selDate) : 'انتخاب تاریخ'}
@@ -348,18 +310,18 @@ function AdminBookingModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>ساعت شروع *</label>
-              <TimePickerDropdown value={startTime} onChange={setStartTime} label="ساعت شروع" />
+              <HourPicker value={startTime} onChange={setStartTime} placeholder="ساعت شروع" />
             </div>
             <div>
               <label className={labelClass}>ساعت پایان *</label>
-              <TimePickerDropdown value={endTime} onChange={setEndTime} label="ساعت پایان" />
+              <HourPicker value={endTime} onChange={setEndTime} placeholder="ساعت پایان" />
             </div>
           </div>
 
           {/* نوع کاربری */}
           <div>
             <label className={labelClass}>نوع کاربری</label>
-            <select value={type} onChange={(e) => setType(e.target.value)} className={inputClass}>
+            <select value={type} onChange={(e) => setType(e.target.value)} className={inputClass} style={inputH}>
               {USAGE_TYPES.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
             </select>
           </div>
@@ -466,8 +428,8 @@ export default function AdminBookingsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors bg-white"
-            style={{ minWidth: 140 }}
+            className="rounded-lg border border-[#E5E5E5] px-3 text-sm focus:outline-none focus:border-[#801A00] transition-colors bg-white"
+            style={{ minWidth: 140, height: 38 }}
           >
             <option value="all">همه وضعیت‌ها</option>
             <option value="PENDING">در انتظار</option>
