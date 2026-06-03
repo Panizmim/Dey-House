@@ -1,3 +1,7 @@
 {
-  "buildCommand": "prisma generate && prisma db push --accept-data-loss && next build"
+  "buildCommand": "prisma generate && prisma db push --accept-data-loss && next build",
+  "env": {
+    "SUPABASE_URL": "https://mayzekooxauibgtmtyhc.supabase.co",
+    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1heXpla29veGF1aWJndG10eWhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDEzMzUsImV4cCI6MjA5NDYxNzMzNX0.OHQRCI3o9eyKO3K0QKTjCt-6hD0DDd9_eaJ6QK0b3Ic"
+  }
 }
