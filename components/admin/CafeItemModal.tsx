@@ -18,15 +18,10 @@ export interface CafeMenuItem {
 interface CafeItemModalProps {
   open: boolean
   item?: CafeMenuItem | null
+  categories?: string[]
   onClose: () => void
   onSave: () => void
 }
-
-const CATEGORIES = [
-  'نوشیدنی گرم بر پایه اسپرسو', 'نوشیدنی سرد بر پایه اسپرسو', 'چای و دمنوش',
-  'نوشیدنی گرم', 'نوشیدنی سرد', 'نوشیدنی ساده',
-  'میان وعده', 'سالاد', 'ساندویچ', 'پاستا', 'بشقاب', 'تاپینگ',
-]
 
 const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
 const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
@@ -41,7 +36,8 @@ async function uploadImage(file: File, folder: string): Promise<string> {
   return data.url as string
 }
 
-export default function CafeItemModal({ open, item, onClose, onSave }: CafeItemModalProps) {
+export default function CafeItemModal({ open, item, categories = [], onClose, onSave }: CafeItemModalProps) {
+  const CATEGORIES = categories
   const [loading, setLoading]   = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -62,7 +58,7 @@ export default function CafeItemModal({ open, item, onClose, onSave }: CafeItemM
         isAvailable: item.isAvailable,
       })
     } else {
-      setForm({ name: '', price: '', category: CATEGORIES[0], description: '', isAvailable: true })
+      setForm({ name: '', price: '', category: CATEGORIES[0] ?? '', description: '', isAvailable: true })
     }
   }, [item, open])
 

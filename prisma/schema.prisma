@@ -102,6 +102,12 @@ model Event {
   @@index([date])
 }
 
+model CafeCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  order Int    @default(0)
+}
+
 model CafeMenuItem {
   id          String  @id @default(cuid())
   name        String
