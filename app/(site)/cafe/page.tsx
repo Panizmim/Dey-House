@@ -190,7 +190,7 @@ export default function CafePage() {
                   onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
                   className="w-full text-right transition-all duration-150 hover:bg-[#FAFAFA]"
                   style={{
-                    padding: '10px 14px', borderRadius: '8px', cursor: 'pointer',
+                    padding: '10px 14px', cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', gap: '2px',
                     background: isActive ? '#FDF5F5' : 'transparent',
                     borderRight: isActive ? '3px solid #801A00' : '3px solid transparent',
