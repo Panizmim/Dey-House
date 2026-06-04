@@ -57,6 +57,14 @@
   ::-webkit-scrollbar-track  { background: #efefef; border-radius: 4px; }
 }
 
+/* حذف آیکون autofill مرورگر روی اینپوت‌ها */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+}
+
 @layer utilities {
   .hero-bg {
     background:

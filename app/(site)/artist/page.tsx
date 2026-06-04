@@ -9,14 +9,14 @@ import PageHero from '@/components/ui/PageHero'
 
 /* ─── Validation ─── */
 const schema = z.object({
-  firstName: z.string().min(2, 'حداقل ۲ حرف'),
-  lastName:  z.string().min(2, 'حداقل ۲ حرف'),
+  fullName:  z.string().min(2, 'حداقل ۲ حرف'),
   phone:     z.string().regex(/^09[0-9]{9}$/, 'شماره موبایل معتبر نیست'),
   email:     z.string().email('ایمیل معتبر نیست'),
   website:   z.string().optional(),
   instagram: z.string().optional(),
   artField:  z.string().min(1, 'رشته هنری را انتخاب کنید'),
-  artworks: z.array(z.object({ description: z.string() })).length(4),
+  artworks: z.array(z.object({ description: z.string() })).length(2),
+  notes:    z.string().optional(),
 })
 
 type ArtistFormData = z.infer<typeof schema>
@@ -128,10 +128,11 @@ async function uploadFile(file: File, folder: string): Promise<string> {
 }
 
 export default function ArtistPage() {
-  const [submitted, setSubmitted]         = useState(false)
-  const [loading, setLoading]             = useState(false)
-  const [portfolioFile, setPortfolioFile] = useState<File | null>(null)
-  const [portfolioName, setPortfolioName] = useState<string>()
+  const [submitted, setSubmitted]           = useState(false)
+  const [loading, setLoading]               = useState(false)
+  const [portfolioFile, setPortfolioFile]   = useState<File | null>(null)
+  const [portfolioName, setPortfolioName]   = useState<string>()
+  const [portfolioError, setPortfolioError] = useState(false)
   const [artworkFiles, setArtworkFiles]   = useState<Record<number, File>>({})
 
   const {
@@ -145,7 +146,7 @@ export default function ArtistPage() {
     resolver: zodResolver(schema),
     defaultValues: {
       artField: '',
-      artworks: [{ description: '' }, { description: '' }, { description: '' }, { description: '' }],
+      artworks: [{ description: '' }, { description: '' }],
     },
   })
 
@@ -154,6 +155,10 @@ export default function ArtistPage() {
   const selectedField = watch('artField')
 
   const onSubmit = async (data: ArtistFormData) => {
+    if (!portfolioFile) {
+      setPortfolioError(true)
+      return
+    }
     setLoading(true)
     try {
       // آپلود پرتفولیو
@@ -164,7 +169,7 @@ export default function ArtistPage() {
 
       // آپلود نمونه کارها + توضیحات
       const artworkItems: { url: string; description: string }[] = []
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 2; i++) {
         const file = artworkFiles[i]
         const description = data.artworks[i]?.description ?? ''
         if (file || description) {
@@ -238,12 +243,9 @@ export default function ArtistPage() {
             اطلاعات فردی و هنری شما به صورت درپشت انجام مراحل بررسی موردنظر فرایند بررسی پروفایل شما را سریع‌تر خواهد کرد.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-0">
-            <Field error={errors.firstName?.message}>
-              <input {...register('firstName')} placeholder="نام کوچک" className={inputClass} />
-            </Field>
-            <Field error={errors.lastName?.message}>
-              <input {...register('lastName')} placeholder="نام خانوادگی" className={inputClass} />
+          <div className="mb-0">
+            <Field error={errors.fullName?.message}>
+              <input {...register('fullName')} placeholder="نام و نام خانوادگی" className={inputClass} />
             </Field>
           </div>
 
@@ -319,21 +321,24 @@ export default function ArtistPage() {
               accept=".pdf"
               hint="Allowed types: application/pdf"
               fileName={portfolioName}
-              onFile={(f) => { setPortfolioFile(f); setPortfolioName(f.name) }}
+              onFile={(f) => { setPortfolioFile(f); setPortfolioName(f.name); setPortfolioError(false) }}
             />
+            {portfolioError && (
+              <p className="text-xs text-red-500 mt-2">آپلود پرتفولیو الزامی است</p>
+            )}
           </div>
 
           {/* ─── بخش ۵ — نمونه کارها ─── */}
           <div className="mt-8">
             <h3 className="text-right font-[800] text-[#171717] mb-1" style={{ fontSize: '16px' }}>
-              ۴ تا از بهترین کارهایتان و توضیحات کامل را وارد کنید.
+              ۲ تا از بهترین کارهایتان و توضیحات کامل را وارد کنید. <span className="font-[400] text-[#A0A0A0]" style={{ fontSize: '13px' }}>(اختیاری)</span>
             </h3>
             <p className="text-right text-[#717171] mb-4" style={{ fontSize: '12px' }}>
               کارشناسان ما به دقت کارهای شما را بررسی می‌کنند. فرمت‌های قابل پشتیبانی: PNG، JPG
             </p>
 
             <div className="flex flex-col gap-4">
-              {[0, 1, 2, 3].map((i) => (
+              {[0, 1].map((i) => (
                 <div
                   key={i}
                   className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-lg p-4"
@@ -356,7 +361,23 @@ export default function ArtistPage() {
             </div>
           </div>
 
-          {/* ─── بخش ۶ — دکمه ─── */}
+          {/* ─── بخش ۶ — توضیحات اضافه ─── */}
+          <div className="mt-8">
+            <h3 className="text-right font-[800] text-[#171717] mb-1" style={{ fontSize: '16px' }}>
+              توضیحات <span className="font-[400] text-[#A0A0A0]" style={{ fontSize: '13px' }}>(اختیاری)</span>
+            </h3>
+            <p className="text-right text-[#717171] mb-4" style={{ fontSize: '12px' }}>
+              هر توضیح یا اطلاعات اضافه‌ای که فکر می‌کنید به بررسی پروفایل شما کمک می‌کند.
+            </p>
+            <textarea
+              {...register('notes')}
+              placeholder="توضیحات خود را اینجا بنویسید..."
+              className={textareaClass}
+              style={{ height: '140px' }}
+            />
+          </div>
+
+          {/* ─── بخش ۷ — دکمه ─── */}
           <div className="mt-10 flex justify-end">
             <button
               type="submit"

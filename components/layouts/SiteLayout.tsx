@@ -10,7 +10,7 @@ import { signOut } from 'next-auth/react'
 
 const navLinks = [
   { href: '/events',  label: 'رویدادها' },
-  { href: '/gallery', label: 'گالری دی‌ده' },
+  { href: '/gallery', label: 'گالری دیـ ده' },
   { href: '/cafe',    label: 'منو' },
   { href: '/artist',  label: 'همکاری هنرمندان' },
   { href: '/about',   label: 'درباره ما' },
