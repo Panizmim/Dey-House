@@ -45,6 +45,7 @@ const studiosData = {
       { label: 'سیستم تهویه',      icon: 'Wind'       },
       { label: 'اسپیکر حرفه‌ای',   icon: 'Volume2'    },
       { label: 'اینترنت پرسرعت',   icon: 'Wifi'       },
+      { label: 'اکوستیک',           icon: 'Volume2'    },
     ],
     reviews: [
       { id: 1, name: 'سارا محمدی',  avatar: 'س', date: 'اردیبهشت ۱۴۰۴', rating: 5, text: 'فضای خیلی خوبی بود. نورپردازی عالی و تجهیزات کامل. حتماً دوباره رزرو می‌کنم.' },
@@ -135,7 +136,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
   const studio = studiosData[params.studioId as StudioId]
   if (!studio) notFound()
 
-  const [descExpanded, setDescExpanded]           = useState(false)
+  const [descExpanded, setDescExpanded]           = useState(true)
   const [showPicker, setShowPicker]               = useState(false)
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null)
   const [selectedEndDate, setSelectedEndDate]     = useState<Date | null>(null)
@@ -657,19 +658,10 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               <p
                 style={{
                   fontSize: 15, color: '#404040', lineHeight: 2, whiteSpace: 'pre-line',
-                  overflow: 'hidden', display: '-webkit-box',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: descExpanded ? 'unset' : 4,
                 } as React.CSSProperties}
               >
                 {studio.description}
               </p>
-              <button
-                onClick={() => setDescExpanded((v) => !v)}
-                style={{ marginTop: 12, color: '#801A00', fontWeight: 700, fontSize: 14, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-              >
-                {descExpanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
-              </button>
             </div>
 
             {/* نظرات */}
