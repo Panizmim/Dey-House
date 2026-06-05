@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
-  Star, MapPin, Grid2x2, X, ChevronLeft, ChevronRight,
+  MapPin, Grid2x2, X, ChevronLeft, ChevronRight,
   Lightbulb, Monitor, Scan, Wind, Volume2, Square, Wifi,
   Maximize2, Armchair, Layers, PaintBucket, Calendar,
   MessageCircle, CheckCircle,
@@ -29,8 +29,6 @@ const studiosData = {
     wallType: 'نقاشی',
     chairCount: 20,
     pricePerHour: 400000,
-    rating: 4.9,
-    reviewCount: 47,
     description: `این فضا یک وایت باکس چند منظوره برای کاربرد هایی همچون تمرین تئاتر، برگزاری کلاس های یوگا و مدیتیشن، نمایشگاه آثار هنری و تجسمی، تمرین موسیقی و آواز و رقص می باشد.`,
     images: [
       '/images/studios/white-room-1.jpg',
@@ -47,12 +45,6 @@ const studiosData = {
       { label: 'اینترنت پرسرعت',   icon: 'Wifi'       },
       { label: 'اکوستیک',           icon: 'Volume2'    },
     ],
-    reviews: [
-      { id: 1, name: 'سارا محمدی',  avatar: 'س', date: 'اردیبهشت ۱۴۰۴', rating: 5, text: 'فضای خیلی خوبی بود. نورپردازی عالی و تجهیزات کامل. حتماً دوباره رزرو می‌کنم.' },
-      { id: 2, name: 'علی رضایی',   avatar: 'ع', date: 'فروردین ۱۴۰۴',  rating: 5, text: 'برای ورکشاپ عکاسی استفاده کردیم. فضا بسیار حرفه‌ای و تمیز بود.' },
-      { id: 3, name: 'مریم کریمی',  avatar: 'م', date: 'اسفند ۱۴۰۳',    rating: 4, text: 'کلاس رقص برگزار کردیم. آینه‌ها و کف مناسب بود. پیشنهاد می‌کنم.' },
-      { id: 4, name: 'رضا احمدی',   avatar: 'ر', date: 'بهمن ۱۴۰۳',     rating: 5, text: 'برای فیلمبرداری محصول استفاده کردیم. نور طبیعی و مصنوعی هر دو عالی بود.' },
-    ],
     location: 'تهران، خانه دی',
   },
   'black-room-1': {
@@ -63,8 +55,6 @@ const studiosData = {
     wallType: 'نقاشی',
     chairCount: 8,
     pricePerHour: 300000,
-    rating: 4.8,
-    reviewCount: 32,
     description: `اتاق سیاه یک یک فضای بلک‌باکس کوچک و صمیمی است که برای تمرین‌های تئاتری، اجراهای کوچک و ورکشاپ‌های بازیگری طراحی شده است.
 
 محیط تاریک و کنترل‌شده این فضا تمرکز کامل را ممکن می‌سازد. سیستم صوتی و آینه‌های موجود این اتاق را به انتخابی ایده‌آل برای گروه‌های کوچک تبدیل کرده است.`,
@@ -80,10 +70,6 @@ const studiosData = {
       { label: 'بلک باکس',       icon: 'Square'  },
       { label: 'سیستم تهویه',    icon: 'Wind'    },
     ],
-    reviews: [
-      { id: 1, name: 'نیلوفر حسینی', avatar: 'ن', date: 'اردیبهشت ۱۴۰۴', rating: 5, text: 'برای تمرین تئاتر عالی بود. فضای بلک‌باکس دقیقاً همان چیزی بود که نیاز داشتیم.' },
-      { id: 2, name: 'امیر صادقی',   avatar: 'ا', date: 'فروردین ۱۴۰۴',  rating: 4, text: 'صدای خوبی داشت و کاملاً ایزوله بود. پیشنهاد می‌کنم.' },
-    ],
     location: 'تهران، خانه دی',
   },
   'black-room-2': {
@@ -94,8 +80,6 @@ const studiosData = {
     wallType: 'نقاشی',
     chairCount: 4,
     pricePerHour: 150000,
-    rating: 4.7,
-    reviewCount: 28,
     description: `اتاق سیاه دو کوچک‌ترین فضای خانه دی است که برای تمرین‌های فردی، جلسات خصوصی و ورکشاپ‌های کوچک مناسب است.
 
 این فضای صمیمی با تجهیزات صوتی و سیستم تهویه مناسب، محیطی آرام و متمرکز برای کارهای خلاقانه فراهم می‌کند.`,
@@ -110,9 +94,6 @@ const studiosData = {
       { label: 'اسپیکر',      icon: 'Volume2' },
       { label: 'بلک باکس',    icon: 'Square'  },
     ],
-    reviews: [
-      { id: 1, name: 'فاطمه موسوی', avatar: 'ف', date: 'اردیبهشت ۱۴۰۴', rating: 5, text: 'برای تمرین انفرادی عالی بود. فضای کوچک و صمیمی.' },
-    ],
     location: 'تهران، خانه دی',
   },
 } as const
@@ -120,23 +101,11 @@ const studiosData = {
 type StudioId = keyof typeof studiosData
 
 
-/* ─── ستاره‌ها ─── */
-function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
-  return (
-    <span style={{ display: 'inline-flex', gap: 2 }}>
-      {[1,2,3,4,5].map((i) => (
-        <Star key={i} size={size} fill={i <= rating ? '#FFB400' : 'none'} color={i <= rating ? '#FFB400' : '#D1D5DB'} />
-      ))}
-    </span>
-  )
-}
-
 /* ─── صفحه ─── */
 export default function StudioDetailPage({ params }: { params: { studioId: string } }) {
   const studio = studiosData[params.studioId as StudioId]
   if (!studio) notFound()
 
-  const [descExpanded, setDescExpanded]           = useState(true)
   const [showPicker, setShowPicker]               = useState(false)
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null)
   const [selectedEndDate, setSelectedEndDate]     = useState<Date | null>(null)
@@ -261,14 +230,9 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
           </div>
         </div>
 
-        {/* ─── تغییر ۳: نام وسط‌چین + امتیاز + متراژ ─── */}
+        {/* نام + متراژ */}
         <div className="px-4 pt-5 pb-4 border-b border-[#F0F0F0] text-center">
           <h1 className="text-[24px] font-black text-[#171717] mb-2">{studio.name}</h1>
-          <div className="flex items-center justify-center gap-1.5 mb-2">
-            <Star size={16} fill="#FFB400" color="#FFB400" />
-            <span className="text-[16px] font-bold text-[#171717]">{studio.rating.toLocaleString('fa-IR')}</span>
-            <span className="text-[14px] text-[#A0A0A0]">({toPersian(studio.reviewCount)} نظر)</span>
-          </div>
           <p className="text-[15px] text-[#717171] font-light">{studio.area}</p>
         </div>
 
@@ -361,31 +325,6 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               <p style={{ position: 'relative', fontSize: 14, color: '#444', fontWeight: 500 }}>برای مشاهده مسیر کلیک کنید</p>
             </div>
           </a>
-        </div>
-
-        {/* ─── نظرات ─── */}
-        <div className="px-4 py-5 border-b border-[#F0F0F0]">
-          <div className="flex items-center gap-2 mb-5">
-            <Star size={18} fill="#171717" color="#171717" />
-            <span className="text-[19px] font-black text-[#171717]">{studio.rating.toLocaleString('fa-IR')}</span>
-            <span className="text-[15px] text-[#717171]">· {toPersian(studio.reviewCount)} نظر</span>
-          </div>
-          <div className="flex flex-col gap-5">
-            {studio.reviews.map((review) => (
-              <div key={review.id}>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0" style={{ background: '#801A00', fontSize: 16 }}>
-                    {review.avatar}
-                  </div>
-                  <div>
-                    <p className="text-[16px] font-bold text-[#171717]">{review.name}</p>
-                    <p className="text-[14px] text-[#A0A0A0]">{review.date}</p>
-                  </div>
-                </div>
-                <p className="text-[15px] text-[#404040] font-light leading-relaxed pr-[52px]">{review.text}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* ─── قوانین کنسلی (موبایل) ─── */}
@@ -628,12 +567,6 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 </span>
               </div>
 
-              {/* امتیاز */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, marginTop: 12 }}>
-                <Stars rating={Math.round(studio.rating)} size={14} />
-                <span style={{ fontWeight: 700, color: '#171717' }}>{studio.rating.toLocaleString('fa-IR')}</span>
-                <span style={{ color: '#717171' }}>({studio.reviewCount.toLocaleString('fa-IR')} نظر)</span>
-              </div>
             </div>
 
             {/* امکانات */}
@@ -662,35 +595,6 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               >
                 {studio.description}
               </p>
-            </div>
-
-            {/* نظرات */}
-            <div style={{ paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid #EFEFEF' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Star size={22} fill="#171717" color="#171717" />
-                <span style={{ fontSize: 20, fontWeight: 900, color: '#171717' }}>
-                  {studio.rating.toLocaleString('fa-IR')} · {studio.reviewCount.toLocaleString('fa-IR')} نظر
-                </span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 24 }}>
-                {studio.reviews.map((r) => (
-                  <div key={r.id}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#801A00', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
-                        {r.avatar}
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{r.name}</p>
-                        <p style={{ fontSize: 12, color: '#717171' }}>{r.date}</p>
-                      </div>
-                    </div>
-                    <Stars rating={r.rating} size={12} />
-                    <p style={{ fontSize: 14, color: '#404040', lineHeight: 1.7, marginTop: 8, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3 } as React.CSSProperties}>
-                      {r.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* نقشه */}
@@ -783,11 +687,6 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                   </span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: '#171717' }}>تومان</span>
                   <span style={{ fontSize: 14, color: '#717171', fontWeight: 300 }}>/ ساعت</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                  <Star size={12} fill="#FFB400" color="#FFB400" />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>{studio.rating.toLocaleString('fa-IR')}</span>
-                  <span style={{ fontSize: 13, color: '#717171' }}>({studio.reviewCount.toLocaleString('fa-IR')} نظر)</span>
                 </div>
               </div>
 
