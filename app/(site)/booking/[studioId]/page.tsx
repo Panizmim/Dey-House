@@ -79,9 +79,7 @@ const studiosData = {
     wallType: 'نقاشی',
     chairCount: 4,
     pricePerHour: 150000,
-    description: `اتاق سیاه دو کوچک‌ترین فضای خانه دی است که برای تمرین‌های فردی، جلسات خصوصی و ورکشاپ‌های کوچک مناسب است.
-
-این فضای صمیمی با تجهیزات صوتی و سیستم تهویه مناسب، محیطی آرام و متمرکز برای کارهای خلاقانه فراهم می‌کند.`,
+    description: `این فضا یک بلک باکس ۱۲ متر مربعی با کاربرد هایی همچون تمرین تئاتر، نمایشنامه خوانی و تمرین موسیقی می باشد.`,
     images: [
       '/images/studios/black-room2-1.jpg',
       '/images/studios/black-room2-2.jpg',
@@ -92,6 +90,7 @@ const studiosData = {
       { label: 'سیستم تهویه', icon: 'Wind'    },
       { label: 'اسپیکر',      icon: 'Volume2' },
       { label: 'بلک باکس',    icon: 'Square'  },
+      { label: 'اکوستیک',     icon: 'Volume2' },
     ],
     location: 'تهران، خانه دی',
   },
