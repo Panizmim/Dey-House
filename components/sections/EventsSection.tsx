@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight } from '@/components/ui/icons'
 
 type PublicEvent = {
   id:          string
@@ -153,7 +152,7 @@ export function EventsSection() {
             onMouseEnter={(e) => { e.currentTarget.style.color = '#171717' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#909090' }}
           >
-            همه رویدادها <ArrowUpRight size={14} style={{ display: 'inline', verticalAlign: 'middle' }} />
+            همه رویدادها
           </Link>
         </div>
 

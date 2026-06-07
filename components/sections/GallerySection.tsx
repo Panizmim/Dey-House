@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight } from '@/components/ui/icons'
 import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
 
 type Gallery = {
@@ -158,7 +157,7 @@ export function GallerySection() {
             onMouseEnter={(e) => { e.currentTarget.style.color = '#171717' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#909090' }}
           >
-            همه نمایشگاه‌ها <ArrowUpRight size={14} style={{ display: 'inline', verticalAlign: 'middle' }} />
+            همه نمایشگاه‌ها
           </Link>
         </div>
 
