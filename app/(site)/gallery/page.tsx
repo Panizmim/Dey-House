@@ -113,12 +113,12 @@ export default function GalleryPage() {
         </div>
 
         {/* متن زیر عکس */}
-        <div className="max-w-[1200px] mx-auto px-8 py-16">
+        <div className="max-w-[860px] mx-auto px-8 py-16">
           <h1 className="font-black text-[#171717] mb-8"
             style={{ fontSize: 'clamp(32px, 5vw, 52px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
             دیـ ده
           </h1>
-          <div className="flex flex-col" style={{ maxWidth: 820, gap: 24 }}>
+          <div className="flex flex-col" style={{ gap: 24 }}>
             {[
               '«دیــ‌‌ ده» یعنی آنچه پیشِ روی توست؛ مقابل چشمانت، نه پنهان و در انزوا.',
               'گالری دیــده جایی‌ست برای دیدن روایت‌های تازه و مواجهه با هنر معاصر؛ نه فقط به‌عنوان اثری بر دیوار، بلکه به‌عنوان بخشی از زندگی روزمره.',
