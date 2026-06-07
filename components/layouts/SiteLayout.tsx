@@ -383,8 +383,9 @@ const footerServices = [
 ]
 
 const footerInfo = [
-  { label: 'درباره ما',   href: '/about'  },
-  { label: 'همکاری هنری', href: '/artist' },
+  { label: 'درباره ما',   href: '/about'   },
+  { label: 'همکاری هنری', href: '/artist'  },
+  { label: 'تماس با ما',  href: '/contact' },
 ]
 
 const socialLinks = [
@@ -417,7 +418,7 @@ function Footer() {
             {/* آدرس */}
             <div className="flex items-start gap-2">
               <MapPin size={14} className="flex-shrink-0 mt-0.5" style={{ opacity: 0.5, color: 'white' }} />
-              <p className="font-light leading-relaxed" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)' }}>
+              <p className="font-light leading-relaxed" style={{ fontSize: '16px', color: 'rgba(255,255,255,0.45)' }}>
                 خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳
               </p>
             </div>
@@ -431,13 +432,13 @@ function Footer() {
               ].map(({ label, tel, display }) => (
                 <div key={tel} className="flex items-center gap-2">
                   <Phone size={13} style={{ opacity: 0.4, color: 'white', flexShrink: 0 }} />
-                  <span className="font-light" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.35)' }}>
+                  <span className="font-light" style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)' }}>
                     {label}
                   </span>
                   <a
                     href={`tel:${tel}`}
                     className="font-light transition-colors hover:text-white"
-                    style={{ fontSize: '14px', color: 'rgba(255,255,255,0.55)', direction: 'ltr', display: 'inline-block' }}
+                    style={{ fontSize: '16px', color: 'rgba(255,255,255,0.55)', direction: 'ltr', display: 'inline-block' }}
                   >
                     {display}
                   </a>
