@@ -68,14 +68,6 @@ export default function GalleryDetailPage() {
   return (
     <main className="max-w-[900px] mx-auto px-2 py-16" dir="rtl">
 
-      {/* breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-[#A0A0A0] mb-10" style={{ fontSize: 13 }}>
-        <Link href="/" className="hover:text-[#801A00] transition-colors">خانه</Link>
-        <ChevronLeft size={12} color="#C0C0C0" />
-        <Link href="/gallery" className="hover:text-[#801A00] transition-colors">گالری</Link>
-        <ChevronLeft size={12} color="#C0C0C0" />
-        <span className="text-[#171717]">{gallery.title}</span>
-      </nav>
 
       {/* ─── header + cover ─── */}
       <div className="flex gap-6 mb-8 items-start">
