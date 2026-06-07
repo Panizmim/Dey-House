@@ -402,7 +402,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row gap-12">
 
           <div className="md:w-[30%] flex flex-col gap-5">
-            <div className="flex items-center mb-5">
+            <div className="flex flex-col gap-3 mb-2">
               <Image
                 src="/images/logo.png"
                 alt="خانه دی"
@@ -411,11 +411,10 @@ function Footer() {
                 className="object-contain"
                 style={{ filter: 'brightness(0) invert(1)' }}
               />
+              <p className="text-white/40 text-base font-light leading-loose">
+                برای زندگی تازه‌ای که هنوز نزیسته‌ایم
+              </p>
             </div>
-
-            <p className="text-white/40 text-base font-light leading-loose">
-              برای زندگی تازه‌ای که هنوز نزیسته‌ایم
-            </p>
 
             {/* آدرس */}
             <div className="flex items-start gap-2">
