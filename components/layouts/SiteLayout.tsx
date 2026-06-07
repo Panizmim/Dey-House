@@ -383,10 +383,8 @@ const footerServices = [
 ]
 
 const footerInfo = [
-  { label: 'درباره ما',       href: '/about'  },
-  { label: 'همکاری هنری',     href: '/artist' },
-  { label: 'اخبار',           href: '#'       },
-  { label: 'قوانین و مقررات', href: '#'       },
+  { label: 'درباره ما',   href: '/about'  },
+  { label: 'همکاری هنری', href: '/artist' },
 ]
 
 const socialLinks = [
@@ -450,7 +448,7 @@ function Footer() {
 
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-10">
             <div className="flex flex-col gap-4">
-              <h4 className="font-bold text-white/50" style={{ fontSize: '14px' }}>خدمات</h4>
+              <h4 className="font-bold text-white/60" style={{ fontSize: '16px' }}>خدمات</h4>
               <nav className="flex flex-col gap-3">
                 {footerServices.map((item) => (
                   <Link key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
@@ -461,7 +459,7 @@ function Footer() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h4 className="font-bold text-white/50" style={{ fontSize: '14px' }}>اطلاعات</h4>
+              <h4 className="font-bold text-white/60" style={{ fontSize: '16px' }}>اطلاعات</h4>
               <nav className="flex flex-col gap-3">
                 {footerInfo.map((item) => (
                   <Link key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
@@ -472,7 +470,7 @@ function Footer() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h4 className="font-bold text-white/50" style={{ fontSize: '14px' }}>ارتباط</h4>
+              <h4 className="font-bold text-white/60" style={{ fontSize: '16px' }}>ارتباط</h4>
               <nav className="flex flex-col gap-3">
                 {socialLinks.map((item) => (
                   <a key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
