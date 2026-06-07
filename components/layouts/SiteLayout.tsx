@@ -402,7 +402,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row gap-12">
 
           <div className="md:w-[30%] flex flex-col gap-5">
-            <div className="flex flex-col gap-3 mb-2">
+            <div className="flex flex-col gap-1 mb-4">
               <Image
                 src="/images/logo.png"
                 alt="خانه دی"
@@ -411,7 +411,7 @@ function Footer() {
                 className="object-contain"
                 style={{ filter: 'brightness(0) invert(1)' }}
               />
-              <p className="text-white/40 text-base font-light leading-loose">
+              <p className="text-white/40 font-light leading-loose" style={{ fontSize: '14px' }}>
                 برای زندگی تازه‌ای که هنوز نزیسته‌ایم
               </p>
             </div>
@@ -419,7 +419,7 @@ function Footer() {
             {/* آدرس */}
             <div className="flex items-start gap-2">
               <MapPin size={14} className="flex-shrink-0 mt-0.5" style={{ opacity: 0.5, color: 'white' }} />
-              <p className="font-light leading-relaxed" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
+              <p className="font-light leading-relaxed" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)' }}>
                 خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳
               </p>
             </div>
@@ -433,13 +433,13 @@ function Footer() {
               ].map(({ label, tel, display }) => (
                 <div key={tel} className="flex items-center gap-2">
                   <Phone size={13} style={{ opacity: 0.4, color: 'white', flexShrink: 0 }} />
-                  <span className="font-light" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>
+                  <span className="font-light" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.35)' }}>
                     {label}
                   </span>
                   <a
                     href={`tel:${tel}`}
                     className="font-light transition-colors hover:text-white"
-                    style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', direction: 'ltr', display: 'inline-block' }}
+                    style={{ fontSize: '14px', color: 'rgba(255,255,255,0.55)', direction: 'ltr', display: 'inline-block' }}
                   >
                     {display}
                   </a>
@@ -450,7 +450,7 @@ function Footer() {
 
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-10">
             <div className="flex flex-col gap-4">
-              <h4 className="text-[11px] font-bold tracking-[0.12em] uppercase text-white/35">خدمات</h4>
+              <h4 className="font-bold text-white/50" style={{ fontSize: '14px' }}>خدمات</h4>
               <nav className="flex flex-col gap-3">
                 {footerServices.map((item) => (
                   <Link key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
@@ -461,7 +461,7 @@ function Footer() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h4 className="text-[11px] font-bold tracking-[0.12em] uppercase text-white/35">اطلاعات</h4>
+              <h4 className="font-bold text-white/50" style={{ fontSize: '14px' }}>اطلاعات</h4>
               <nav className="flex flex-col gap-3">
                 {footerInfo.map((item) => (
                   <Link key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
@@ -472,7 +472,7 @@ function Footer() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h4 className="text-[11px] font-bold tracking-[0.12em] uppercase text-white/35">ارتباط</h4>
+              <h4 className="font-bold text-white/50" style={{ fontSize: '14px' }}>ارتباط</h4>
               <nav className="flex flex-col gap-3">
                 {socialLinks.map((item) => (
                   <a key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
