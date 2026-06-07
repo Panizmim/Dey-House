@@ -111,9 +111,11 @@ export default function GalleryDetailPage() {
       {gallery.description && (
         <div className="mb-12">
           <h2 className="font-black text-[#171717] mb-5" style={{ fontSize: 20 }}>گزاره</h2>
-          <div className="font-light text-[#404040]" style={{ fontSize: 15, lineHeight: 1.6 }}>
+          <div>
             {gallery.description.split('\n').map((line, i) => (
-              <p key={i} dir="auto" style={{ minHeight: '1em' }}>{line || ' '}</p>
+              <p key={i} dir="auto" className="text-[#1a1a1a]" style={{ fontSize: 'clamp(15px, 1.8vw, 18px)', fontWeight: 400, lineHeight: 2.2, textAlign: 'justify', minHeight: '1em' }}>
+                {line || ' '}
+              </p>
             ))}
           </div>
         </div>
