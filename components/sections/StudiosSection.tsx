@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Star, ChevronRight, ChevronLeft } from '@/components/ui/icons'
+import { ChevronRight, ChevronLeft } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 const studios = [
@@ -11,7 +11,6 @@ const studios = [
     name:         'اتاق سفید',
     area:         '۵۰ متر مربع',
     pricePerHour: 400_000,
-    rating:       4.9,
     floorType:    'پارکت',
     wallType:     'سفید',
     chairCount:   30,
@@ -27,7 +26,6 @@ const studios = [
     name:         'اتاق سیاه یک',
     area:         '۲۰ متر مربع',
     pricePerHour: 300_000,
-    rating:       4.8,
     floorType:    'سیمانی',
     wallType:     'سیاه',
     chairCount:   20,
@@ -43,7 +41,6 @@ const studios = [
     name:         'اتاق سیاه دو',
     area:         '۱۲ متر مربع',
     pricePerHour: 150_000,
-    rating:       4.7,
     floorType:    'سیمانی',
     wallType:     'سیاه',
     chairCount:   15,
@@ -136,17 +133,11 @@ function StudioCard({ studio }: { studio: typeof studios[number] }) {
       {/* ─── اطلاعات ─── */}
       <div>
 
-        {/* نام + امتیاز */}
-        <div className="flex items-start justify-between gap-2 mb-1">
+        {/* نام */}
+        <div className="mb-1">
           <h3 className="text-[15px] font-black text-[#171717] leading-tight">
             {studio.name}
           </h3>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Star size={13} fill="#FFB400" color="#FFB400" />
-            <span className="text-[13px] font-bold text-[#171717]">
-              {studio.rating.toLocaleString('fa-IR')}
-            </span>
-          </div>
         </div>
 
         {/* متراژ */}
