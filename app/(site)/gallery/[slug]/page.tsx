@@ -73,7 +73,7 @@ export default function GalleryDetailPage() {
       <div className="flex gap-6 mb-8 items-start">
         {/* کاور — سمت راست در RTL (اول در DOM) */}
         {gallery.coverImage && (
-          <div className="relative flex-shrink-0" style={{ width: 200, height: 200 }}>
+          <div className="relative flex-shrink-0" style={{ width: 300, height: 300 }}>
             <Image
               src={gallery.coverImage}
               alt={gallery.title}
