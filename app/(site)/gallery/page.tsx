@@ -98,12 +98,13 @@ export default function GalleryPage() {
   return (
     <main>
       {/* ─── Hero ─── */}
-      <section className="flex flex-col md:flex-row items-center gap-12 max-w-[1200px] mx-auto px-8 py-20">
-        <div className="w-full md:w-1/2 flex-shrink-0 relative" style={{ aspectRatio: '4/3' }}>
+      <section>
+        {/* عکس full-width */}
+        <div className="w-full relative" style={{ aspectRatio: '16/7' }}>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a0808 0%, #3d1a1a 100%)' }} />
           <Image
             src="/images/gallery/gallery-hero.jpg"
-            alt="گالری خانه دی"
+            alt="گالری دیـ ده"
             fill
             className="object-cover"
             priority
@@ -111,12 +112,13 @@ export default function GalleryPage() {
           />
         </div>
 
-        <div className="flex-1 text-right">
-          <h1 className="font-black text-[#171717] mb-6"
-            style={{ fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+        {/* متن زیر عکس */}
+        <div className="max-w-[1200px] mx-auto px-8 py-16 text-right">
+          <h1 className="font-black text-[#171717] mb-8"
+            style={{ fontSize: 'clamp(32px, 5vw, 52px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
             دیـ ده
           </h1>
-          <div className="font-light text-[#555] flex flex-col gap-4" style={{ fontSize: 15, lineHeight: 1.9 }}>
+          <div className="font-light text-[#555] flex flex-col gap-4" style={{ fontSize: 15, lineHeight: 1.9, maxWidth: 820 }}>
             <p>«دیــ‌‌ ده» یعنی آنچه پیشِ روی توست؛ مقابل چشمانت، نه پنهان و در انزوا.</p>
             <p>گالری دیــده جایی‌ست برای دیدن روایت‌های تازه و مواجهه با هنر معاصر؛ نه فقط به‌عنوان اثری بر دیوار، بلکه به‌عنوان بخشی از زندگی روزمره.</p>
             <p>در دیــ ده تلاش می‌کنیم مرز میان اثر هنری و زندگی روزمره را کمرنگ کنیم؛ جایی که هر‌کسی ــ بدون نیاز به پیش‌زمینه‌‌ی تخصصی ــ با هنر روبه‌رو شود و آن را نه یک رویداد استثنایی، بلکه بخشی از جریان همیشگی زندگی ببیند؛ جایی که دیدن می‌تواند شکل تازه‌ای پیدا کند.</p>
