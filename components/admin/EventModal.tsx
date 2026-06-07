@@ -237,7 +237,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [selectedDate, setSelectedDate]     = useState<Date | null>(null)
   const [form, setForm] = useState({
-    title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false,
+    title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isArchived: false,
   })
 
   useEffect(() => {
@@ -256,6 +256,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         location:    event.location ?? '',
         description: event.description ?? '',
         isFeatured:  event.isFeatured,
+        isArchived:  event.isArchived,
       })
       if (isoDate) {
         const [y, m, d] = isoDate.split('-').map(Number)
@@ -270,7 +271,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         setGallery([])
       }
     } else {
-      setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false })
+      setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isArchived: false })
       setSelectedDate(null)
       setGallery([])
     }
@@ -317,7 +318,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, imageUrl: finalImageUrl, galleryImages: galleryUrls }),
+        body: JSON.stringify({ ...form, imageUrl: finalImageUrl, galleryImages: galleryUrls, isArchived: form.isArchived }),
       })
       if (!res.ok) throw new Error()
       toast.success(event ? 'رویداد با موفقیت ویرایش شد' : 'رویداد با موفقیت ایجاد شد')
@@ -525,6 +526,43 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           />
           نمایش به عنوان رویداد ویژه در صفحه اصلی
         </label>
+
+        {/* وضعیت فعال / غیرفعال */}
+        <div style={{ borderTop: '1px solid #F0F0F0', paddingTop: 16 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#404040', marginBottom: 10 }}>وضعیت رویداد</p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              type="button"
+              onClick={() => set('isArchived', false)}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 8, border: '2px solid',
+                borderColor: !form.isArchived ? '#059669' : '#E5E5E5',
+                background: !form.isArchived ? '#ECFDF5' : 'white',
+                color: !form.isArchived ? '#065F46' : '#A0A0A0',
+                fontSize: 14, fontWeight: !form.isArchived ? 700 : 400,
+                cursor: 'pointer', transition: 'all 150ms',
+                fontFamily: 'YekanBakh, Tahoma, sans-serif',
+              }}
+            >
+              ● فعال
+            </button>
+            <button
+              type="button"
+              onClick={() => set('isArchived', true)}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 8, border: '2px solid',
+                borderColor: form.isArchived ? '#6B7280' : '#E5E5E5',
+                background: form.isArchived ? '#F3F4F6' : 'white',
+                color: form.isArchived ? '#374151' : '#A0A0A0',
+                fontSize: 14, fontWeight: form.isArchived ? 700 : 400,
+                cursor: 'pointer', transition: 'all 150ms',
+                fontFamily: 'YekanBakh, Tahoma, sans-serif',
+              }}
+            >
+              ○ غیرفعال
+            </button>
+          </div>
+        </div>
       </div>
     </Modal>
   )
