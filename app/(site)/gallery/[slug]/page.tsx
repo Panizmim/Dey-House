@@ -94,11 +94,11 @@ export default function GalleryDetailPage() {
 
         {/* متن — سمت چپ در RTL (دوم در DOM) */}
         <div className="flex-1 text-right pt-1">
-          <p className="text-[#A0A0A0] font-light mb-2" style={{ fontSize: 13 }}>{gallery.artistName}</p>
-          <h1 className="font-black text-[#171717] mb-3"
+          <h1 className="font-black text-[#171717] mb-2"
             style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
             {gallery.title}
           </h1>
+          <p className="text-[#A0A0A0] font-light mb-3" style={{ fontSize: 13 }}>{gallery.artistName}</p>
           <p className="text-[#A0A0A0] font-light" style={{ fontSize: 13 }}>
             {formatJalali(gallery.startDate)} — {formatJalali(gallery.endDate)}
           </p>
