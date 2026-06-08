@@ -205,13 +205,6 @@ export default function GalleryDetailPage() {
         </div>
       )}
 
-      {/* بازگشت */}
-      <div className="text-right">
-        <Link href="/gallery" className="text-[#801A00] hover:underline font-medium" style={{ fontSize: 14 }}>
-          ← بازگشت به گالری
-        </Link>
-      </div>
-
       {/* ─── Lightbox ─── */}
       {lightboxIndex !== null && (
         <div
