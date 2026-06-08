@@ -19,6 +19,7 @@ export interface EventRow {
   imageUrl: string | null
   galleryImages: string
   isFeatured: boolean
+  isActive: boolean
   isArchived: boolean
 }
 
@@ -224,7 +225,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [selectedDate, setSelectedDate]     = useState<Date | null>(null)
   const [form, setForm] = useState({
-    title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isArchived: false,
+    title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false,
   })
 
   useEffect(() => {
@@ -243,6 +244,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         location:    event.location ?? '',
         description: event.description ?? '',
         isFeatured:  event.isFeatured,
+        isActive:    event.isActive,
         isArchived:  event.isArchived,
       })
       if (isoDate) {
@@ -258,7 +260,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         setGallery([])
       }
     } else {
-      setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isArchived: false })
+      setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false })
       setSelectedDate(null)
       setGallery([])
     }
@@ -520,13 +522,13 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           <div style={{ display: 'flex', gap: 10 }}>
             <button
               type="button"
-              onClick={() => set('isArchived', false)}
+              onClick={() => set('isActive', true)}
               style={{
                 flex: 1, padding: '10px 0', borderRadius: 8, border: '2px solid',
-                borderColor: !form.isArchived ? '#059669' : '#E5E5E5',
-                background: !form.isArchived ? '#ECFDF5' : 'white',
-                color: !form.isArchived ? '#065F46' : '#A0A0A0',
-                fontSize: 14, fontWeight: !form.isArchived ? 700 : 400,
+                borderColor: form.isActive ? '#059669' : '#E5E5E5',
+                background: form.isActive ? '#ECFDF5' : 'white',
+                color: form.isActive ? '#065F46' : '#A0A0A0',
+                fontSize: 14, fontWeight: form.isActive ? 700 : 400,
                 cursor: 'pointer', transition: 'all 150ms',
                 fontFamily: 'YekanBakh, Tahoma, sans-serif',
               }}
@@ -535,13 +537,13 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
             </button>
             <button
               type="button"
-              onClick={() => set('isArchived', true)}
+              onClick={() => set('isActive', false)}
               style={{
                 flex: 1, padding: '10px 0', borderRadius: 8, border: '2px solid',
-                borderColor: form.isArchived ? '#6B7280' : '#E5E5E5',
-                background: form.isArchived ? '#F3F4F6' : 'white',
-                color: form.isArchived ? '#374151' : '#A0A0A0',
-                fontSize: 14, fontWeight: form.isArchived ? 700 : 400,
+                borderColor: !form.isActive ? '#6B7280' : '#E5E5E5',
+                background: !form.isActive ? '#F3F4F6' : 'white',
+                color: !form.isActive ? '#374151' : '#A0A0A0',
+                fontSize: 14, fontWeight: !form.isActive ? 700 : 400,
                 cursor: 'pointer', transition: 'all 150ms',
                 fontFamily: 'YekanBakh, Tahoma, sans-serif',
               }}

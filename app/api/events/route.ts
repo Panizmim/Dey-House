@@ -16,7 +16,7 @@ function formatPersianDate(date: Date) {
 export async function GET() {
   try {
     const events = await db.event.findMany({
-      where:   { isArchived: false },
+      where:   { isArchived: false, isActive: true },
       orderBy: { date: 'desc' },
     })
 

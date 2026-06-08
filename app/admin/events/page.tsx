@@ -78,8 +78,10 @@ export default function AdminEventsPage() {
       key: 'isArchived',
       label: 'وضعیت',
       render: (row) => row.isArchived
-        ? <Badge label="آرشیو" bg="#F3F4F6" color="#6B7280" />
-        : <Badge label="فعال"  bg="#D1FAE5" color="#065F46" />,
+        ? <Badge label="آرشیو"    bg="#F3F4F6" color="#6B7280" />
+        : !row.isActive
+        ? <Badge label="غیرفعال"  bg="#FEF3C7" color="#92400E" />
+        : <Badge label="فعال"     bg="#D1FAE5" color="#065F46" />,
     },
     {
       key: 'actions',
