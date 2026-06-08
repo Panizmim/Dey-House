@@ -12,6 +12,7 @@ type PublicEvent = {
   time:        string
   location:    string
   description: string
+  isActive:    boolean
   imageUrl?:   string
   gradient:    string
 }
@@ -66,6 +67,19 @@ function EventCard({ event }: { event: PublicEvent }) {
         }}>
           {event.type}
         </span>
+
+        {/* badge به اتمام رسیده */}
+        {!event.isActive && (
+          <span style={{
+            position: 'absolute', bottom: 10, left: 10,
+            background: 'rgba(0,0,0,0.72)',
+            backdropFilter: 'blur(6px)',
+            color: 'white', fontSize: 11, fontWeight: 600,
+            padding: '4px 10px', borderRadius: 4,
+          }}>
+            به اتمام رسیده
+          </span>
+        )}
       </div>
 
       {/* ─── اطلاعات زیر پوستر ─── */}

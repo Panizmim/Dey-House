@@ -54,15 +54,17 @@ function EventCard({ event }: { event: PublicEvent }) {
         }}>
           {event.type}
         </span>
-        {/* badge وضعیت */}
-        <span style={{
-          position: 'absolute', top: 10, left: 10,
-          background: event.isActive ? 'rgba(47,158,68,0.85)' : 'rgba(0,0,0,0.45)',
-          color: 'white', fontSize: 11, fontWeight: 600,
-          padding: '4px 10px', borderRadius: 4,
-        }}>
-          {event.isActive ? 'فعال' : 'آرشیو'}
-        </span>
+        {/* badge به اتمام رسیده */}
+        {!event.isActive && (
+          <span style={{
+            position: 'absolute', bottom: 10, left: 10,
+            background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)',
+            color: 'white', fontSize: 11, fontWeight: 600,
+            padding: '4px 10px', borderRadius: 4,
+          }}>
+            به اتمام رسیده
+          </span>
+        )}
       </div>
 
       {/* اطلاعات */}

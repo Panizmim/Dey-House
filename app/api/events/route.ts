@@ -30,7 +30,7 @@ export async function GET() {
         time:        e.time,
         location:    e.location ?? '',
         description: e.description ?? '',
-        isActive:    !e.isArchived,
+        isActive:    e.isActive,
         isFeatured:  e.isFeatured,
         imageUrl:    e.imageUrl ?? undefined,
         gradient:    typeGradients[e.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)',
