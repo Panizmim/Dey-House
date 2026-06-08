@@ -11,13 +11,14 @@ type Slide = {
 
 const INTERVAL_MS = 5000
 
-export function HeroSection() {
-  const [slides,       setSlides]       = useState<Slide[]>([])
-  const [loaded,       setLoaded]       = useState(false)
+export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
+  const [slides,       setSlides]       = useState<Slide[]>(initialSlides ?? [])
+  const [loaded,       setLoaded]       = useState(initialSlides != null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const touchStartX = useRef<number>(0)
 
   useEffect(() => {
+    if (initialSlides != null) return
     fetch('/api/hero-banners')
       .then((r) => r.json())
       .then((data: Slide[]) => {
@@ -25,7 +26,7 @@ export function HeroSection() {
       })
       .catch(() => {})
       .finally(() => setLoaded(true))
-  }, [])
+  }, [initialSlides])
 
   const next = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % slides.length)
