@@ -9,21 +9,11 @@ type Slide = {
   showText: boolean
 }
 
-const FALLBACK: Slide[] = [
-  { id: 'f1', imageUrl: '/images/hero/slide1.jpg', showText: true },
-  { id: 'f2', imageUrl: '/images/hero/slide2.jpg', showText: true },
-  { id: 'f3', imageUrl: '/images/hero/slide3.jpg', showText: true },
-  { id: 'f4', imageUrl: '/images/hero/slide4.jpg', showText: true },
-  { id: 'f5', imageUrl: '/images/hero/slide5.jpg', showText: true },
-  { id: 'f6', imageUrl: '/images/hero/slide6.jpg', showText: true },
-  { id: 'f7', imageUrl: '/images/hero/slide7.jpg', showText: true },
-  { id: 'f8', imageUrl: '/images/hero/slide8.jpg', showText: true },
-]
-
 const INTERVAL_MS = 5000
 
 export function HeroSection() {
-  const [slides,       setSlides]       = useState<Slide[]>(FALLBACK)
+  const [slides,       setSlides]       = useState<Slide[]>([])
+  const [loaded,       setLoaded]       = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const touchStartX = useRef<number>(0)
 
@@ -34,6 +24,7 @@ export function HeroSection() {
         if (Array.isArray(data) && data.length > 0) setSlides(data)
       })
       .catch(() => {})
+      .finally(() => setLoaded(true))
   }, [])
 
   const next = useCallback(() => {
@@ -50,6 +41,19 @@ export function HeroSection() {
   }, [next])
 
   const currentSlide = slides[currentIndex]
+
+  if (!loaded) {
+    return (
+      <section className="relative w-full overflow-hidden h-[65vh] md:h-screen" style={{ background: '#1a0808' }}>
+        <div className="absolute inset-0 bg-black/40 z-10" />
+        <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
+          <p className="text-white text-center leading-tight" style={{ fontFamily: 'Paeez, YekanBakh, Tahoma, sans-serif', fontSize: 'clamp(32px, 5vw, 72px)', maxWidth: '700px' }}>
+            بَرای زندگیِ تازه‌ای کِه هَنوز نَزیستهِ‌ایم.
+          </p>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section
