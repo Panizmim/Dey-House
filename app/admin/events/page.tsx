@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Archive, ArchiveRestore } from '@/components/ui/icons'
+import { Plus, Pencil, Archive, ArchiveRestore, Trash2 } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import EventModal, { type EventRow } from '@/components/admin/EventModal'
 import DataTable, { type Column } from '@/components/admin/DataTable'
@@ -35,6 +35,13 @@ export default function AdminEventsPage() {
   function openEdit(event: EventRow) {
     setEditEvent(event)
     setModalOpen(true)
+  }
+
+  async function deleteEvent(event: EventRow) {
+    if (!window.confirm(`آیا مطمئن هستید که می‌خواهید رویداد «${event.title}» را حذف کنید؟ این عمل قابل بازگشت نیست.`)) return
+    const res = await fetch(`/api/admin/events/${event.id}`, { method: 'DELETE' })
+    if (res.ok) { toast.success('رویداد حذف شد'); fetchEvents() }
+    else toast.error('خطا در حذف رویداد')
   }
 
   async function toggleArchive(event: EventRow) {
@@ -92,6 +99,13 @@ export default function AdminEventsPage() {
           >
             {row.isArchived ? <ArchiveRestore size={13} /> : <Archive size={13} />}
             {row.isArchived ? 'فعال‌سازی' : 'آرشیو'}
+          </button>
+          <button
+            onClick={() => deleteEvent(row)}
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', fontSize: 13, cursor: 'pointer' }}
+          >
+            <Trash2 size={13} />
+            حذف
           </button>
         </div>
       ),
