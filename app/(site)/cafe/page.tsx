@@ -148,8 +148,7 @@ export default function CafePage() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
-        title="منوی کافه خانه دی"
-        subtitle="برای زندگی تازه‌ای که هنوز نزیسته‌ایم"
+        title="منوی کافه"
       />
 
       <div className="bg-[#FDF5F5] border-b border-[#F0D5D5] py-3 px-6 text-center">
