@@ -10,7 +10,7 @@ export default function PageHero({ title, subtitle }: PageHeroProps) {
       style={{ background: '#801A00' }}
     >
       {/* صندلی تزئینی */}
-      <div className="absolute bottom-0 right-0 w-[65%] max-w-[640px] h-full pointer-events-none">
+      <div className="absolute bottom-0 right-0 w-full lg:w-[65%] max-w-[640px] h-full pointer-events-none">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/chair.png"
