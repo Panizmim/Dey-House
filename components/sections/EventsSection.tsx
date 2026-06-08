@@ -68,35 +68,35 @@ function EventCard({ event }: { event: PublicEvent }) {
           {event.type}
         </span>
 
-        {/* badge به اتمام رسیده */}
-        {!event.isActive && (
-          <span style={{
-            position: 'absolute', bottom: 10, left: 10,
-            background: 'rgba(0,0,0,0.72)',
-            backdropFilter: 'blur(6px)',
-            color: 'white', fontSize: 11, fontWeight: 600,
-            padding: '4px 10px', borderRadius: 4,
-          }}>
-            به اتمام رسیده
-          </span>
-        )}
       </div>
 
       {/* ─── اطلاعات زیر پوستر ─── */}
       <div style={{ paddingTop: 14 }}>
-        {/* عنوان */}
-        <h3
-          style={{
-            fontSize: 18, fontWeight: 900, color: '#171717',
-            lineHeight: 1.4, marginBottom: 10,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          } as React.CSSProperties}
-        >
-          {event.title}
-        </h3>
+        {/* عنوان + badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <h3
+            style={{
+              fontSize: 18, fontWeight: 900, color: '#171717',
+              lineHeight: 1.4, margin: 0,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            } as React.CSSProperties}
+          >
+            {event.title}
+          </h3>
+          {!event.isActive && (
+            <span style={{
+              flexShrink: 0,
+              background: '#F3F4F6', color: '#6B7280',
+              fontSize: 11, fontWeight: 600,
+              padding: '3px 8px', borderRadius: 4,
+            }}>
+              به اتمام رسیده
+            </span>
+          )}
+        </div>
 
         {/* تاریخ و ساعت */}
         <div style={{ fontSize: 12, color: '#909090', display: 'flex', alignItems: 'center', gap: 6 }}>
