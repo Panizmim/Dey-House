@@ -15,18 +15,18 @@ type MenuItem = {
 }
 
 const categories = [
-  { id: 'cat-espresso-hot',  title: 'نوشیدنی گرم بر پایه اسپرسو', subtitle: 'Hot espresso drinks' },
-  { id: 'cat-espresso-cold', title: 'نوشیدنی سرد بر پایه اسپرسو', subtitle: 'Cold espresso drinks' },
-  { id: 'cat-tea',           title: 'چای و دمنوش',                 subtitle: 'Tea and herbal infusions' },
-  { id: 'cat-hot',           title: 'نوشیدنی گرم',                 subtitle: 'Hot drinks' },
-  { id: 'cat-cold',          title: 'نوشیدنی سرد',                 subtitle: 'Cold drinks' },
-  { id: 'cat-simple',        title: 'نوشیدنی ساده',                subtitle: 'Simple drinks' },
-  { id: 'cat-snacks',        title: 'میان وعده',                   subtitle: 'Appetizers' },
-  { id: 'cat-salad',         title: 'سالاد',                       subtitle: 'Salads' },
-  { id: 'cat-sandwich',      title: 'ساندویچ',                     subtitle: 'Sandwiches' },
-  { id: 'cat-pasta',         title: 'پاستا',                       subtitle: 'Pasta' },
-  { id: 'cat-plate',         title: 'بشقاب',                       subtitle: 'Main plates' },
-  { id: 'cat-topping',       title: 'تاپینگ',                      subtitle: 'Toppings' },
+  { id: 'cat-espresso-hot',  title: 'نوشیدنی گرم بر پایه اسپرسو' },
+  { id: 'cat-espresso-cold', title: 'نوشیدنی سرد بر پایه اسپرسو' },
+  { id: 'cat-tea',           title: 'چای و دمنوش'                 },
+  { id: 'cat-hot',           title: 'نوشیدنی گرم'                 },
+  { id: 'cat-cold',          title: 'نوشیدنی سرد'                 },
+  { id: 'cat-simple',        title: 'نوشیدنی ساده'                },
+  { id: 'cat-snacks',        title: 'میان وعده'                   },
+  { id: 'cat-salad',         title: 'سالاد'                       },
+  { id: 'cat-sandwich',      title: 'ساندویچ'                     },
+  { id: 'cat-pasta',         title: 'پاستا'                       },
+  { id: 'cat-plate',         title: 'بشقاب'                       },
+  { id: 'cat-topping',       title: 'تاپینگ'                      },
 ]
 
 const catTitleToId: Record<string, string> = {
@@ -199,9 +199,6 @@ export default function CafePage() {
                   <span style={{ fontSize: '14px', fontWeight: 700, color: isActive ? '#801A00' : '#171717' }}>
                     {cat.title}
                   </span>
-                  <span style={{ fontSize: '11px', color: '#B0B0B0', fontWeight: 300, direction: 'ltr', textAlign: 'right' }}>
-                    {cat.subtitle}
-                  </span>
                 </button>
               )
             })}
@@ -221,9 +218,6 @@ export default function CafePage() {
                   <div className="flex items-center gap-4 mb-6">
                     <div>
                       <h2 className="text-lg font-black text-[#171717]">{cat.title}</h2>
-                      <p className="text-xs text-[#B0B0B0] font-light mt-0.5" style={{ direction: 'ltr', textAlign: 'right' }}>
-                        {cat.subtitle}
-                      </p>
                     </div>
                     <div className="flex-1 h-px bg-[#EFEFEF]" />
                   </div>
