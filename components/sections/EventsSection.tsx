@@ -56,47 +56,35 @@ function EventCard({ event }: { event: PublicEvent }) {
           />
         )}
 
-        {/* badge نوع رویداد */}
-        <span style={{
-          position: 'absolute', top: 10, right: 10,
-          background: 'rgba(20,20,20,0.62)',
-          backdropFilter: 'blur(6px)',
-          color: 'white', fontSize: 11, fontWeight: 600,
-          padding: '4px 10px', borderRadius: 4,
-          letterSpacing: '0.02em',
-        }}>
-          {event.type}
-        </span>
+        {/* badge اتمام یافته */}
+        {!event.isActive && (
+          <span style={{
+            position: 'absolute', top: 10, left: 10,
+            background: 'rgba(20,20,20,0.62)',
+            backdropFilter: 'blur(6px)',
+            color: 'white', fontSize: 11, fontWeight: 600,
+            padding: '4px 10px', borderRadius: 4,
+          }}>
+            اتمام یافته
+          </span>
+        )}
 
       </div>
 
       {/* ─── اطلاعات زیر پوستر ─── */}
       <div style={{ paddingTop: 14 }}>
-        {/* عنوان + badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-          <h3
-            style={{
-              fontSize: 18, fontWeight: 900, color: '#171717',
-              lineHeight: 1.4, margin: 0,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            } as React.CSSProperties}
-          >
-            {event.title}
-          </h3>
-          {!event.isActive && (
-            <span style={{
-              flexShrink: 0,
-              background: '#F3F4F6', color: '#6B7280',
-              fontSize: 11, fontWeight: 600,
-              padding: '3px 8px', borderRadius: 4,
-            }}>
-              به اتمام رسیده
-            </span>
-          )}
-        </div>
+        <h3
+          style={{
+            fontSize: 18, fontWeight: 900, color: '#171717',
+            lineHeight: 1.4, marginBottom: 10,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          } as React.CSSProperties}
+        >
+          {event.title}
+        </h3>
 
         {/* تاریخ و ساعت */}
         <div style={{ fontSize: 12, color: '#909090', display: 'flex', alignItems: 'center', gap: 6 }}>
