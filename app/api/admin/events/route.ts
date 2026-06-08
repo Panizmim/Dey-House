@@ -22,16 +22,18 @@ export async function POST(req: NextRequest) {
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   try {
     const body = await req.json()
-    const { title, type, date, time, location, description, imageUrl, isFeatured } = body
+    const { title, type, date, time, location, description, imageUrl, isFeatured, isArchived, galleryImages } = body
     const event = await db.event.create({
       data: {
         title, type, time,
-        location: location || null,
-        description: description || null,
-        imageUrl: imageUrl || null,
-        isFeatured: !!isFeatured,
-        slug: slugify(title),
-        date: new Date(date),
+        location:      location || null,
+        description:   description || null,
+        imageUrl:      imageUrl || null,
+        isFeatured:    !!isFeatured,
+        isArchived:    !!isArchived,
+        galleryImages: JSON.stringify(Array.isArray(galleryImages) ? galleryImages : []),
+        slug:          slugify(title),
+        date:          new Date(date),
       },
     })
     return NextResponse.json(event)

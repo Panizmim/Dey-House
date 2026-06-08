@@ -39,29 +39,28 @@ const eventTypes = ['تئاتر', 'نمایشگاه', 'موسیقی', 'ادبی'
 const toFa = (n: number | string) =>
   String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
 
-/* ─── TimePicker ─── */
+/* ─── TimePicker 24h ─── */
 function TimePickerDropdown({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  const HOURS   = Array.from({ length: 12 }, (_, i) => i + 1)
+  const HOURS   = Array.from({ length: 24 }, (_, i) => i)
   const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
 
-  const parse = (v: string): { h: number; m: number; p: 'AM' | 'PM' } => {
-    if (!v) return { h: 12, m: 0, p: 'AM' }
+  const parse = (v: string): { h: number; m: number } => {
+    if (!v) return { h: 9, m: 0 }
     const [hh, mm] = v.split(':').map(Number)
-    return { h: hh % 12 || 12, m: mm, p: hh >= 12 ? 'PM' : 'AM' }
+    return { h: hh, m: mm }
   }
 
-  const { h, m, p } = parse(value)
+  const { h, m } = parse(value)
 
-  const commit = (hour: number, min: number, period: 'AM' | 'PM') => {
-    const h24 = period === 'AM' ? (hour === 12 ? 0 : hour) : (hour === 12 ? 12 : hour + 12)
-    onChange(`${String(h24).padStart(2, '0')}:${String(min).padStart(2, '0')}`)
+  const commit = (hour: number, min: number) => {
+    onChange(`${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`)
   }
 
   const display = value
-    ? `${toFa(h)}:${toFa(String(m).padStart(2, '0'))} ${p === 'AM' ? 'صبح' : 'بعدازظهر'}`
+    ? `${toFa(String(h).padStart(2, '0'))}:${toFa(String(m).padStart(2, '0'))}`
     : 'انتخاب ساعت'
 
   useEffect(() => {
@@ -104,17 +103,17 @@ function TimePickerDropdown({ value, onChange }: { value: string; onChange: (v: 
           position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 60,
           background: 'white', border: '1px solid #E5E5E5', borderRadius: 12,
           boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
-          width: 224, padding: '12px 10px',
+          width: 160, padding: '12px 10px',
         }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
 
             {/* ساعت */}
             <div>
-              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center', letterSpacing: '0.05em' }}>ساعت</p>
+              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center' }}>ساعت</p>
               <div style={colStyle}>
                 {HOURS.map((hour) => (
-                  <button key={hour} type="button" style={btnStyle(h === hour)} onClick={() => commit(hour, m, p)}>
-                    {toFa(hour)}
+                  <button key={hour} type="button" style={btnStyle(h === hour)} onClick={() => commit(hour, m)}>
+                    {toFa(String(hour).padStart(2, '0'))}
                   </button>
                 ))}
               </div>
@@ -122,23 +121,11 @@ function TimePickerDropdown({ value, onChange }: { value: string; onChange: (v: 
 
             {/* دقیقه */}
             <div>
-              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center', letterSpacing: '0.05em' }}>دقیقه</p>
+              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center' }}>دقیقه</p>
               <div style={colStyle}>
                 {MINUTES.map((min) => (
-                  <button key={min} type="button" style={btnStyle(m === min)} onClick={() => commit(h, min, p)}>
+                  <button key={min} type="button" style={btnStyle(m === min)} onClick={() => commit(h, min)}>
                     {toFa(String(min).padStart(2, '0'))}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* صبح / بعدازظهر */}
-            <div>
-              <p style={{ fontSize: 10, color: '#A0A0A0', fontWeight: 700, marginBottom: 6, textAlign: 'center', letterSpacing: '0.05em' }}>دوره</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {(['AM', 'PM'] as const).map((period) => (
-                  <button key={period} type="button" style={{ ...btnStyle(p === period), padding: '10px 4px' }} onClick={() => commit(h, m, period)}>
-                    {period === 'AM' ? 'صبح' : 'بعدازظهر'}
                   </button>
                 ))}
               </div>
