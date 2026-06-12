@@ -81,13 +81,13 @@ export default async function EventDetailPage({ params }: Props) {
             style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
             {event.title}
           </h1>
-          <p className="font-light text-[#A0A0A0] mb-1" style={{ fontSize: 13 }}>{event.type}</p>
-          <p className="font-light text-[#A0A0A0] mb-1" style={{ fontSize: 13 }}>{dateStr}</p>
+          <p className="font-light mb-1" style={{ fontSize: 15, color: '#555555' }}>{event.type}</p>
+          <p className="font-light mb-1" style={{ fontSize: 15, color: '#555555' }}>{dateStr}</p>
           {event.time && (
-            <p className="font-light text-[#A0A0A0] mb-1" style={{ fontSize: 13 }}>{formatTime(event.time)}</p>
+            <p className="font-light mb-1" style={{ fontSize: 15, color: '#555555' }}>{formatTime(event.time)}</p>
           )}
           {event.location && (
-            <p className="font-light text-[#A0A0A0]" style={{ fontSize: 13 }}>{event.location}</p>
+            <p className="font-light" style={{ fontSize: 15, color: '#555555' }}>{event.location}</p>
           )}
           <div style={{ marginTop: 16 }}>
             <EventShareButton title={event.title} />
