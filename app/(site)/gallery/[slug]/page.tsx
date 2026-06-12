@@ -21,10 +21,12 @@ type GalleryDetail = {
   venueImages: string
 }
 
-function formatJalali(dateStr: string) {
+function formatJalali(dateStr: string, withYear = true) {
   try {
     const j = toJalali(new Date(dateStr))
-    return `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]} ${toPersian(j.jy)}`
+    return withYear
+      ? `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]} ${toPersian(j.jy)}`
+      : `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]}`
   } catch { return '' }
 }
 
@@ -92,7 +94,7 @@ export default function GalleryDetailPage() {
           </h1>
           <p className="text-[#A0A0A0] font-light mb-3" style={{ fontSize: 13 }}>{gallery.artistName}</p>
           <p className="text-[#A0A0A0] font-light" style={{ fontSize: 13 }}>
-            {formatJalali(gallery.startDate)} — {formatJalali(gallery.endDate)}
+            {formatJalali(gallery.startDate, false)} — {formatJalali(gallery.endDate)}
           </p>
         </div>
       </div>
