@@ -1,10 +1,7 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import Link from 'next/link'
-import { ChevronLeft, MapPin, Calendar, Clock } from '@/components/ui/icons'
 import { db } from '@/lib/db'
 import EventGallery from './EventGallery'
-import EventDescriptionExpand from './EventDescriptionExpand'
 import EventShareButton from './EventShareButton'
 
 export const dynamic = 'force-dynamic'
@@ -54,123 +51,88 @@ export default async function EventDetailPage({ params }: Props) {
 
   if (!event) notFound()
 
-  const gradient = typeGradients[event.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
-  const dateStr  = new Date(event.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
-  const desc     = event.description ?? ''
+  const gradient     = typeGradients[event.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
+  const dateStr      = new Date(event.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
+  const desc         = event.description ?? ''
+  let galleryImages: string[] = []
+  try { galleryImages = JSON.parse((event as { galleryImages?: string }).galleryImages ?? '[]') } catch {}
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '32px 32px 80px' }}>
-
-      {/* ─── breadcrumb ─── */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#A0A0A0', marginBottom: 32 }}>
-        <Link href="/" className="hover:text-[#801A00] transition-colors">خانه</Link>
-        <ChevronLeft size={13} style={{ color: '#C0C0C0' }} />
-        <Link href="/events" className="hover:text-[#801A00] transition-colors">رویدادها</Link>
-        <ChevronLeft size={13} style={{ color: '#C0C0C0' }} />
-        <span style={{ color: '#171717' }}>{event.title}</span>
-      </nav>
+    <main className="max-w-[900px] mx-auto px-4 py-16" dir="rtl">
 
       {/* ─── پوستر + اطلاعات ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-12 mb-16">
+      <div className="flex gap-6 mb-8 items-start">
 
-        {/* پوستر ۴:۵ */}
-        <div style={{ borderRadius: 12, overflow: 'hidden', aspectRatio: '4/5', background: gradient }}>
-          {event.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
+        {/* پوستر — سمت راست در RTL */}
+        {event.imageUrl && (
+          <div className="flex-shrink-0" style={{ width: 240, height: 300, overflow: 'hidden' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={event.imageUrl}
               alt={event.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* اطلاعات */}
-        <div>
-          {/* عنوان */}
-          <h1 style={{
-            fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 900,
-            color: '#171717', marginBottom: 16, lineHeight: 1.15,
-          }}>
+        {/* متن — سمت چپ در RTL */}
+        <div className="flex-1 text-right pt-1">
+          <h1 className="font-black text-[#171717] mb-2"
+            style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
             {event.title}
           </h1>
-
-          {/* badge + اشتراک‌گذاری */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center',
-              background: '#FDF0F0', border: '1px solid #F0D5D5',
-              borderRadius: 6, padding: '5px 14px',
-              fontSize: 13, fontWeight: 700, color: '#801A00',
-            }}>
-              {event.type}
-            </span>
+          <p className="font-light text-[#A0A0A0] mb-1" style={{ fontSize: 13 }}>{event.type}</p>
+          <p className="font-light text-[#A0A0A0] mb-1" style={{ fontSize: 13 }}>{dateStr}</p>
+          {event.time && (
+            <p className="font-light text-[#A0A0A0] mb-1" style={{ fontSize: 13 }}>{formatTime(event.time)}</p>
+          )}
+          {event.location && (
+            <p className="font-light text-[#A0A0A0]" style={{ fontSize: 13 }}>{event.location}</p>
+          )}
+          <div style={{ marginTop: 16 }}>
             <EventShareButton title={event.title} />
           </div>
-
-          {/* مکان */}
-          {event.location && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
-              <MapPin size={16} style={{ color: '#801A00', marginTop: 3, flexShrink: 0 }} />
-              <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', letterSpacing: '0.06em', marginBottom: 2 }}>مکان</p>
-                <p style={{ fontSize: 14, color: '#404040' }}>{event.location}</p>
-              </div>
-            </div>
-          )}
-
-          {/* تاریخ */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
-            <Calendar size={16} style={{ color: '#801A00', marginTop: 3, flexShrink: 0 }} />
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', letterSpacing: '0.06em', marginBottom: 2 }}>تاریخ</p>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{dateStr}</p>
-            </div>
-          </div>
-
-          {/* ساعت */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
-            <Clock size={16} style={{ color: '#801A00', marginTop: 3, flexShrink: 0 }} />
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#801A00', letterSpacing: '0.06em', marginBottom: 2 }}>ساعت</p>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>{formatTime(event.time)}</p>
-            </div>
-          </div>
-
-          <hr style={{ border: 'none', borderTop: '1px solid #EFEFEF', margin: '20px 0' }} />
-
-          {/* توضیحات */}
-          {desc && <EventDescriptionExpand description={desc} />}
         </div>
       </div>
 
-      {/* ─── گالری (از galleryImages دیتابیس) ─── */}
-      {(() => {
-        let galleryImages: string[] = []
-        try { galleryImages = JSON.parse((event as { galleryImages?: string }).galleryImages ?? '[]') } catch {}
-        if (galleryImages.length === 0) return null
-        return (
-          <div style={{ marginTop: 64 }}>
-            <EventGallery
-              images={galleryImages}
-              imageGradients={galleryImages.map(() => gradient)}
-              title={event.title}
-            />
+      <div className="w-full h-px bg-[#EFEFEF] my-8" />
+
+      {/* ─── توضیحات ─── */}
+      {desc && (
+        <div className="mb-12">
+          <h2 className="font-black text-[#171717] mb-5" style={{ fontSize: 20 }}>توضیحات</h2>
+          <div>
+            {desc.split('\n').map((line, i) => (
+              <p key={i} dir="auto" className="font-light text-[#1a1a1a]"
+                style={{ fontSize: 15, lineHeight: 2.2, textAlign: 'justify', minHeight: '1em' }}>
+                {line || ' '}
+              </p>
+            ))}
           </div>
-        )
-      })()}
+        </div>
+      )}
+
+      {/* ─── گالری رویداد ─── */}
+      {galleryImages.length > 0 && (
+        <div className="mb-16">
+          <EventGallery
+            images={galleryImages}
+            imageGradients={galleryImages.map(() => gradient)}
+            title={event.title}
+          />
+        </div>
+      )}
 
       {/* ─── رویدادهای دیگر ─── */}
       {related.length > 0 && (
-        <div style={{ marginTop: 72 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#171717', marginBottom: 24 }}>رویدادهای دیگر</h2>
-
+        <div style={{ marginTop: 64 }}>
+          <h2 className="font-black text-[#171717]" style={{ fontSize: 20, marginBottom: 24 }}>رویدادهای دیگر</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {related.map((e) => {
               const relGradient = typeGradients[e.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
               const relDate     = new Date(e.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
               return (
-                <Link
+                <a
                   key={e.id}
                   href={`/events/${e.slug}`}
                   className="block transition-shadow hover:shadow-md"
@@ -181,12 +143,6 @@ export default async function EventDetailPage({ params }: Props) {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={e.imageUrl} alt={e.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
-                    <span
-                      className="absolute top-3 right-3 text-white font-bold"
-                      style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(8px)', borderRadius: 6, padding: '3px 10px', fontSize: 11 }}
-                    >
-                      {e.type}
-                    </span>
                   </div>
                   <div style={{ padding: 16 }}>
                     <h3 className="font-[800] text-[#171717] line-clamp-2" style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 8 }}>
@@ -194,13 +150,13 @@ export default async function EventDetailPage({ params }: Props) {
                     </h3>
                     <p style={{ fontSize: 12, color: '#A0A0A0' }}>{relDate}</p>
                   </div>
-                </Link>
+                </a>
               )
             })}
           </div>
         </div>
       )}
 
-    </div>
+    </main>
   )
 }

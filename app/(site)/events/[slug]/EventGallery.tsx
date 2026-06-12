@@ -36,24 +36,12 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
     <>
       {/* هدر */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, color: '#171717' }}>عکس‌های رویداد</h2>
-        <button
-          onClick={() => setLightbox({ open: true, index: 0 })}
-          style={{
-            fontSize: 13, color: '#717171',
-            border: '1px solid #E5E5E5', borderRadius: 8, padding: '6px 14px',
-            background: 'white', cursor: 'pointer', transition: 'all 150ms',
-            fontFamily: 'YekanBakh, Tahoma, sans-serif',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.color = '#801A00' }}
-          onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.color = '#717171' }}
-        >
-          همه عکس‌ها
-        </button>
+        <h2 style={{ fontSize: 20, fontWeight: 900, color: '#171717' }}>گالری رویداد</h2>
+        <span style={{ fontSize: 13, color: '#A0A0A0' }}>{toPersianNum(images.length)} تصویر</span>
       </div>
 
       {/* گرید عکس‌ها */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div className="grid gap-1 grid-cols-3 sm:grid-cols-5">
         {images.map((img, i) => (
           <button
             key={i}
@@ -61,12 +49,12 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
             style={{
               position: 'relative', paddingTop: '100%',
               border: 'none', cursor: 'pointer',
-              overflow: 'hidden', borderRadius: 10,
+              overflow: 'hidden', borderRadius: 0,
               background: imageGradients[i] ?? '#E5E5E5',
               transition: 'transform 300ms',
               display: 'block',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.03)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)' }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
