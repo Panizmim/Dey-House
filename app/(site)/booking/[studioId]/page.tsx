@@ -311,12 +311,9 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
         <div className="px-4 py-5 border-b border-[#F0F0F0]">
           <h2 className="text-[19px] font-black text-[#171717] mb-3">موقعیت مکانی</h2>
           <a href="https://nshn.ir/_bvk7KWxiB9q" target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none', borderRadius: 12, overflow: 'hidden', height: 180 }}>
-            <div style={{ height: '100%', background: 'linear-gradient(160deg, #e6ede4 0%, #d4e0d0 40%, #c2d4bc 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'relative' }}>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.12 }}>
-                <div style={{ position: 'absolute', top: '35%', left: 0, right: 0, height: 7, background: 'white', borderRadius: 4 }} />
-                <div style={{ position: 'absolute', top: '65%', left: 0, right: 0, height: 4, background: 'white', borderRadius: 2 }} />
-                <div style={{ position: 'absolute', top: 0, bottom: 0, left: '45%', width: 5, background: 'white', borderRadius: 3 }} />
-              </div>
+            <div style={{ height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/map.png" alt="نقشه خانه دی" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
                 <MapPin size={22} color="#801A00" />
               </div>
@@ -606,7 +603,6 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               >
                 <div style={{
                   height: 260, borderRadius: 12, border: '1px solid #E0E0E0',
-                  background: 'linear-gradient(160deg, #e6ede4 0%, #d4e0d0 40%, #c2d4bc 100%)',
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center', gap: 12,
                   cursor: 'pointer', position: 'relative', overflow: 'hidden',
@@ -623,13 +619,8 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                     t.style.boxShadow = 'none'
                   }}
                 >
-                  {/* خطوط دکوراتیو شبیه خیابان */}
-                  <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
-                    <div style={{ position: 'absolute', top: '30%', left: 0, right: 0, height: 8, background: 'white', borderRadius: 4 }} />
-                    <div style={{ position: 'absolute', top: '60%', left: 0, right: 0, height: 5, background: 'white', borderRadius: 3 }} />
-                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: '40%', width: 6, background: 'white', borderRadius: 3 }} />
-                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: '70%', width: 4, background: 'white', borderRadius: 2 }} />
-                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/map.png" alt="نقشه خانه دی" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
 
                   <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>

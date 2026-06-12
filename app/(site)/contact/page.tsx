@@ -13,6 +13,30 @@ export default function ContactPage() {
           برای ارتباط با خانه دی از طریق شبکه‌های اجتماعی یا ایمیل info@deyhouse.ir با ما در تماس باشید.
         </p>
 
+        {/* شماره‌های تماس */}
+        <div className="mt-12">
+          <h2 className="text-[18px] font-black text-[#171717] mb-5">شماره‌های تماس</h2>
+          <div className="flex flex-col gap-3">
+            {[
+              { label: 'کافه',   phone: '۰۹۰۲۹۲۸۲۱۳۵' },
+              { label: 'پلاتو',  phone: '۰۹۰۲۰۲۸۲۱۴۵' },
+              { label: 'گالری', phone: '۰۹۱۸۹۲۸۲۱۴۵' },
+            ].map(({ label, phone }) => (
+              <div key={label} className="flex items-center justify-between border-b border-[#F0F0F0] pb-3">
+                <span style={{ fontSize: 14, color: '#404040', fontWeight: 400 }}>{label}</span>
+                <a
+                  href={`tel:${phone}`}
+                  dir="ltr"
+                  style={{ fontSize: 15, color: '#171717', fontWeight: 700, textDecoration: 'none', letterSpacing: '0.02em' }}
+                  className="hover:text-[#801A00] transition-colors"
+                >
+                  {phone}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* نقشه */}
         <div className="mt-12">
           <h2 className="text-[18px] font-black text-[#171717] mb-4">موقعیت مکانی</h2>
@@ -25,21 +49,15 @@ export default function ContactPage() {
           >
             <div
               className="rounded-xl border border-[#E0E0E0] transition-all duration-200 hover:border-[#801A00] hover:shadow-lg"
-              style={{
-                height: 260,
-                background: 'linear-gradient(160deg, #e6ede4 0%, #d4e0d0 40%, #c2d4bc 100%)',
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', gap: 12,
-                cursor: 'pointer', position: 'relative', overflow: 'hidden',
-              }}
+              style={{ height: 260, position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
             >
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
-                <div style={{ position: 'absolute', top: '30%', left: 0, right: 0, height: 8, background: 'white', borderRadius: 4 }} />
-                <div style={{ position: 'absolute', top: '60%', left: 0, right: 0, height: 5, background: 'white', borderRadius: 3 }} />
-                <div style={{ position: 'absolute', top: 0, bottom: 0, left: '40%', width: 6, background: 'white', borderRadius: 3 }} />
-                <div style={{ position: 'absolute', top: 0, bottom: 0, left: '70%', width: 4, background: 'white', borderRadius: 2 }} />
-              </div>
-              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/map.png"
+                alt="نقشه خانه دی"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
                 <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
                   <MapPin size={26} color="#801A00" />
                 </div>
@@ -57,9 +75,9 @@ export default function ContactPage() {
           <div className="flex items-start gap-3 mt-4">
             <MapPin size={18} color="#801A00" className="flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-[13px] font-bold text-[#171717] mb-1">خانه دی</p>
+              <p className="text-[13px] font-bold text-[#171717] mb-1">آدرس</p>
               <p className="text-[13px] text-[#717171] font-light leading-relaxed">
-                تهران — برای مسیریابی روی نقشه کلیک کنید
+                خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳
               </p>
               <a
                 href="https://nshn.ir/_bvk7KWxiB9q"
