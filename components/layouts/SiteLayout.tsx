@@ -7,7 +7,8 @@ import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { Menu, X, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone } from '@/components/ui/icons'
 import { signOut } from 'next-auth/react'
-import { LoginModal } from '@/components/ui/LoginModal'
+import { LoginModal }    from '@/components/ui/LoginModal'
+import { RegisterModal } from '@/components/ui/RegisterModal'
 
 const navLinks = [
   { href: '/events',  label: 'رویدادها' },
@@ -145,7 +146,8 @@ function Navbar() {
   const hasHero = pathname === '/'
   const [scrolled, setScrolled] = useState(!hasHero)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
+  const [loginOpen,    setLoginOpen]    = useState(false)
+  const [registerOpen, setRegisterOpen] = useState(false)
 
   useEffect(() => {
     const handler = () => setScrolled(!hasHero || window.scrollY > 10)
@@ -384,7 +386,16 @@ function Navbar() {
         }
       `}</style>
 
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LoginModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true) }}
+      />
+      <RegisterModal
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true) }}
+      />
     </>
   )
 }

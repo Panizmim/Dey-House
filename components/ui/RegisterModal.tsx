@@ -7,33 +7,40 @@ import { z } from 'zod'
 import { signIn } from 'next-auth/react'
 import { X } from '@/components/ui/icons'
 
-const loginSchema = z.object({
-  email:    z.string().email('ایمیل معتبر نیست'),
-  password: z.string().min(6, 'رمز عبور باید حداقل ۶ کاراکتر باشد'),
+const registerSchema = z.object({
+  name:            z.string().min(2, 'نام باید حداقل ۲ کاراکتر باشد'),
+  email:           z.string().email('ایمیل معتبر نیست'),
+  phone:           z.string().regex(/^09[0-9]{9}$/, 'شماره موبایل معتبر نیست'),
+  password:        z.string().min(8, 'رمز عبور باید حداقل ۸ کاراکتر باشد'),
+  confirmPassword: z.string(),
+}).refine((d) => d.password === d.confirmPassword, {
+  message: 'رمز عبور و تکرار آن باید یکسان باشند',
+  path: ['confirmPassword'],
 })
 
-type LoginForm = z.infer<typeof loginSchema>
+type RegisterForm = z.infer<typeof registerSchema>
 
 interface Props {
-  open:               boolean
-  onClose:            () => void
-  onSwitchToRegister: () => void
+  open:            boolean
+  onClose:         () => void
+  onSwitchToLogin: () => void
 }
 
-export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
+export function RegisterModal({ open, onClose, onSwitchToLogin }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [showPass,    setShowPass]    = useState(false)
   const [serverError, setServerError] = useState('')
+  const [loading,     setLoading]     = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
+    formState: { errors },
+  } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) })
 
   useEffect(() => {
-    if (!open) { reset(); setServerError(''); setShowPass(false) }
+    if (!open) { reset(); setServerError(''); setShowPass(false); setLoading(false) }
   }, [open, reset])
 
   useEffect(() => {
@@ -47,16 +54,27 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
     }
   }, [open, onClose])
 
-  async function onSubmit(data: LoginForm) {
+  async function onSubmit(data: RegisterForm) {
+    setLoading(true)
     setServerError('')
-    const result = await signIn('credentials', {
-      email:    data.email,
-      password: data.password,
-      redirect: false,
-    })
-    if (!result) { setServerError('خطا در ارتباط با سرور'); return }
-    if (result.error) { setServerError('ایمیل یا رمز عبور اشتباه است'); return }
-    if (result.ok) { onClose(); window.location.reload() }
+    try {
+      const res = await fetch('/api/auth/register', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name: data.name, email: data.email, phone: data.phone, password: data.password }),
+      })
+      const result = await res.json()
+      if (!res.ok) { setServerError(result.error ?? 'خطا در ثبت‌نام'); return }
+
+      const signInResult = await signIn('credentials', { email: data.email, password: data.password, redirect: false })
+      if (signInResult?.error) { onSwitchToLogin(); return }
+      onClose()
+      window.location.href = '/dashboard'
+    } catch {
+      setServerError('خطای شبکه. لطفاً دوباره تلاش کنید')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (!open) return null
@@ -69,10 +87,9 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
       onMouseDown={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
       <div
-        className="relative w-full bg-white rounded-2xl shadow-2xl"
-        style={{ maxWidth: 400, padding: '36px 32px 32px' }}
+        className="relative w-full bg-white rounded-2xl shadow-2xl overflow-y-auto"
+        style={{ maxWidth: 420, padding: '36px 32px 32px', maxHeight: '90vh' }}
       >
-        {/* دکمه بستن */}
         <button
           onClick={onClose}
           className="absolute top-4 left-4 flex items-center justify-center rounded-full transition-colors hover:bg-gray-100"
@@ -83,10 +100,20 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
         </button>
 
         <h2 className="text-xl font-bold text-center mb-6" style={{ color: '#171717' }}>
-          ورود به حساب کاربری
+          ایجاد حساب کاربری
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: '#404040' }}>نام و نام خانوادگی</label>
+            <input
+              {...register('name')}
+              placeholder="نام کامل"
+              className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm outline-none focus:border-[#801A00] transition-colors"
+            />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: '#404040' }}>ایمیل</label>
             <input
@@ -100,12 +127,23 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: '#404040' }}>شماره موبایل</label>
+            <input
+              {...register('phone')}
+              placeholder="09123456789"
+              dir="ltr"
+              className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm outline-none focus:border-[#801A00] transition-colors"
+            />
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1" style={{ color: '#404040' }}>رمز عبور</label>
             <div className="relative">
               <input
                 {...register('password')}
                 type={showPass ? 'text' : 'password'}
-                placeholder="رمز عبور"
+                placeholder="حداقل ۸ کاراکتر"
                 className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm outline-none focus:border-[#801A00] transition-colors pl-16"
               />
               <button
@@ -120,6 +158,17 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: '#404040' }}>تکرار رمز عبور</label>
+            <input
+              {...register('confirmPassword')}
+              type={showPass ? 'text' : 'password'}
+              placeholder="رمز عبور را دوباره وارد کنید"
+              className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm outline-none focus:border-[#801A00] transition-colors"
+            />
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+          </div>
+
           {serverError && (
             <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
               <p className="text-red-600 text-sm">{serverError}</p>
@@ -128,22 +177,22 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={loading}
             className="w-full text-white font-medium py-2.5 rounded-xl transition-colors disabled:opacity-60"
             style={{ background: '#801A00', fontSize: 15 }}
           >
-            {isSubmitting ? 'در حال ورود...' : 'ورود'}
+            {loading ? 'در حال ثبت‌نام...' : 'ثبت‌نام'}
           </button>
         </form>
 
         <p className="text-center text-sm mt-5" style={{ color: '#717171' }}>
-          حساب ندارید؟{' '}
+          حساب دارید؟{' '}
           <button
-            onClick={onSwitchToRegister}
+            onClick={onSwitchToLogin}
             className="font-medium hover:underline"
             style={{ color: '#801A00', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
           >
-            ثبت‌نام کنید
+            وارد شوید
           </button>
         </p>
       </div>
