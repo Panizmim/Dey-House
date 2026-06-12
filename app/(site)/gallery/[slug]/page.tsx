@@ -92,8 +92,8 @@ export default function GalleryDetailPage() {
             style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
             {gallery.title}
           </h1>
-          <p className="text-[#A0A0A0] font-light mb-3" style={{ fontSize: 15 }}>{gallery.artistName}</p>
-          <p className="text-[#A0A0A0] font-light" style={{ fontSize: 15 }}>
+          <p className="font-light mb-3" style={{ fontSize: 15, color: '#1a1a1a' }}>{gallery.artistName}</p>
+          <p className="font-light" style={{ fontSize: 15, color: '#1a1a1a' }}>
             {formatJalali(gallery.startDate, false)} — {formatJalali(gallery.endDate)}
           </p>
         </div>
