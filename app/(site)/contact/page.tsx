@@ -44,7 +44,7 @@ export default function ContactPage() {
             href="https://nshn.ir/_bvk7KWxiB9q"
             target="_blank"
             rel="noopener noreferrer"
-            className="block"
+            className="block group"
             style={{ textDecoration: 'none' }}
           >
             <div
@@ -57,16 +57,10 @@ export default function ContactPage() {
                 alt="نقشه خانه دی"
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               />
-              <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
-                  <MapPin size={26} color="#801A00" />
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 }}>خانه دی</p>
-                  <p style={{ fontSize: 12, color: '#555', fontWeight: 400 }}>برای مشاهده مسیر کلیک کنید</p>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#801A00', color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-                  <MapPin size={11} color="white" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200" />
+              <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#801A00', color: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+                  <MapPin size={12} color="white" />
                   باز کردن در نشان
                 </div>
               </div>

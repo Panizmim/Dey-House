@@ -310,14 +310,15 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
         {/* ─── موقعیت مکانی ─── */}
         <div className="px-4 py-5 border-b border-[#F0F0F0]">
           <h2 className="text-[19px] font-black text-[#171717] mb-3">موقعیت مکانی</h2>
-          <a href="https://nshn.ir/_bvk7KWxiB9q" target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none', borderRadius: 12, overflow: 'hidden', height: 180 }}>
-            <div style={{ height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+          <a href="https://nshn.ir/_bvk7KWxiB9q" target="_blank" rel="noopener noreferrer" className="block group" style={{ textDecoration: 'none', borderRadius: 12, overflow: 'hidden', height: 180 }}>
+            <div style={{ height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/map.png" alt="نقشه خانه دی" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
-                <MapPin size={22} color="#801A00" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200" />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6, background: '#801A00', color: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+                <MapPin size={12} color="white" />
+                باز کردن در نشان
               </div>
-              <p style={{ position: 'relative', fontSize: 14, color: '#444', fontWeight: 500 }}>برای مشاهده مسیر کلیک کنید</p>
             </div>
           </a>
         </div>
@@ -601,10 +602,9 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 rel="noopener noreferrer"
                 style={{ display: 'block', textDecoration: 'none' }}
               >
-                <div style={{
+                <div className="group" style={{
                   height: 260, borderRadius: 12, border: '1px solid #E0E0E0',
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center', gap: 12,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', position: 'relative', overflow: 'hidden',
                   transition: 'border-color 200ms, box-shadow 200ms',
                 }}
@@ -621,23 +621,10 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/map.png" alt="نقشه خانه دی" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-
-                  <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
-                      <MapPin size={26} color="#801A00" />
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <p style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 }}>خانه دی</p>
-                      <p style={{ fontSize: 12, color: '#555', fontWeight: 400 }}>برای مشاهده مسیر کلیک کنید</p>
-                    </div>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      background: '#801A00', color: 'white',
-                      padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
-                    }}>
-                      <MapPin size={11} color="white" />
-                      باز کردن در نشان
-                    </div>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200" />
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6, background: '#801A00', color: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+                    <MapPin size={12} color="white" />
+                    باز کردن در نشان
                   </div>
                 </div>
               </a>
