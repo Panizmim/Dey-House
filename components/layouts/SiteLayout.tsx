@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { Menu, X, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone } from '@/components/ui/icons'
 import { signOut } from 'next-auth/react'
+import { LoginModal } from '@/components/ui/LoginModal'
 
 const navLinks = [
   { href: '/events',  label: 'رویدادها' },
@@ -144,6 +145,7 @@ function Navbar() {
   const hasHero = pathname === '/'
   const [scrolled, setScrolled] = useState(!hasHero)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
 
   useEffect(() => {
     const handler = () => setScrolled(!hasHero || window.scrollY > 10)
@@ -197,13 +199,23 @@ function Navbar() {
           </div>
 
           {/* آیکون کاربر — چپ */}
-          <Link
-            href={session ? '/dashboard/profile' : '/login'}
-            style={{ color: 'inherit', display: 'flex', alignItems: 'center', padding: '6px' }}
-            aria-label="حساب کاربری"
-          >
-            <User size={22} />
-          </Link>
+          {session ? (
+            <Link
+              href="/dashboard/profile"
+              style={{ color: 'inherit', display: 'flex', alignItems: 'center', padding: '6px' }}
+              aria-label="حساب کاربری"
+            >
+              <User size={22} />
+            </Link>
+          ) : (
+            <button
+              onClick={() => setLoginOpen(true)}
+              style={{ color: 'inherit', display: 'flex', alignItems: 'center', padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}
+              aria-label="ورود به حساب"
+            >
+              <User size={22} />
+            </button>
+          )}
         </div>
 
         {/* ── دسکتاپ ── */}
@@ -255,14 +267,14 @@ function Navbar() {
             {session ? (
               <UserDropdown scrolled={scrolled} />
             ) : (
-              <Link
-                href="/login"
+              <button
+                onClick={() => setLoginOpen(true)}
                 className="relative pb-0.5 group"
-                style={{ fontSize: '17px', fontWeight: 600 }}
+                style={{ fontSize: '17px', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
               >
                 ورود / ثبت‌نام
                 <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
-              </Link>
+              </button>
             )}
           </div>
         </div>
@@ -346,18 +358,19 @@ function Navbar() {
                   خروج از حساب
                 </button>
               ) : (
-                <Link
-                  href="/login"
-                  onClick={close}
+                <button
+                  onClick={() => { close(); setLoginOpen(true) }}
                   style={{
-                    display: 'block', textAlign: 'center',
+                    display: 'block', textAlign: 'center', width: '100%',
                     border: '1px solid #E5E5E5',
                     borderRadius: 10, padding: '13px',
-                    fontSize: 15, fontWeight: 600, color: '#171717', textDecoration: 'none',
+                    fontSize: 15, fontWeight: 600, color: '#171717',
+                    background: 'white', cursor: 'pointer',
+                    fontFamily: 'YekanBakh, Tahoma, sans-serif',
                   }}
                 >
                   ورود / ثبت‌نام
-                </Link>
+                </button>
               )}
             </div>
           </div>
@@ -370,6 +383,8 @@ function Navbar() {
           to   { transform: translateX(0); }
         }
       `}</style>
+
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   )
 }
