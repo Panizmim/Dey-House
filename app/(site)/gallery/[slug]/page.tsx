@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ChevronLeft } from '@/components/ui/icons'
 import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
+import { Lightbox } from '@/components/ui/Lightbox'
 
 type GalleryDetail = {
   id:          string
@@ -207,58 +208,12 @@ export default function GalleryDetailPage() {
         </div>
       )}
 
-      {/* ─── Lightbox ─── */}
-      {lightboxIndex !== null && (
-        <div
-          className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center"
-          onClick={() => setLightboxIndex(null)}
-        >
-          <div
-            className="relative max-w-4xl max-h-[85vh] w-full mx-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={artworks[lightboxIndex]}
-              alt=""
-              width={1200}
-              height={800}
-              className="object-contain max-h-[85vh] w-full"
-            />
-
-            <div className="absolute top-4 right-4 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
-              {toPersian(lightboxIndex + 1)} / {toPersian(artworks.length)}
-            </div>
-
-            <button
-              onClick={() => setLightboxIndex(null)}
-              className="absolute top-4 left-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-all"
-              style={{ fontSize: 18 }}
-            >
-              ×
-            </button>
-
-            {lightboxIndex > 0 && (
-              <button
-                onClick={() => setLightboxIndex((i) => i! - 1)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full text-white hover:bg-white/40 transition-all flex items-center justify-center"
-                style={{ fontSize: 22 }}
-              >
-                ›
-              </button>
-            )}
-
-            {lightboxIndex < artworks.length - 1 && (
-              <button
-                onClick={() => setLightboxIndex((i) => i! + 1)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full text-white hover:bg-white/40 transition-all flex items-center justify-center"
-                style={{ fontSize: 22 }}
-              >
-                ‹
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+      <Lightbox
+        images={artworks}
+        index={lightboxIndex}
+        onChange={setLightboxIndex}
+        alt={gallery.title}
+      />
     </main>
   )
 }

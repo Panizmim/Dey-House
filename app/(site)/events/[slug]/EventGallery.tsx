@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { X, ChevronRight, ChevronLeft } from '@/components/ui/icons'
+import { useState } from 'react'
+import { Lightbox } from '@/components/ui/Lightbox'
 import { toPersianNum } from '@/lib/utils'
 
 interface Props {
@@ -11,26 +11,7 @@ interface Props {
 }
 
 export default function EventGallery({ images, imageGradients, title }: Props) {
-  const [lightbox, setLightbox] = useState<{ open: boolean; index: number }>({ open: false, index: 0 })
-
-  useEffect(() => {
-    document.body.style.overflow = lightbox.open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [lightbox.open])
-
-  useEffect(() => {
-    if (!lightbox.open) return
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'ArrowRight' && lightbox.index > 0)
-        setLightbox((p) => ({ ...p, index: p.index - 1 }))
-      if (e.key === 'ArrowLeft' && lightbox.index < images.length - 1)
-        setLightbox((p) => ({ ...p, index: p.index + 1 }))
-      if (e.key === 'Escape')
-        setLightbox({ open: false, index: 0 })
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [lightbox, images.length])
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   return (
     <>
@@ -40,12 +21,12 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
         <span style={{ fontSize: 13, color: '#A0A0A0' }}>{toPersianNum(images.length)} تصویر</span>
       </div>
 
-      {/* گرید عکس‌ها */}
+      {/* گرید */}
       <div className="grid gap-1 grid-cols-3 sm:grid-cols-5">
         {images.map((img, i) => (
           <button
             key={i}
-            onClick={() => setLightbox({ open: true, index: i })}
+            onClick={() => setLightboxIndex(i)}
             style={{
               position: 'relative', paddingTop: '100%',
               border: 'none', cursor: 'pointer',
@@ -68,110 +49,13 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
         ))}
       </div>
 
-      {/* Lightbox */}
-      {lightbox.open && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.95)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-          onClick={() => setLightbox({ open: false, index: 0 })}
-        >
-          {/* دکمه بستن */}
-          <button
-            style={{
-              position: 'absolute', top: 20, left: 20,
-              background: 'rgba(255,255,255,0.1)', border: 'none',
-              borderRadius: '50%', padding: 8, cursor: 'pointer',
-              color: 'rgba(255,255,255,0.7)', display: 'flex',
-              transition: 'all 150ms',
-            }}
-            onClick={() => setLightbox({ open: false, index: 0 })}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'white' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
-          >
-            <X size={24} />
-          </button>
-
-          {/* شماره */}
-          <div style={{ position: 'absolute', top: 24, right: 24, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-            {toPersianNum(lightbox.index + 1)} / {toPersianNum(images.length)}
-          </div>
-
-          {/* تصویر */}
-          <div
-            style={{ position: 'relative', maxWidth: '80vw', maxHeight: '85vh', margin: '0 80px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{
-              position: 'absolute', inset: 0, borderRadius: 12,
-              background: imageGradients[lightbox.index] ?? '#333', zIndex: -1,
-            }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={images[lightbox.index]}
-              alt={title}
-              style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain', borderRadius: 12, display: 'block' }}
-              onError={(e) => { e.currentTarget.style.display = 'none' }}
-            />
-          </div>
-
-          {/* ناوبری RTL: ArrowRight = قبلی (index - 1) */}
-          {lightbox.index > 0 && (
-            <button
-              style={{
-                position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)',
-                background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                padding: 12, cursor: 'pointer', color: 'white', display: 'flex',
-                transition: 'all 150ms',
-              }}
-              onClick={(e) => { e.stopPropagation(); setLightbox((p) => ({ ...p, index: p.index - 1 })) }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
-            >
-              <ChevronRight size={24} />
-            </button>
-          )}
-
-          {lightbox.index < images.length - 1 && (
-            <button
-              style={{
-                position: 'absolute', left: 24, top: '50%', transform: 'translateY(-50%)',
-                background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                padding: 12, cursor: 'pointer', color: 'white', display: 'flex',
-                transition: 'all 150ms',
-              }}
-              onClick={(e) => { e.stopPropagation(); setLightbox((p) => ({ ...p, index: p.index + 1 })) }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
-            >
-              <ChevronLeft size={24} />
-            </button>
-          )}
-
-          {/* dots */}
-          <div style={{
-            position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', gap: 8,
-          }}>
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.stopPropagation(); setLightbox((p) => ({ ...p, index: i })) }}
-                style={{
-                  width: i === lightbox.index ? 16 : 8, height: 8,
-                  borderRadius: 4,
-                  background: i === lightbox.index ? 'white' : 'rgba(255,255,255,0.4)',
-                  border: 'none', cursor: 'pointer',
-                  transition: 'all 200ms',
-                  padding: 0,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      <Lightbox
+        images={images}
+        index={lightboxIndex}
+        onChange={setLightboxIndex}
+        alt={title}
+        gradient={lightboxIndex !== null ? imageGradients[lightboxIndex] : undefined}
+      />
     </>
   )
 }
