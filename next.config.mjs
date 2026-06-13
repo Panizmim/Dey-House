@@ -13,6 +13,16 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp'],
     instrumentationHook: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'deyhouse.com' }],
+        destination: 'https://www.deyhouse.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig
