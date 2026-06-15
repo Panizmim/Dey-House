@@ -26,7 +26,7 @@ function EventCard({ event }: { event: PublicEvent }) {
   return (
     <Link
       href={`/events/${event.slug}`}
-      style={{ display: 'block', textDecoration: 'none' }}
+      style={{ display: 'block', textDecoration: 'none', WebkitTapHighlightColor: 'transparent', outline: 'none' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -34,7 +34,7 @@ function EventCard({ event }: { event: PublicEvent }) {
       <div style={{
         position: 'relative', paddingTop: '125%',
         background: event.gradient, overflow: 'hidden',
-        borderRadius: 2,
+        borderRadius: 0,
       }}>
         {event.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -44,6 +44,7 @@ function EventCard({ event }: { event: PublicEvent }) {
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%', objectFit: 'cover',
+              display: 'block', border: 'none',
               transform: hovered ? 'scale(1.04)' : 'scale(1)',
               transition: 'transform 500ms ease',
             }}

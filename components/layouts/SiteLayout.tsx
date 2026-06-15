@@ -282,107 +282,112 @@ function Navbar() {
         </div>
       </header>
 
-      {/* ── پنل کشویی موبایل (راست) ── */}
+      {/* ── منوی فول‌پیج موبایل ── */}
       {mobileMenuOpen && (
-        <>
-          {/* overlay */}
-          <div
-            className="lg:hidden fixed inset-0 z-[48]"
-            style={{ background: 'rgba(0,0,0,0.52)' }}
-            onClick={close}
-          />
+        <div
+          className="lg:hidden z-[52] bg-white flex flex-col overflow-hidden"
+          style={{ animation: 'menuFadeIn 200ms ease forwards', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, minHeight: '-webkit-fill-available' }}
+        >
+          {/* هدر: فقط دکمه بستن */}
+          <div className="flex items-center px-5" style={{ height: 60, flexShrink: 0 }}>
+            <button
+              onClick={close}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', color: '#171717' }}
+              aria-label="بستن منو"
+            >
+              <X size={24} />
+            </button>
+          </div>
 
-          {/* پنل */}
-          <div
-            className="lg:hidden fixed top-0 right-0 bottom-0 z-[49] bg-white flex flex-col"
-            style={{ width: 'min(72vw, 280px)', animation: 'slideInFromRight 240ms ease forwards' }}
-          >
-            {/* هدر پنل */}
-            <div className="flex items-center justify-between px-5 border-b border-[#F0F0F0]" style={{ height: 60, flexShrink: 0 }}>
-              <button
-                onClick={close}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', color: '#171717' }}
-                aria-label="بستن منو"
-              >
-                <X size={22} />
-              </button>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#171717' }}>خانه دی</span>
-            </div>
+          {/* لوگو — سمت راست، بالای لینک‌ها */}
+          <div className="flex justify-start px-6 pb-4" style={{ flexShrink: 0 }}>
+            <Link href="/" onClick={close}>
+              <div className="relative" style={{ width: 96, height: 38 }}>
+                <Image
+                  src="/images/logo.primary color.png"
+                  alt="خانه دی"
+                  fill
+                  className="object-contain"
+                  style={{ mixBlendMode: 'multiply' }}
+                />
+              </div>
+            </Link>
+          </div>
 
-            {/* لینک‌ها */}
-            <div className="flex flex-col flex-1 overflow-y-auto">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={close}
-                  style={{
-                    display: 'block',
-                    padding: '15px 20px',
-                    fontSize: 16,
-                    fontWeight: 500,
-                    color: '#171717',
-                    borderBottom: '1px solid #F5F5F5',
-                    textDecoration: 'none',
-                  }}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
-            {/* دکمه‌های اکشن */}
-            <div className="px-4 pt-4 pb-8 flex flex-col gap-3" style={{ borderTop: '1px solid #F0F0F0', flexShrink: 0 }}>
+          {/* لینک‌ها */}
+          <div className="flex flex-col flex-1 overflow-y-auto" style={{ borderTop: '1px solid #F0F0F0' }}>
+            {[...navLinks, { href: '/contact', label: 'تماس با ما' }].map((link) => (
               <Link
-                href="/#studios"
+                key={link.href}
+                href={link.href}
                 onClick={close}
                 style={{
-                  display: 'block', textAlign: 'center',
-                  background: '#801A00', color: 'white',
-                  borderRadius: 10, padding: '13px',
-                  fontSize: 15, fontWeight: 700, textDecoration: 'none',
+                  display: 'flex', alignItems: 'center',
+                  padding: '18px 24px',
+                  fontSize: 20, fontWeight: 600, color: '#171717',
+                  borderBottom: '1px solid #F0F0F0',
+                  textDecoration: 'none',
                 }}
               >
-                رزرو پلاتو
+                {link.label}
               </Link>
-
-              {session ? (
-                <button
-                  onClick={() => { close(); signOut() }}
-                  style={{
-                    background: 'transparent', border: '1px solid #E5E5E5',
-                    borderRadius: 10, padding: '13px',
-                    fontSize: 14, fontWeight: 600, color: '#801A00',
-                    cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
-                    width: '100%',
-                  }}
-                >
-                  خروج از حساب
-                </button>
-              ) : (
-                <button
-                  onClick={() => { close(); setLoginOpen(true) }}
-                  style={{
-                    display: 'block', textAlign: 'center', width: '100%',
-                    border: '1px solid #E5E5E5',
-                    borderRadius: 10, padding: '13px',
-                    fontSize: 15, fontWeight: 600, color: '#171717',
-                    background: 'white', cursor: 'pointer',
-                    fontFamily: 'YekanBakh, Tahoma, sans-serif',
-                  }}
-                >
-                  ورود / ثبت‌نام
-                </button>
-              )}
-            </div>
+            ))}
           </div>
-        </>
+
+          {/* دکمه‌های اکشن */}
+          <div
+            className="px-5 pt-4 flex flex-col gap-3"
+            style={{ borderTop: '1px solid #F0F0F0', flexShrink: 0, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
+          >
+            <Link
+              href="/#studios"
+              onClick={close}
+              style={{
+                display: 'block', textAlign: 'center',
+                background: '#801A00', color: 'white',
+                borderRadius: 12, padding: '15px',
+                fontSize: 16, fontWeight: 700, textDecoration: 'none',
+              }}
+            >
+              رزرو پلاتو
+            </Link>
+
+            {session ? (
+              <button
+                onClick={() => { close(); signOut() }}
+                style={{
+                  background: 'transparent', border: '1px solid #E5E5E5',
+                  borderRadius: 12, padding: '15px',
+                  fontSize: 15, fontWeight: 600, color: '#801A00',
+                  cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                  width: '100%',
+                }}
+              >
+                خروج از حساب
+              </button>
+            ) : (
+              <button
+                onClick={() => { close(); setLoginOpen(true) }}
+                style={{
+                  display: 'block', textAlign: 'center', width: '100%',
+                  border: '1px solid #E5E5E5',
+                  borderRadius: 12, padding: '15px',
+                  fontSize: 15, fontWeight: 600, color: '#171717',
+                  background: 'white', cursor: 'pointer',
+                  fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                }}
+              >
+                ورود / ثبت‌نام
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       <style>{`
-        @keyframes slideInFromRight {
-          from { transform: translateX(100%); }
-          to   { transform: translateX(0); }
+        @keyframes menuFadeIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
