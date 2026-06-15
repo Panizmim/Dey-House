@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { signIn } from 'next-auth/react'
+import Image from 'next/image'
 import { X } from '@/components/ui/icons'
 
 const loginSchema = z.object({
@@ -81,6 +82,16 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
         >
           <X size={18} />
         </button>
+
+        <div className="flex justify-center mb-5">
+          <Image
+            src="/images/logo.primary color.png"
+            alt="خانه دی"
+            width={72}
+            height={72}
+            className="object-contain"
+          />
+        </div>
 
         <h2 className="text-xl font-bold text-center mb-6" style={{ color: '#171717' }}>
           ورود به حساب کاربری
