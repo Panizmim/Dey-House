@@ -14,10 +14,8 @@ const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴
 
 function formatTime(time: string): string {
   if (!time) return ''
-  const [hh, mm] = time.split(':').map(Number)
-  const period = hh >= 12 ? 'بعدازظهر' : 'صبح'
-  const h12 = hh % 12 || 12
-  return `${toFa(h12)}:${toFa(String(mm).padStart(2, '0'))} ${period}`
+  const [hh, mm] = time.split(':')
+  return `${toFa(hh.padStart(2, '0'))}:${toFa(mm.padStart(2, '0'))}`
 }
 
 const typeGradients: Record<string, string> = {

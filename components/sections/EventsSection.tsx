@@ -86,15 +86,9 @@ function EventCard({ event }: { event: PublicEvent }) {
           {event.title}
         </h3>
 
-        {/* تاریخ و ساعت */}
-        <div style={{ fontSize: 12, color: '#909090', display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* تاریخ */}
+        <div style={{ fontSize: 12, color: '#909090' }}>
           <span>{event.date}</span>
-          {event.time && (
-            <>
-              <span style={{ color: '#D0D0D0' }}>·</span>
-              <span>{formatTime(event.time)}</span>
-            </>
-          )}
         </div>
       </div>
     </Link>
