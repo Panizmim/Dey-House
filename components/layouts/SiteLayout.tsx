@@ -190,7 +190,7 @@ function Navbar() {
             <Link href="/" onClick={close}>
               <div className="relative" style={{ width: 76, height: 30 }}>
                 <Image
-                  src="/images/logo.png"
+                  src="/images/logo.primary color.png"
                   alt="خانه دی"
                   fill
                   className="object-contain"
@@ -227,14 +227,14 @@ function Navbar() {
             <Link href="/" onClick={close}>
               <div className="relative w-24 h-10">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/logo.primary color.png"
                   alt="خانه دی"
                   fill
                   className="object-contain"
                   style={
                     scrolled
                       ? { mixBlendMode: 'multiply' }
-                      : { filter: 'invert(1) grayscale(1) brightness(5)', mixBlendMode: 'screen' }
+                      : { filter: 'brightness(0) invert(1)' }
                   }
                 />
               </div>
@@ -429,7 +429,7 @@ function Footer() {
           <div className="md:w-[30%] flex flex-col gap-5">
             <div className="flex flex-col gap-1 mb-4">
               <Image
-                src="/images/logo.png"
+                src="/images/logo.primary color.png"
                 alt="خانه دی"
                 width={140}
                 height={46}
