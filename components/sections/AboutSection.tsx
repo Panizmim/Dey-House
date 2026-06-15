@@ -4,11 +4,12 @@ export function AboutSection() {
       className="bg-neutral-50 border-t border-b border-neutral-200"
       style={{ position: 'relative', overflow: 'hidden' }}
     >
-      {/* ─── صندلی + خط ─── */}
+      {/* ─── صندلی دسکتاپ (absolute) ─── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/chair.png"
         alt=""
+        className="hidden md:block"
         style={{
           position:      'absolute',
           top:           '50%',
@@ -27,14 +28,8 @@ export function AboutSection() {
         <div style={{ maxWidth: 600 }}>
 
           <h2
-            style={{
-              fontSize:      'clamp(24px, 3vw, 36px)',
-              fontWeight:    900,
-              color:         '#171717',
-              letterSpacing: '-0.02em',
-              lineHeight:    1.2,
-              marginBottom:  28,
-            }}
+            className="font-black text-[#171717] text-[20px] md:text-[26px]"
+            style={{ letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 28 }}
           >
             خانه دی
           </h2>
@@ -60,6 +55,22 @@ export function AboutSection() {
           </p>
 
         </div>
+
+        {/* ─── صندلی موبایل — زیر متن ─── */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/chair.png"
+          alt=""
+          className="block md:hidden"
+          style={{
+            width:        '100%',
+            height:       'auto',
+            opacity:      0.22,
+            mixBlendMode: 'multiply',
+            marginTop:    32,
+            pointerEvents:'none',
+          }}
+        />
       </div>
     </section>
   )

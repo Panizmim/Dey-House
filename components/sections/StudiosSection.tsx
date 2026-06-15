@@ -178,7 +178,7 @@ export function StudiosSection() {
         <div>
           <h2
             className="font-black text-[#171717]"
-            style={{ fontSize: 'clamp(24px, 3vw, 36px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+            style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
           >
             رزرو فضا
           </h2>
@@ -186,7 +186,7 @@ export function StudiosSection() {
       </div>
 
       {/* grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-7">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 md:gap-y-7">
         {studios.map((studio) => (
           <StudioCard key={studio.id} studio={studio} />
         ))}

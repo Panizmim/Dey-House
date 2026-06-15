@@ -19,12 +19,6 @@ type PublicEvent = {
 
 const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
 
-function formatTime(time: string): string {
-  const [hh, mm] = time.split(':').map(Number)
-  const period = hh >= 12 ? 'بعدازظهر' : 'صبح'
-  const h12 = hh % 12 || 12
-  return `${toFa(h12)}:${toFa(String(mm).padStart(2, '0'))} ${period}`
-}
 
 function EventCard({ event }: { event: PublicEvent }) {
   const [hovered, setHovered] = useState(false)
@@ -130,11 +124,10 @@ export function EventsSection() {
           display: 'flex', alignItems: 'baseline',
           justifyContent: 'space-between', marginBottom: 32,
         }}>
-          <h2 style={{
-            fontSize: 'clamp(24px, 3vw, 36px)',
-            fontWeight: 900, color: '#171717',
-            letterSpacing: '-0.02em', lineHeight: 1.2,
-          }}>
+          <h2
+            className="font-black text-[#171717]"
+            style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+          >
             رویدادها
           </h2>
           <Link
@@ -153,7 +146,7 @@ export function EventsSection() {
         </div>
 
         {/* ─── گرید کارت‌ها ─── */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-10 md:gap-y-8">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
             : events.map((event) => <EventCard key={event.id} event={event} />)

@@ -89,7 +89,7 @@ export function CafePreview() {
         <div className="flex items-center justify-between mb-8">
           <h2
             className="font-black text-[#171717]"
-            style={{ fontSize: 'clamp(24px, 3vw, 36px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+            style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
           >
             منوی کافه
           </h2>

@@ -139,11 +139,10 @@ export function GallerySection() {
           display: 'flex', alignItems: 'baseline',
           justifyContent: 'space-between', marginBottom: 32,
         }}>
-          <h2 style={{
-            fontSize: 'clamp(24px, 3vw, 36px)',
-            fontWeight: 900, color: '#171717',
-            letterSpacing: '-0.02em', lineHeight: 1.2,
-          }}>
+          <h2
+            className="font-black text-[#171717]"
+            style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+          >
             نمایشگاه‌ها
           </h2>
           <Link

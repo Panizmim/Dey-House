@@ -14,7 +14,7 @@ export function ArtistSubmissionCTA() {
             <h2
               className="text-[#171717] font-black mb-8"
               style={{
-                fontSize:      'clamp(24px, 3vw, 36px)',
+                fontSize:      'clamp(20px, 2.2vw, 28px)',
                 letterSpacing: '-0.02em',
                 lineHeight:    1.2,
               }}
