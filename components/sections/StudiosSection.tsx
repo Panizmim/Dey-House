@@ -14,6 +14,7 @@ const studios = [
     floorType:    'پارکت',
     wallType:     'سفید',
     chairCount:   30,
+    acoustic:     'اکوستیک',
     images: [
       '/images/studios/white-room-1.jpg',
       '/images/studios/white-room-2.jpg',
@@ -29,6 +30,7 @@ const studios = [
     floorType:    'سیمانی',
     wallType:     'سیاه',
     chairCount:   20,
+    acoustic:     'اکوستیک',
     images: [
       '/images/studios/black-room1-1.jpg',
       '/images/studios/black-room1-2.jpg',
@@ -44,6 +46,7 @@ const studios = [
     floorType:    'سیمانی',
     wallType:     'سیاه',
     chairCount:   15,
+    acoustic:     'اکوستیک',
     images: [
       '/images/studios/black-room2-1.jpg',
       '/images/studios/black-room2-2.jpg',
@@ -140,34 +143,24 @@ function StudioCard({ studio }: { studio: typeof studios[number] }) {
           </h3>
         </div>
 
-        {/* متراژ */}
-        <p className="text-[13px] text-[#717171] font-light mb-1">
-          {studio.area}
-        </p>
-
-        {/* کف · دیوار */}
-        <div className="flex items-center gap-1 mb-1">
-          <p className="text-[13px] text-[#717171] font-light">کف: {studio.floorType}</p>
-          <span className="text-[#D0D0D0] text-[10px]">·</span>
-          <p className="text-[13px] text-[#717171] font-light">دیوار: {studio.wallType}</p>
+        {/* جزئیات فضا */}
+        <div className="flex items-center gap-4 mt-3 mb-3">
+          <span className="text-[13px] text-[#717171] font-medium">{studio.area}</span>
+          <span className="text-[13px] text-[#717171] font-medium">{toPersianNum(studio.chairCount)} صندلی</span>
+          <span className="text-[13px] text-[#717171] font-medium">{studio.acoustic}</span>
         </div>
-
-        {/* تعداد صندلی */}
-        <p className="text-[12px] text-[#A0A0A0] font-light mb-3">
-          {toPersianNum(studio.chairCount)} صندلی
-        </p>
 
         {/* separator */}
         <div className="w-full h-px bg-[#E8E8E8] mb-3" />
 
         {/* قیمت */}
         <div className="flex items-baseline gap-1">
-          <span className="text-[13px] text-[#717171] font-light">شروع از:</span>
+          <span className="text-[13px] text-[#717171] font-medium">شروع از:</span>
           <span className="text-[15px] font-black text-[#171717]">
             {studio.pricePerHour.toLocaleString('fa-IR')}
           </span>
           <span className="text-[15px] font-black text-[#171717]">تومان</span>
-          <span className="text-[13px] text-[#717171] font-light">/ ساعت</span>
+          <span className="text-[13px] text-[#717171] font-medium">/ ساعت</span>
         </div>
 
       </div>

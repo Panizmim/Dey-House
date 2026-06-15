@@ -359,7 +359,9 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                     <p className="text-[15px] font-black text-[#171717] mb-1 leading-tight" style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' } as React.CSSProperties}>
                       {other.name}
                     </p>
-                    <p className="text-[12px] text-[#717171] font-light mb-2">{other.area}</p>
+                    <p className="text-[12px] text-[#717171] font-light mb-2">
+                      {other.area} · {toPersian(other.chairCount)} صندلی
+                    </p>
                     <p className="text-[13px] font-bold text-[#801A00]">
                       {toPersian(other.pricePerHour.toLocaleString('fa-IR'))}
                       <span className="text-[11px] font-light text-[#A0A0A0] mr-1">ت/ساعت</span>
