@@ -133,7 +133,7 @@ export default function EventsPage() {
       {/* فیلتر بالا */}
       <div className="sticky z-30 bg-white border-b border-[#F0F0F0]" style={{ top: 60 }}>
         {/* تب‌های نوع رویداد */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-3">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 pt-4 pb-3">
           {EVENT_TYPES.map((t) => (
             <button
               key={t}
