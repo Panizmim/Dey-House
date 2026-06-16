@@ -46,7 +46,7 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
           background: 'transparent', border: 'none', cursor: 'pointer',
-          fontSize: '17px', fontWeight: 600, color: textColor,
+          fontSize: '14px', fontWeight: 600, color: textColor,
           fontFamily: 'YekanBakh, Tahoma, sans-serif',
           padding: 0,
         }}
@@ -247,7 +247,7 @@ function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                style={{ fontSize: '18px', fontWeight: 400 }}
+                style={{ fontSize: '15px', fontWeight: 400 }}
                 className="px-3 py-1.5 transition-opacity duration-200 hover:opacity-70 whitespace-nowrap"
               >
                 {link.label}
@@ -260,7 +260,7 @@ function Navbar() {
             <Link
               href="/#studios"
               className="relative pb-0.5 group"
-              style={{ fontSize: '17px', fontWeight: 600 }}
+              style={{ fontSize: '14px', fontWeight: 600 }}
             >
               رزرو پلاتو
               <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
@@ -272,7 +272,7 @@ function Navbar() {
               <button
                 onClick={() => setLoginOpen(true)}
                 className="relative pb-0.5 group"
-                style={{ fontSize: '17px', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
+                style={{ fontSize: '14px', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
               >
                 ورود / ثبت‌نام
                 <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-current transition-all duration-200 group-hover:w-full" />
@@ -315,8 +315,8 @@ function Navbar() {
           </div>
 
           {/* لینک‌ها */}
-          <div className="flex flex-col flex-1 overflow-y-auto" style={{ borderTop: '1px solid #F0F0F0' }}>
-            {[...navLinks, { href: '/contact', label: 'تماس با ما' }].map((link) => (
+          <div className="flex flex-col flex-1 overflow-y-auto">
+            {[...navLinks, { href: '/contact', label: 'تماس با ما' }].map((link, i, arr) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -325,7 +325,7 @@ function Navbar() {
                   display: 'flex', alignItems: 'center',
                   padding: '18px 24px',
                   fontSize: 18, fontWeight: 600, color: '#171717',
-                  borderBottom: '1px solid #F0F0F0',
+                  borderBottom: i === arr.length - 1 ? 'none' : '1px solid #F0F0F0',
                   textDecoration: 'none',
                 }}
               >
@@ -337,7 +337,7 @@ function Navbar() {
           {/* دکمه‌های اکشن */}
           <div
             className="px-5 pt-4 flex flex-col gap-3"
-            style={{ borderTop: '1px solid #F0F0F0', flexShrink: 0, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
+            style={{ flexShrink: 0, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
           >
             <Link
               href="/#studios"
