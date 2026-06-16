@@ -118,7 +118,7 @@ export default function PaymentFailurePage({ searchParams }: Props) {
         {/* دکمه‌ها */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <Link
-            href="/booking"
+            href="/#studios"
             style={{
               display: 'block', textAlign: 'center',
               background: '#801A00', color: 'white',

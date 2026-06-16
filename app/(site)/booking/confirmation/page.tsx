@@ -80,7 +80,7 @@ function ConfirmationContent() {
         <h1 className="text-2xl font-bold text-neutral-900 mb-3">پرداخت ناموفق</h1>
         <p className="text-neutral-600 mb-6">متأسفانه پرداخت تأیید نشد. رزرو لغو شد.</p>
         <Link
-          href="/booking"
+          href="/#studios"
           className="bg-brand hover:bg-brand-hover text-white font-medium px-6 py-2.5 rounded-btn transition-colors"
         >
           تلاش مجدد

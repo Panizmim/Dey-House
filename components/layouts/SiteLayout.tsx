@@ -407,7 +407,7 @@ function Navbar() {
 
 /* ─── Footer ─── */
 const footerServices = [
-  { label: 'رزرو پلاتو', href: '/booking' },
+  { label: 'رزرو پلاتو', href: '/#studios' },
   { label: 'رویدادها',   href: '/events'  },
   { label: 'کافه',       href: '/cafe'    },
   { label: 'گالری',      href: '/gallery' },
