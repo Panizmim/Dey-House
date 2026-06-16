@@ -324,7 +324,7 @@ function Navbar() {
                 style={{
                   display: 'flex', alignItems: 'center',
                   padding: '18px 24px',
-                  fontSize: 20, fontWeight: 600, color: '#171717',
+                  fontSize: 18, fontWeight: 600, color: '#171717',
                   borderBottom: '1px solid #F0F0F0',
                   textDecoration: 'none',
                 }}
