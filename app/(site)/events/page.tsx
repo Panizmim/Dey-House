@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, ChevronDown } from '@/components/ui/icons'
+import { ChevronDown } from '@/components/ui/icons'
 import PageHero from '@/components/ui/PageHero'
 
 type PublicEvent = {
@@ -97,7 +97,6 @@ function SkeletonCard() {
 export default function EventsPage() {
   const [allEvents,     setAllEvents]     = useState<PublicEvent[]>([])
   const [loading,       setLoading]       = useState(true)
-  const [search,        setSearch]        = useState('')
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [activeOnly,    setActiveOnly]    = useState(false)
   const [typeOpen,      setTypeOpen]      = useState(true)
@@ -115,13 +114,12 @@ export default function EventsPage() {
   }
 
   const filtered = allEvents.filter((e) => {
-    if (search && !e.title.includes(search) && !e.description.includes(search)) return false
     if (selectedTypes.length > 0 && !selectedTypes.includes(e.type)) return false
     if (activeOnly && !e.isActive) return false
     return true
   })
 
-  const hasFilters = search || selectedTypes.length > 0 || activeOnly
+  const hasFilters = selectedTypes.length > 0 || activeOnly
 
   return (
     <>
@@ -134,22 +132,6 @@ export default function EventsPage() {
     <div className="md:hidden">
       {/* فیلتر بالا */}
       <div className="sticky z-30 bg-white border-b border-[#F0F0F0]" style={{ top: 60 }}>
-        {/* سرچ */}
-        <div className="px-4 pt-3 pb-2">
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid #E5E5E5', borderRadius: 10, padding: '9px 14px', background: 'white' }}
-            onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
-            onBlurCapture={(e) => { e.currentTarget.style.borderColor = '#E5E5E5' }}
-          >
-            <Search size={14} style={{ color: '#A0A0A0', flexShrink: 0 }} />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="جستجو رویداد..."
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#171717', background: 'transparent', fontFamily: 'YekanBakh, Tahoma, sans-serif' }}
-            />
-          </div>
-        </div>
         {/* تب‌های نوع رویداد */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-3">
           {EVENT_TYPES.map((t) => (
@@ -200,33 +182,6 @@ export default function EventsPage() {
 
         {/* ─── Sidebar ─── */}
         <aside style={{ position: 'sticky', top: 96 }}>
-
-          {/* جستجو */}
-          <div style={{ marginBottom: 28 }}>
-            <div
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                border: '1px solid #E5E5E5', borderRadius: 10,
-                padding: '10px 14px', background: 'white', transition: 'border-color 150ms',
-              }}
-              onFocusCapture={(e) => { e.currentTarget.style.borderColor = '#801A00' }}
-              onBlurCapture={(e)  => { e.currentTarget.style.borderColor = '#E5E5E5' }}
-            >
-              <Search size={15} style={{ color: '#A0A0A0', flexShrink: 0 }} />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="جستجو..."
-                style={{
-                  flex: 1, border: 'none', outline: 'none',
-                  fontSize: 13, color: '#171717', background: 'transparent',
-                  fontFamily: 'YekanBakh, Tahoma, sans-serif',
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ height: 1, background: '#F0F0F0', marginBottom: 20 }} />
 
           {/* نوع رویداد */}
           <div style={{ marginBottom: 20 }}>
@@ -292,7 +247,7 @@ export default function EventsPage() {
 
           {hasFilters && (
             <button
-              onClick={() => { setSearch(''); setSelectedTypes([]); setActiveOnly(false) }}
+              onClick={() => { setSelectedTypes([]); setActiveOnly(false) }}
               style={{
                 marginTop: 20, width: '100%', padding: '9px',
                 border: '1px solid #E5E5E5', borderRadius: 8, background: 'white',

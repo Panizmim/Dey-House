@@ -69,14 +69,14 @@ export default function GalleryDetailPage() {
   const venueImages: string[] = JSON.parse(gallery.venueImages || '[]')
 
   return (
-    <main className="max-w-[900px] mx-auto px-2 py-16" dir="rtl">
+    <main className="max-w-[900px] mx-auto px-8 md:px-4 py-16" dir="rtl">
 
 
       {/* ─── header + cover ─── */}
       <div className="flex gap-6 mb-8 items-start">
         {/* کاور — سمت راست در RTL (اول در DOM) */}
         {gallery.coverImage && (
-          <div className="relative flex-shrink-0" style={{ width: 300, height: 300 }}>
+          <div className="relative flex-shrink-0 w-[190px] h-[190px] md:w-[300px] md:h-[300px]">
             <Image
               src={gallery.coverImage}
               alt={gallery.title}

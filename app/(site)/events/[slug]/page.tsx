@@ -56,14 +56,14 @@ export default async function EventDetailPage({ params }: Props) {
   try { galleryImages = JSON.parse((event as { galleryImages?: string }).galleryImages ?? '[]') } catch {}
 
   return (
-    <main className="max-w-[900px] mx-auto px-4 py-16" dir="rtl">
+    <main className="max-w-[900px] mx-auto px-8 md:px-4 py-16" dir="rtl">
 
       {/* ─── پوستر + اطلاعات ─── */}
       <div className="flex gap-6 mb-8 items-start">
 
         {/* پوستر — سمت راست در RTL */}
         {event.imageUrl && (
-          <div className="flex-shrink-0" style={{ width: 240, height: 300, overflow: 'hidden' }}>
+          <div className="flex-shrink-0 w-[150px] h-[188px] md:w-[240px] md:h-[300px]" style={{ overflow: 'hidden' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={event.imageUrl}
