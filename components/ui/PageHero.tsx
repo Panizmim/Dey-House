@@ -25,7 +25,7 @@ export default function PageHero({ title, subtitle }: PageHeroProps) {
         <h1
           className="font-black text-white"
           style={{
-            fontSize: 'clamp(28px, 4vw, 40px)',
+            fontSize: 'clamp(34px, 5vw, 52px)',
             letterSpacing: '-0.02em',
             lineHeight: 1.1,
           }}
