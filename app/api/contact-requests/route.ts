@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { db } from '@/lib/db'
 
 const contactSchema = z.object({
-  name:      z.string().min(2, 'نام معتبر نیست'),
-  email:     z.string().email('ایمیل معتبر نیست'),
-  phone:     z.string().regex(/^09[0-9]{9}$/, 'موبایل معتبر نیست'),
+  name:      z.string().min(1),
+  email:     z.string().optional().default(''),
+  phone:     z.string().optional().default(''),
   usageType: z.string(),
   message:   z.string().optional(),
 })
