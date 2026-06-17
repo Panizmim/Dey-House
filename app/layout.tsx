@@ -5,7 +5,7 @@ import { SessionProvider } from '@/components/providers/SessionProvider'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.deyhouse.com'),
-  title: 'خانه دی — کافه‌گالری فرهنگی معاصر',
+  title: 'خانه دی | Dey House',
   description: 'خانه دی، فضایی برای هنر، فرهنگ و خلاقیت — کافه‌گالری و پلاتوهای تمرین در تهران',
 }
 
