@@ -17,9 +17,6 @@ type PublicEvent = {
   gradient:    string
 }
 
-const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
-
-
 function EventCard({ event }: { event: PublicEvent }) {
   const [hovered, setHovered] = useState(false)
 
