@@ -47,7 +47,7 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
     return (
       <section className="relative w-full overflow-hidden h-[65vh] md:h-screen" style={{ background: '#1a0808' }}>
         <div className="absolute inset-0 bg-black/40 z-10" />
-        <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
+        <div className="absolute inset-0 z-20 flex items-center justify-center px-6 pb-10">
           <p className="text-white text-center leading-tight" style={{ fontFamily: 'Paeez, YekanBakh, Tahoma, sans-serif', fontSize: 'clamp(32px, 5vw, 72px)', maxWidth: '700px' }}>
             بَرای زندگیِ تازه‌ای کِه هَنوز نَزیستهِ‌ایم.
           </p>
