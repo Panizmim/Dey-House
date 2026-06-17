@@ -887,26 +887,27 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
         }}
       />
 
-      {/* ══════ صفحه موفقیت سایر موارد ══════ */}
+      {/* ══════ پاپ‌اپ موفقیت سایر موارد ══════ */}
       {showSuccess && usageType === 'other' && (
-        <div className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center px-8 text-center">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: '#FDF0F0' }}>
-            <CheckCircle size={36} color="#801A00" />
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-5" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="relative bg-white rounded-2xl px-8 py-10 w-full max-w-sm text-center shadow-xl">
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="absolute top-4 left-4 p-1.5 rounded-full text-[#A0A0A0] hover:text-[#171717] hover:bg-[#F5F5F5] transition-all"
+            >
+              <X size={20} />
+            </button>
+            <div className="flex justify-center mb-5">
+              <CheckCircle size={48} color="#16a34a" />
+            </div>
+            <h2 className="text-[22px] font-black text-[#171717] mb-3">درخواست ثبت شد!</h2>
+            <p className="text-[14px] text-[#717171] font-light leading-relaxed mb-2">
+              تیم خانه دی درخواست رزرو شما را دریافت کرد.
+            </p>
+            <p className="text-[13px] text-[#404040] font-medium leading-relaxed">
+              ظرف ۲۴ ساعت آینده با شما تماس گرفته می‌شود تا جزئیات رزرو و هزینه نهایی هماهنگ شود.
+            </p>
           </div>
-          <h2 className="text-[24px] font-black text-[#171717] mb-3">درخواست ثبت شد!</h2>
-          <p className="text-[15px] text-[#717171] font-light leading-relaxed max-w-sm mb-2">
-            تیم خانه دی درخواست رزرو شما را دریافت کرد.
-          </p>
-          <p className="text-[14px] text-[#A0A0A0] font-light leading-relaxed max-w-sm mb-8">
-            ظرف ۲۴ ساعت آینده با شما تماس گرفته می‌شود تا جزئیات رزرو و هزینه نهایی هماهنگ شود.
-          </p>
-          <Link
-            href="/"
-            className="px-8 py-3 text-white rounded-xl font-bold text-[15px]"
-            style={{ background: '#801A00' }}
-          >
-            بازگشت به صفحه اصلی
-          </Link>
         </div>
       )}
 
