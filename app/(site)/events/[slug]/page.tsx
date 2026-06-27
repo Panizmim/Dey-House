@@ -63,7 +63,7 @@ export default async function EventDetailPage({ params }: Props) {
 
         {/* پوستر — سمت راست در RTL */}
         {event.imageUrl && (
-          <div className="flex-shrink-0 w-[150px] h-[188px] md:w-[240px] md:h-[300px]" style={{ overflow: 'hidden' }}>
+          <div className="flex-shrink-0 w-[150px] h-[212px] md:w-[240px] md:h-[340px]" style={{ overflow: 'hidden' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={event.imageUrl}
@@ -136,7 +136,7 @@ export default async function EventDetailPage({ params }: Props) {
                   className="block transition-shadow hover:shadow-md"
                   style={{ textDecoration: 'none', border: '1px solid #EFEFEF', borderRadius: 12, overflow: 'hidden', background: 'white' }}
                 >
-                  <div style={{ position: 'relative', paddingTop: '125%', background: relGradient }}>
+                  <div style={{ position: 'relative', paddingTop: '141.4%', background: relGradient }}>
                     {e.imageUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={e.imageUrl} alt={e.title} className="absolute inset-0 w-full h-full object-cover" />

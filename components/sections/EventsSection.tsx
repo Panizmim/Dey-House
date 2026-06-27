@@ -29,7 +29,7 @@ function EventCard({ event }: { event: PublicEvent }) {
     >
       {/* ─── پوستر مربعی ─── */}
       <div style={{
-        position: 'relative', paddingTop: '125%',
+        position: 'relative', paddingTop: '141.4%',
         background: event.gradient, overflow: 'hidden',
         borderRadius: 0,
       }}>
@@ -90,7 +90,7 @@ function EventCard({ event }: { event: PublicEvent }) {
 function SkeletonCard() {
   return (
     <div>
-      <div className="animate-pulse" style={{ paddingTop: '125%', background: '#F0F0F0', borderRadius: 2, position: 'relative' }} />
+      <div className="animate-pulse" style={{ paddingTop: '141.4%', background: '#F0F0F0', borderRadius: 2, position: 'relative' }} />
       <div style={{ paddingTop: 14 }}>
         <div className="animate-pulse" style={{ height: 18, background: '#F0F0F0', borderRadius: 4, marginBottom: 10, width: '75%' }} />
         <div className="animate-pulse" style={{ height: 12, background: '#F0F0F0', borderRadius: 4, width: '55%' }} />
