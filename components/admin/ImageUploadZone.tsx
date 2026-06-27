@@ -31,11 +31,25 @@ export default function ImageUploadZone({
   return (
     <div>
       {currentUrl && !preview && (
-        <div style={{ marginBottom: 12 }}>
-          <Image src={currentUrl} alt="تصویر فعلی" width={80} height={80} className="rounded-lg object-cover" />
-          <p style={{ fontSize: 11, color: '#B0B0B0', marginTop: 4 }}>
-            تصویر فعلی — برای تغییر، تصویر جدید انتخاب کنید
-          </p>
+        <div
+          onClick={() => status !== 'uploading' && inputRef.current?.click()}
+          style={{ position: 'relative', marginBottom: 12, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', maxWidth: 200 }}
+        >
+          <Image
+            src={currentUrl}
+            alt="تصویر فعلی"
+            width={200}
+            height={280}
+            className="object-cover w-full"
+            style={{ display: 'block', borderRadius: 10 }}
+          />
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity"
+            style={{ background: 'rgba(0,0,0,0.5)', borderRadius: 10 }}
+          >
+            <ImagePlus size={22} color="white" />
+            <span style={{ color: 'white', fontSize: 12, fontWeight: 600 }}>تغییر پوستر</span>
+          </div>
         </div>
       )}
 
