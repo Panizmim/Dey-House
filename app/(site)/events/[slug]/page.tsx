@@ -58,38 +58,34 @@ export default async function EventDetailPage({ params }: Props) {
   return (
     <main className="max-w-[900px] mx-auto px-8 md:px-4 py-16" dir="rtl">
 
-      {/* ─── پوستر + اطلاعات ─── */}
-      <div className="flex gap-6 mb-8 items-start">
+      {/* ─── پوستر ۱۶:۹ ─── */}
+      {event.imageUrl ? (
+        <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderRadius: 10, marginBottom: 28, background: gradient }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={event.imageUrl}
+            alt={event.title}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
+      ) : (
+        <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 10, marginBottom: 28, background: gradient }} />
+      )}
 
-        {/* پوستر — سمت راست در RTL */}
-        {event.imageUrl && (
-          <div className="flex-shrink-0 w-[150px] h-[188px] md:w-[240px] md:h-[300px]" style={{ overflow: 'hidden' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={event.imageUrl}
-              alt={event.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-        )}
-
-        {/* متن — سمت چپ در RTL */}
-        <div className="flex-1 text-right pt-1">
-          <h1 className="font-black text-[#171717] mb-2"
-            style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
-            {event.title}
-          </h1>
-          <p className="font-light mb-1" style={{ fontSize: 15, color: '#555555' }}>{event.type}</p>
-          <p className="font-light mb-1" style={{ fontSize: 15, color: '#555555' }}>{dateStr}</p>
-          {event.time && (
-            <p className="font-light mb-1" style={{ fontSize: 15, color: '#555555' }}>{formatTime(event.time)}</p>
-          )}
-          {event.location && (
-            <p className="font-light" style={{ fontSize: 15, color: '#555555' }}>{event.location}</p>
-          )}
-          <div style={{ marginTop: 16 }}>
-            <EventShareButton title={event.title} />
-          </div>
+      {/* ─── اطلاعات رویداد ─── */}
+      <div className="mb-8 text-right">
+        <h1 className="font-black text-[#171717] mb-3"
+          style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+          {event.title}
+        </h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px', fontSize: 14, color: '#555555' }}>
+          <span className="font-light">{event.type}</span>
+          <span className="font-light">{dateStr}</span>
+          {event.time && <span className="font-light">{formatTime(event.time)}</span>}
+          {event.location && <span className="font-light">{event.location}</span>}
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <EventShareButton title={event.title} />
         </div>
       </div>
 
@@ -136,7 +132,7 @@ export default async function EventDetailPage({ params }: Props) {
                   className="block transition-shadow hover:shadow-md"
                   style={{ textDecoration: 'none', border: '1px solid #EFEFEF', borderRadius: 12, overflow: 'hidden', background: 'white' }}
                 >
-                  <div style={{ position: 'relative', paddingTop: '125%', background: relGradient }}>
+                  <div style={{ position: 'relative', paddingTop: '56.25%', background: relGradient }}>
                     {e.imageUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={e.imageUrl} alt={e.title} className="absolute inset-0 w-full h-full object-cover" />

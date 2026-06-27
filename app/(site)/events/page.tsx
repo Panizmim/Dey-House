@@ -31,8 +31,8 @@ function EventCard({ event }: { event: PublicEvent }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* پوستر ۴:۵ */}
-      <div style={{ position: 'relative', paddingTop: '125%', background: event.gradient, overflow: 'hidden', borderRadius: 2 }}>
+      {/* پوستر ۱۶:۹ */}
+      <div style={{ position: 'relative', paddingTop: '56.25%', background: event.gradient, overflow: 'hidden', borderRadius: 2 }}>
         {event.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -85,7 +85,7 @@ function EventCard({ event }: { event: PublicEvent }) {
 function SkeletonCard() {
   return (
     <div>
-      <div className="animate-pulse" style={{ paddingTop: '125%', background: '#F3F4F6', borderRadius: 2, position: 'relative' }} />
+      <div className="animate-pulse" style={{ paddingTop: '56.25%', background: '#F3F4F6', borderRadius: 2, position: 'relative' }} />
       <div style={{ paddingTop: 14 }}>
         <div className="animate-pulse" style={{ height: 17, background: '#F3F4F6', borderRadius: 4, marginBottom: 9, width: '75%' }} />
         <div className="animate-pulse" style={{ height: 12, background: '#F3F4F6', borderRadius: 4, width: '55%' }} />
