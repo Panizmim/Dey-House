@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 const typeGradients: Record<string, string> = {
   'نمایشگاه': 'linear-gradient(135deg, #1a3a2a, #2d5a3a)',
   'تئاتر':    'linear-gradient(135deg, #1a0a2a, #2d1a4a)',
