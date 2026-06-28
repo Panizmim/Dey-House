@@ -88,6 +88,7 @@ model Event {
   slug          String   @unique
   description   String?
   date          DateTime
+  endDate       DateTime?
   time          String
   location      String?
   type          String

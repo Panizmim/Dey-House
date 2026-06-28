@@ -14,6 +14,7 @@ export interface EventRow {
   title: string
   type: string
   date: string
+  endDate: string | null
   time: string
   location: string | null
   description: string | null
@@ -224,26 +225,51 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const [imageUrl,     setImageUrl]     = useState<string | null>(null)
   const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
   const [gallery, setGallery]           = useState<GallerySlot[]>([])
-  const [showDatePicker, setShowDatePicker] = useState(false)
-  const [pickerStyle,   setPickerStyle]     = useState<React.CSSProperties>({})
-  const dateBtnRef                          = useRef<HTMLButtonElement>(null)
-  const [selectedDate, setSelectedDate]     = useState<Date | null>(null)
+  const [showStartPicker, setShowStartPicker] = useState(false)
+  const [showEndPicker,   setShowEndPicker]   = useState(false)
+  const [startStyle,      setStartStyle]      = useState<React.CSSProperties>({})
+  const [endStyle,        setEndStyle]        = useState<React.CSSProperties>({})
+  const startBtnRef                           = useRef<HTMLButtonElement>(null)
+  const endBtnRef                             = useRef<HTMLButtonElement>(null)
+  const [startDate, setStartDate]             = useState<Date | null>(null)
+  const [endDate,   setEndDate]               = useState<Date | null>(null)
   const [form, setForm] = useState({
-    title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false,
+    title: '', type: 'تئاتر', date: '', endDate: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false,
   })
+
+  function openStartPicker() {
+    if (startBtnRef.current) {
+      const r = startBtnRef.current.getBoundingClientRect()
+      setStartStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999 })
+    }
+    setShowStartPicker((v) => !v)
+    setShowEndPicker(false)
+  }
+
+  function openEndPicker() {
+    if (endBtnRef.current) {
+      const r = endBtnRef.current.getBoundingClientRect()
+      setEndStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999 })
+    }
+    setShowEndPicker((v) => !v)
+    setShowStartPicker(false)
+  }
 
   useEffect(() => {
     if (!open) return
     setImagePreview(null)
     setImageUrl(null)
     setImageStatus('idle')
-    setShowDatePicker(false)
+    setShowStartPicker(false)
+    setShowEndPicker(false)
     if (event) {
-      const isoDate = event.date ? event.date.slice(0, 10) : ''
+      const isoStart = event.date    ? event.date.slice(0, 10)    : ''
+      const isoEnd   = event.endDate ? event.endDate.slice(0, 10) : ''
       setForm({
         title:       event.title,
         type:        event.type,
-        date:        isoDate,
+        date:        isoStart,
+        endDate:     isoEnd,
         time:        event.time ?? '',
         location:    event.location ?? '',
         description: event.description ?? '',
@@ -251,12 +277,8 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         isActive:    event.isActive,
         isArchived:  event.isArchived,
       })
-      if (isoDate) {
-        const [y, m, d] = isoDate.split('-').map(Number)
-        setSelectedDate(new Date(y, m - 1, d))
-      } else {
-        setSelectedDate(null)
-      }
+      setStartDate(isoStart ? (() => { const [y,m,d] = isoStart.split('-').map(Number); return new Date(y,m-1,d) })() : null)
+      setEndDate  (isoEnd   ? (() => { const [y,m,d] = isoEnd.split('-').map(Number);   return new Date(y,m-1,d) })() : null)
       try {
         const saved: string[] = JSON.parse(event.galleryImages || '[]')
         setGallery(saved.map((url) => ({ url, file: null, preview: null })))
@@ -264,8 +286,9 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         setGallery([])
       }
     } else {
-      setForm({ title: '', type: 'تئاتر', date: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false })
-      setSelectedDate(null)
+      setForm({ title: '', type: 'تئاتر', date: '', endDate: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false })
+      setStartDate(null)
+      setEndDate(null)
       setGallery([])
     }
   }, [event, open])
@@ -289,7 +312,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
 
   async function handleSubmit() {
     if (!form.title || !form.date || !form.time) {
-      toast.error('عنوان، تاریخ و ساعت الزامی هستند')
+      toast.error('عنوان، تاریخ شروع و ساعت الزامی هستند')
       return
     }
     if (imageStatus === 'uploading') { toast.error('لطفاً صبر کنید تا آپلود تصویر تمام شود'); return }
@@ -311,7 +334,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, imageUrl: finalImageUrl, galleryImages: galleryUrls, isArchived: form.isArchived }),
+        body: JSON.stringify({ ...form, imageUrl: finalImageUrl, galleryImages: galleryUrls, isArchived: form.isArchived, endDate: form.endDate || null }),
       })
       if (!res.ok) throw new Error()
       toast.success(event ? 'رویداد با موفقیت ویرایش شد' : 'رویداد با موفقیت ایجاد شد')
@@ -372,33 +395,44 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           </div>
         </div>
 
-        {/* تاریخ + ساعت */}
+        {/* تاریخ شروع + تاریخ پایان */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={labelClass}>تاریخ *</label>
+            <label className={labelClass}>تاریخ شروع *</label>
             <button
-              ref={dateBtnRef}
+              ref={startBtnRef}
               type="button"
-              onClick={() => {
-                if (dateBtnRef.current) {
-                  const r = dateBtnRef.current.getBoundingClientRect()
-                  setPickerStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999 })
-                }
-                setShowDatePicker((v) => !v)
-              }}
+              onClick={openStartPicker}
               className={inputClass}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
             >
-              <span style={{ color: selectedDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
-                {selectedDate ? jalaliToDisplay(selectedDate) : 'انتخاب تاریخ'}
+              <span style={{ color: startDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                {startDate ? jalaliToDisplay(startDate) : 'انتخاب تاریخ'}
               </span>
-              <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showDatePicker ? 'rotate(180deg)' : 'rotate(0)' }} />
+              <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showStartPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
             </button>
           </div>
-          <div style={{ position: 'relative' }}>
-            <label className={labelClass}>ساعت *</label>
-            <TimePickerDropdown value={form.time} onChange={(v) => set('time', v)} />
+          <div>
+            <label className={labelClass}>تاریخ پایان</label>
+            <button
+              ref={endBtnRef}
+              type="button"
+              onClick={openEndPicker}
+              className={inputClass}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+            >
+              <span style={{ color: endDate ? '#171717' : '#A0A0A0', fontSize: 14 }}>
+                {endDate ? jalaliToDisplay(endDate) : 'انتخاب تاریخ'}
+              </span>
+              <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showEndPicker ? 'rotate(180deg)' : 'rotate(0)' }} />
+            </button>
           </div>
+        </div>
+
+        {/* ساعت */}
+        <div>
+          <label className={labelClass}>ساعت *</label>
+          <TimePickerDropdown value={form.time} onChange={(v) => set('time', v)} />
         </div>
 
         {/* توضیحات */}
@@ -554,21 +588,40 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       </div>
     </Modal>
 
-    {showDatePicker && typeof window !== 'undefined' && createPortal(
+    {(showStartPicker || showEndPicker) && typeof window !== 'undefined' && createPortal(
       <>
-        <div className="fixed inset-0 z-[9998]" onClick={() => setShowDatePicker(false)} />
-        <div style={pickerStyle}>
-          <JalaliDatePicker
-            selected={selectedDate}
-            disablePast={false}
-            onSelect={(date) => {
-              setSelectedDate(date)
-              const iso = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
-              set('date', iso)
-              setShowDatePicker(false)
-            }}
-          />
-        </div>
+        <div
+          className="fixed inset-0 z-[9998]"
+          onClick={() => { setShowStartPicker(false); setShowEndPicker(false) }}
+        />
+        {showStartPicker && (
+          <div style={startStyle}>
+            <JalaliDatePicker
+              selected={startDate}
+              disablePast={false}
+              onSelect={(date) => {
+                setStartDate(date)
+                const iso = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
+                set('date', iso)
+                setShowStartPicker(false)
+              }}
+            />
+          </div>
+        )}
+        {showEndPicker && (
+          <div style={endStyle}>
+            <JalaliDatePicker
+              selected={endDate}
+              disablePast={false}
+              onSelect={(date) => {
+                setEndDate(date)
+                const iso = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
+                set('endDate', iso)
+                setShowEndPicker(false)
+              }}
+            />
+          </div>
+        )}
       </>,
       document.body
     )}
