@@ -63,7 +63,17 @@ export async function POST(req: NextRequest) {
 
   try {
     const bytes       = await file.arrayBuffer()
-    const inputBuffer = Buffer.from(bytes)
+    let   inputBuffer = Buffer.from(bytes)
+
+    const isHeic = ['.heic', '.heif', '.heics'].includes(ext) ||
+                   ['image/heic', 'image/heif', 'image/heics'].includes(file.type)
+
+    if (isHeic) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const heicConvert = require('heic-convert')
+      const jpegBuffer  = await heicConvert({ buffer: inputBuffer, format: 'JPEG', quality: 0.92 })
+      inputBuffer       = Buffer.from(jpegBuffer)
+    }
 
     const optimizedBuffer = await sharp(inputBuffer, { failOn: 'none' })
       .rotate()
@@ -93,6 +103,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('Image upload error:', error)
-    return NextResponse.json({ error: 'خطا در پردازش یا آپلود تصویر' }, { status: 500 })
+    const detail = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ error: 'خطا در پردازش یا آپلود تصویر', detail }, { status: 500 })
   }
 }
