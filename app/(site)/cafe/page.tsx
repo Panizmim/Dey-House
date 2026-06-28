@@ -122,15 +122,10 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
 
         {/* اطلاعات */}
         <div className="p-5 flex flex-col gap-4">
-          {/* نام + دسته */}
-          <div>
-            <span style={{ fontSize: 11, color: '#801A00', background: '#FDF5F5', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>
-              {item.category}
-            </span>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#171717', marginTop: 10, lineHeight: 1.3 }}>
-              {item.name}
-            </h2>
-          </div>
+          {/* نام */}
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#171717', lineHeight: 1.3 }}>
+            {item.name}
+          </h2>
 
           {/* توضیحات */}
           {item.description && (
