@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { ImagePlus, X } from '@/components/ui/icons'
+import { convertIfHeic } from '@/lib/convertHeic'
 
 export type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 
@@ -22,14 +23,15 @@ export default function ImageUploadZone({
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
 
-  function handleFile(file: File) {
+  async function handleFile(file: File) {
     const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
     const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
     const typeOk = file.type.startsWith('image/') || file.type === '' || file.type === 'application/octet-stream'
     const extOk  = allowedExts.includes(ext)
     if (!typeOk && !extOk) return
     if (file.size > 50 * 1024 * 1024) return
-    onFileSelect(file)
+    const converted = await convertIfHeic(file)
+    onFileSelect(converted)
   }
 
   return (

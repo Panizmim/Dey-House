@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
 import ImageUploadZone, { type UploadStatus } from '@/components/admin/ImageUploadZone'
+import { convertIfHeic } from '@/lib/convertHeic'
 
 type Gallery = {
   id:          string
@@ -203,8 +204,9 @@ function GalleryModal({
   }
 
   async function doUpload(file: File, folder: string): Promise<string> {
+    const converted = await convertIfHeic(file)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', converted)
     fd.append('folder', folder)
     const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
     if (!res.ok) {
