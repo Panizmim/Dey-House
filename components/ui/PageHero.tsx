@@ -5,54 +5,19 @@ interface PageHeroProps {
 
 export default function PageHero({ title, subtitle }: PageHeroProps) {
   return (
-    <div
-      className="relative overflow-hidden flex flex-col items-center justify-center text-center px-8 h-[260px] lg:h-[320px]"
-      style={{ background: '#801A00' }}
-    >
-      {/* صندلی تزئینی */}
-      <div className="absolute bottom-0 right-0 w-[45%] sm:w-[55%] lg:w-[65%] max-w-[640px] h-full pointer-events-none">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/chair.png"
-          alt=""
-          className="w-full h-full object-contain object-right-bottom"
-          style={{ opacity: 0.15, filter: 'brightness(0) invert(1)' }}
-        />
-      </div>
-
-      {/* محتوا */}
-      <div className="relative z-10 flex flex-col items-center">
-        <h1
-          className="font-black text-white"
-          style={{
-            fontSize: 'clamp(34px, 5vw, 52px)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-          }}
-        >
-          {title}
-        </h1>
-
-        {subtitle && (
-          <p
-            className="mt-3 font-light"
-            style={{
-              fontSize: '14px',
-              color: 'rgba(255,255,255,0.6)',
-              maxWidth: '480px',
-              lineHeight: 1.7,
-            }}
-          >
-            {subtitle}
-          </p>
-        )}
-      </div>
-
-      {/* خط پایین */}
-      <div
-        className="absolute bottom-0 left-0 right-0"
-        style={{ height: '1px', background: 'rgba(255,255,255,0.1)' }}
-      />
+    <div className="flex flex-col items-center justify-center text-center px-8 pt-14 pb-10">
+      <h1
+        className="font-black text-[#171717] flex items-center gap-3 justify-center"
+        style={{ fontSize: 'clamp(26px, 4vw, 40px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
+      >
+        <span style={{ display: 'inline-block', width: 12, height: 12, background: '#801A00', borderRadius: 2, flexShrink: 0 }} />
+        {title}
+      </h1>
+      {subtitle && (
+        <p className="mt-3 font-light text-[#777777]" style={{ fontSize: 14, maxWidth: 480, lineHeight: 1.8 }}>
+          {subtitle}
+        </p>
+      )}
     </div>
   )
 }
