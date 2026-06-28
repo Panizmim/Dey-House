@@ -30,20 +30,6 @@ const categories = [
   { id: 'cat-topping',       title: 'تاپینگ'                      },
 ]
 
-const catTitleToId: Record<string, string> = {
-  'نوشیدنی گرم بر پایه اسپرسو': 'cat-espresso-hot',
-  'نوشیدنی سرد بر پایه اسپرسو': 'cat-espresso-cold',
-  'چای و دمنوش':                 'cat-tea',
-  'نوشیدنی گرم':                 'cat-hot',
-  'نوشیدنی سرد':                 'cat-cold',
-  'نوشیدنی ساده':                'cat-simple',
-  'میان وعده':                   'cat-snacks',
-  'سالاد':                       'cat-salad',
-  'ساندویچ':                     'cat-sandwich',
-  'پاستا':                       'cat-pasta',
-  'بشقاب':                       'cat-plate',
-  'تاپینگ':                      'cat-topping',
-}
 
 const placeholderGradients = [
   'linear-gradient(135deg, #f5e6d3, #e8c9a0)',
@@ -340,11 +326,6 @@ export default function CafePage() {
                   </div>
                 </section>
 
-                {catTitleToId[cat.title] === 'cat-simple' && (
-                  <div className="relative w-full my-4" style={{ height: 80 }}>
-                    <Image src="/images/chair.png" alt="" fill className="object-contain object-right" />
-                  </div>
-                )}
               </div>
             )
           })}
