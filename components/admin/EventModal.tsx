@@ -8,6 +8,7 @@ import Modal from './Modal'
 import ImageUploadZone, { type UploadStatus } from './ImageUploadZone'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
+import { convertIfHeic } from '@/lib/convertHeic'
 
 export interface EventRow {
   id: string
@@ -143,8 +144,9 @@ function TimePickerDropdown({ value, onChange }: { value: string; onChange: (v: 
 }
 
 async function uploadImage(file: File): Promise<string> {
+  const converted = await convertIfHeic(file)
   const fd = new FormData()
-  fd.append('file', file)
+  fd.append('file', converted)
   fd.append('folder', 'events')
   const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
   if (!res.ok) throw new Error('خطا در آپلود تصویر')

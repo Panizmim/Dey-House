@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Plus, Trash2, X, ImagePlus } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
+import { convertIfHeic } from '@/lib/convertHeic'
 
 type HeroBanner = {
   id:       string
@@ -32,8 +33,9 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
     if (!file) { toast.error('لطفاً یک تصویر انتخاب کنید'); return }
     setSaving(true)
     try {
+      const converted = await convertIfHeic(file)
       const fd = new FormData()
-      fd.append('file', file)
+      fd.append('file', converted)
       fd.append('folder', 'hero')
       toast.loading('در حال آپلود تصویر...', { id: 'hero-upload' })
       const uploadRes = await fetch('/api/admin/upload', { method: 'POST', body: fd })
