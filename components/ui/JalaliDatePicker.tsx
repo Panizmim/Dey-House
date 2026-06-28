@@ -10,19 +10,30 @@ import {
 } from '@/lib/jalali'
 
 interface Props {
-  selected: Date | null
-  onSelect: (date: Date) => void
+  selected?: Date | null
+  onSelect?: (date: Date) => void
   disablePast?: boolean
+  multiSelect?: boolean
+  selectedDates?: Date[]
+  onSelectMultiple?: (dates: Date[]) => void
 }
 
-export default function JalaliDatePicker({ selected, onSelect, disablePast = true }: Props) {
+export default function JalaliDatePicker({
+  selected, onSelect,
+  disablePast = true,
+  multiSelect = false,
+  selectedDates = [],
+  onSelectMultiple,
+}: Props) {
   const today    = todayJalali()
-  const initDate = selected ? toJalali(selected) : today
+  const initDate = selected ? toJalali(selected) : (selectedDates[0] ? toJalali(selectedDates[0]) : today)
 
   const [viewYear,  setViewYear]  = useState(initDate.jy)
   const [viewMonth, setViewMonth] = useState(initDate.jm)
 
   const selectedJ: JalaliDate | null = selected ? toJalali(selected) : null
+
+  const selectedJDates: JalaliDate[] = selectedDates.map(toJalali)
 
   const daysCount = daysInJalaliMonth(viewYear, viewMonth)
   const firstDay  = firstDayOfJalaliMonth(viewYear, viewMonth)
@@ -44,15 +55,33 @@ export default function JalaliDatePicker({ selected, onSelect, disablePast = tru
     return false
   }
 
-  const isSelected = (jd: number) =>
-    selectedJ?.jy === viewYear && selectedJ?.jm === viewMonth && selectedJ?.jd === jd
+  const isSelected = (jd: number) => {
+    if (multiSelect) {
+      return selectedJDates.some(d => d.jy === viewYear && d.jm === viewMonth && d.jd === jd)
+    }
+    return selectedJ?.jy === viewYear && selectedJ?.jm === viewMonth && selectedJ?.jd === jd
+  }
 
   const isToday = (jd: number) =>
     today.jy === viewYear && today.jm === viewMonth && today.jd === jd
 
   const handleSelect = (jd: number) => {
     if (isPast(jd)) return
-    onSelect(fromJalali(viewYear, viewMonth, jd))
+    const date = fromJalali(viewYear, viewMonth, jd)
+
+    if (multiSelect && onSelectMultiple) {
+      const already = selectedJDates.some(d => d.jy === viewYear && d.jm === viewMonth && d.jd === jd)
+      if (already) {
+        onSelectMultiple(selectedDates.filter((_, i) => {
+          const j = selectedJDates[i]
+          return !(j.jy === viewYear && j.jm === viewMonth && j.jd === jd)
+        }))
+      } else {
+        onSelectMultiple([...selectedDates, date])
+      }
+    } else if (onSelect) {
+      onSelect(date)
+    }
   }
 
   return (
@@ -161,8 +190,33 @@ export default function JalaliDatePicker({ selected, onSelect, disablePast = tru
         })}
       </div>
 
-      {/* تاریخ انتخابی */}
-      {selectedJ && (
+      {/* تاریخ‌های انتخابی */}
+      {multiSelect && selectedDates.length > 0 && (
+        <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #F0F0F0' }}>
+          <p style={{ fontSize: 11, color: '#A0A0A0', marginBottom: 8, fontWeight: 600 }}>
+            {toPersian(selectedDates.length)} روز انتخاب شده
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {selectedDates
+              .slice()
+              .sort((a, b) => a.getTime() - b.getTime())
+              .map((d, i) => {
+                const j = toJalali(d)
+                return (
+                  <span key={i} style={{
+                    fontSize: 11, background: '#FDF0F0', color: '#801A00',
+                    padding: '2px 8px', borderRadius: 20, fontWeight: 600,
+                  }}>
+                    {toPersian(j.jd)} {PERSIAN_MONTHS[j.jm - 1]}
+                  </span>
+                )
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* تاریخ انتخابی — حالت تکی */}
+      {!multiSelect && selectedJ && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #F0F0F0', textAlign: 'center' }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: '#801A00' }}>
             {toPersian(selectedJ.jd)} {PERSIAN_MONTHS[selectedJ.jm - 1]} {toPersian(selectedJ.jy)}

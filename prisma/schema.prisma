@@ -93,6 +93,7 @@ model Event {
   type          String
   imageUrl      String?
   galleryImages String   @default("[]")
+  eventDates    String   @default("[]")
   isFeatured    Boolean  @default(false)
   isActive      Boolean  @default(true)
   isArchived    Boolean  @default(false)
