@@ -49,9 +49,12 @@ export default async function EventDetailPage({ params }: Props) {
 
   if (!event) notFound()
 
-  const gradient     = typeGradients[event.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
-  const dateStr      = new Date(event.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
-  const desc         = event.description ?? ''
+  const gradient    = typeGradients[event.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
+  const fmtDate     = (d: Date) => d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
+  const startStr    = fmtDate(new Date(event.date))
+  const endStr      = event.endDate ? fmtDate(new Date(event.endDate)) : null
+  const dateStr     = endStr ? `از ${startStr} تا ${endStr}` : startStr
+  const desc        = event.description ?? ''
   let galleryImages: string[] = []
   try { galleryImages = JSON.parse((event as { galleryImages?: string }).galleryImages ?? '[]') } catch {}
 
