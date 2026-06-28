@@ -50,12 +50,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'فایلی انتخاب نشده' }, { status: 400 })
   }
 
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/heics', 'image/avif']
-  const allowedExts  = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
-  const ext          = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
-  const typeOk       = allowedTypes.includes(file.type) || file.type === '' || file.type === 'application/octet-stream'
-  const extOk        = allowedExts.includes(ext)
-  if (!typeOk && !extOk) {
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
+  const ext = '.' + file.name.toLowerCase().split('.').pop()
+  const isImage = file.type.startsWith('image/') || file.type === '' || file.type === 'application/octet-stream'
+  if (!isImage || !allowedExts.includes(ext)) {
     return NextResponse.json({ error: 'فقط فایل‌های JPG، PNG، WebP و HEIC مجاز هستند' }, { status: 400 })
   }
 
@@ -67,7 +65,8 @@ export async function POST(req: NextRequest) {
     const bytes       = await file.arrayBuffer()
     const inputBuffer = Buffer.from(bytes)
 
-    const optimizedBuffer = await sharp(inputBuffer)
+    const optimizedBuffer = await sharp(inputBuffer, { failOn: 'none' })
+      .rotate()
       .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 82, effort: 4 })
       .toBuffer()
