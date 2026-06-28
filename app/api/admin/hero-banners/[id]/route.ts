@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 
@@ -19,6 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         order:    body.order    !== undefined ? body.order    : undefined,
       },
     })
+    revalidatePath('/')
     return NextResponse.json(banner)
   } catch (error) {
     console.error('HeroBanner update error:', error)
@@ -30,6 +32,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   try {
     await db.heroBanner.delete({ where: { id: params.id } })
+    revalidatePath('/')
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error('HeroBanner delete error:', error)
