@@ -121,7 +121,7 @@ function MultiImagePicker({
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif,.heics"
           multiple
           style={{ display: 'none' }}
           onChange={(e) => { if (e.target.files?.length) { onAddFiles(e.target.files); e.target.value = '' } }}

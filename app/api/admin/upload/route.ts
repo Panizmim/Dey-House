@@ -50,13 +50,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'فایلی انتخاب نشده' }, { status: 400 })
   }
 
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-  if (!allowedTypes.includes(file.type)) {
-    return NextResponse.json({ error: 'فقط فایل‌های JPG، PNG و WebP مجاز هستند' }, { status: 400 })
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/heics', 'image/avif']
+  const allowedExts  = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
+  const ext          = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+  const typeOk       = allowedTypes.includes(file.type) || file.type === '' || file.type === 'application/octet-stream'
+  const extOk        = allowedExts.includes(ext)
+  if (!typeOk && !extOk) {
+    return NextResponse.json({ error: 'فقط فایل‌های JPG، PNG، WebP و HEIC مجاز هستند' }, { status: 400 })
   }
 
-  if (file.size > 20 * 1024 * 1024) {
-    return NextResponse.json({ error: 'حجم فایل نباید بیشتر از ۲۰MB باشد' }, { status: 400 })
+  if (file.size > 50 * 1024 * 1024) {
+    return NextResponse.json({ error: 'حجم فایل نباید بیشتر از ۵۰MB باشد' }, { status: 400 })
   }
 
   try {

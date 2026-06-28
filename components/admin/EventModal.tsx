@@ -203,14 +203,20 @@ function GallerySlotCard({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif,.heics"
         style={{ display: 'none' }}
         onChange={(e) => {
           const file = e.target.files?.[0]
-          if (file && file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) {
+          if (!file) return
+          const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
+          const ext  = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+          const ok   = file.type.startsWith('image/') || file.type === '' || allowedExts.includes(ext)
+          if (ok && file.size <= 50 * 1024 * 1024) {
             onFile(file)
-          } else if (file) {
-            toast.error('فایل باید تصویر و حداکثر ۵MB باشد')
+          } else if (!ok) {
+            toast.error('فرمت فایل پشتیبانی نمی‌شود')
+          } else {
+            toast.error('حجم فایل نباید بیشتر از ۵۰MB باشد')
           }
           e.target.value = ''
         }}

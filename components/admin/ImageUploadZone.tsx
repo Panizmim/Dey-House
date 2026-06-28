@@ -23,8 +23,12 @@ export default function ImageUploadZone({
   const [dragging, setDragging] = useState(false)
 
   function handleFile(file: File) {
-    if (!file.type.startsWith('image/')) return
-    if (file.size > 20 * 1024 * 1024) return
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    const typeOk = file.type.startsWith('image/') || file.type === '' || file.type === 'application/octet-stream'
+    const extOk  = allowedExts.includes(ext)
+    if (!typeOk && !extOk) return
+    if (file.size > 50 * 1024 * 1024) return
     onFileSelect(file)
   }
 
@@ -138,14 +142,14 @@ export default function ImageUploadZone({
         >
           <ImagePlus size={24} color="#B0B0B0" style={{ margin: '0 auto 8px' }} />
           <p style={{ fontSize: 13, color: '#717171', marginBottom: 4 }}>انتخاب تصویر یا رها کردن فایل اینجا</p>
-          <p style={{ fontSize: 11, color: '#B0B0B0' }}>JPG, PNG, WebP — حداکثر ۲۰MB</p>
+          <p style={{ fontSize: 11, color: '#B0B0B0' }}>JPG، PNG، WebP، HEIC — حداکثر ۵۰MB</p>
         </div>
       )}
 
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif,.heics"
         style={{ display: 'none' }}
         onChange={(e) => {
           const file = e.target.files?.[0]

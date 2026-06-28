@@ -118,7 +118,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
             <input
               ref={inputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,.heic,.heif,.heics"
               style={{ display: 'none' }}
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
             />
