@@ -13,13 +13,6 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp', 'heic-convert'],
     instrumentationHook: true,
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      const externals = Array.isArray(config.externals) ? config.externals : []
-      config.externals = [...externals, 'heic2any']
-    }
-    return config
-  },
   async redirects() {
     return [
       {
