@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import { db } from '@/lib/db'
 import EventGallery from './EventGallery'
 import EventShareButton from './EventShareButton'
+import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,10 +11,18 @@ interface Props {
   params: { slug: string }
 }
 
-const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
+function formatJalali(dateStr: string | Date, withYear = true) {
+  try {
+    const j = toJalali(new Date(dateStr))
+    return withYear
+      ? `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]} ${toPersian(j.jy)}`
+      : `${toPersian(j.jd)} ${PERSIAN_MONTHS[j.jm - 1]}`
+  } catch { return '' }
+}
 
 function formatTime(time: string): string {
   if (!time) return ''
+  const toFa = (n: string) => n.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d])
   const [hh, mm] = time.split(':')
   return `${toFa(hh.padStart(2, '0'))}:${toFa(mm.padStart(2, '0'))}`
 }
@@ -49,12 +58,11 @@ export default async function EventDetailPage({ params }: Props) {
 
   if (!event) notFound()
 
-  const gradient    = typeGradients[event.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
-  const fmtDate     = (d: Date) => d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
-  const startStr    = fmtDate(new Date(event.date))
-  const endStr      = event.endDate ? fmtDate(new Date(event.endDate)) : null
-  const dateStr     = endStr ? `از ${startStr} تا ${endStr}` : startStr
-  const desc        = event.description ?? ''
+  const gradient = typeGradients[event.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
+  const dateStr  = event.endDate
+    ? `${formatJalali(event.date, false)} — ${formatJalali(event.endDate)}`
+    : formatJalali(event.date)
+  const desc     = event.description ?? ''
   let galleryImages: string[] = []
   try { galleryImages = JSON.parse((event as { galleryImages?: string }).galleryImages ?? '[]') } catch {}
 
