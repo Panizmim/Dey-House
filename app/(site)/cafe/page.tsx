@@ -201,7 +201,6 @@ export default function CafePage() {
   const [loading,       setLoading]       = useState(true)
   const [activeSection, setActiveSection] = useState(categories[0].id)
   const [selected,      setSelected]      = useState<{ item: MenuItem; index: number } | null>(null)
-  const observerRef  = useRef<IntersectionObserver | null>(null)
   const navScrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -209,11 +208,7 @@ export default function CafePage() {
     if (!nav) return
     const activeBtn = nav.querySelector<HTMLElement>(`[data-cat="${activeSection}"]`)
     if (!activeBtn) return
-    const navLeft   = nav.scrollLeft
-    const navWidth  = nav.offsetWidth
-    const btnLeft   = activeBtn.offsetLeft
-    const btnWidth  = activeBtn.offsetWidth
-    const target    = btnLeft - navWidth / 2 + btnWidth / 2
+    const target = activeBtn.offsetLeft - nav.offsetWidth / 2 + activeBtn.offsetWidth / 2
     nav.scrollTo({ left: target, behavior: 'smooth' })
   }, [activeSection])
 
@@ -227,20 +222,19 @@ export default function CafePage() {
 
   useEffect(() => {
     if (loading) return
-    observerRef.current?.disconnect()
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id)
-        }
-      },
-      { rootMargin: '-130px 0px -60% 0px', threshold: 0 },
-    )
-    categories.forEach((cat) => {
-      const el = document.getElementById(cat.id)
-      if (el) observerRef.current?.observe(el)
-    })
-    return () => observerRef.current?.disconnect()
+    const OFFSET = 140
+    function onScroll() {
+      let active = ''
+      for (const cat of categories) {
+        const el = document.getElementById(cat.id)
+        if (!el) continue
+        if (el.getBoundingClientRect().top <= OFFSET) active = cat.id
+      }
+      if (active) setActiveSection(active)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [loading])
 
   const itemsByCategory = (catTitle: string) =>
