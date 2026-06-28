@@ -439,6 +439,19 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
                     }
                   }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowDatePicker(false)}
+                  style={{
+                    width: '100%', marginTop: 6,
+                    padding: '10px 0', borderRadius: 10,
+                    border: 'none', background: '#801A00',
+                    color: 'white', fontSize: 14, fontWeight: 700,
+                    cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                  }}
+                >
+                  تأیید{selectedDates.length > 0 ? ` (${selectedDates.length} روز)` : ''}
+                </button>
               </div>
             )}
           </div>
