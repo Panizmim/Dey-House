@@ -227,15 +227,28 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const [gallery, setGallery]           = useState<GallerySlot[]>([])
   const [showStartPicker, setShowStartPicker] = useState(false)
   const [showEndPicker,   setShowEndPicker]   = useState(false)
+  const [showTypeDrop,    setShowTypeDrop]    = useState(false)
   const [startStyle,      setStartStyle]      = useState<React.CSSProperties>({})
   const [endStyle,        setEndStyle]        = useState<React.CSSProperties>({})
+  const [typeStyle,       setTypeStyle]       = useState<React.CSSProperties>({})
   const startBtnRef                           = useRef<HTMLButtonElement>(null)
   const endBtnRef                             = useRef<HTMLButtonElement>(null)
+  const typeBtnRef                            = useRef<HTMLButtonElement>(null)
   const [startDate, setStartDate]             = useState<Date | null>(null)
   const [endDate,   setEndDate]               = useState<Date | null>(null)
   const [form, setForm] = useState({
     title: '', type: 'تئاتر', date: '', endDate: '', time: '', location: '', description: '', isFeatured: false, isActive: true, isArchived: false,
   })
+
+  function openTypeDrop() {
+    if (typeBtnRef.current) {
+      const r = typeBtnRef.current.getBoundingClientRect()
+      setTypeStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999, width: r.width })
+    }
+    setShowTypeDrop((v) => !v)
+    setShowStartPicker(false)
+    setShowEndPicker(false)
+  }
 
   function openStartPicker() {
     if (startBtnRef.current) {
@@ -262,6 +275,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
     setImageStatus('idle')
     setShowStartPicker(false)
     setShowEndPicker(false)
+    setShowTypeDrop(false)
     if (event) {
       const isoStart = event.date    ? event.date.slice(0, 10)    : ''
       const isoEnd   = event.endDate ? event.endDate.slice(0, 10) : ''
@@ -385,9 +399,16 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>نوع رویداد *</label>
-            <select className={inputClass} value={form.type} onChange={(e) => set('type', e.target.value)}>
-              {eventTypes.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <button
+              ref={typeBtnRef}
+              type="button"
+              onClick={openTypeDrop}
+              className={inputClass}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
+            >
+              <span style={{ color: '#171717', fontSize: 14 }}>{form.type}</span>
+              <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showTypeDrop ? 'rotate(180deg)' : 'rotate(0)' }} />
+            </button>
           </div>
           <div>
             <label className={labelClass}>مکان</label>
@@ -588,12 +609,36 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
       </div>
     </Modal>
 
-    {(showStartPicker || showEndPicker) && typeof window !== 'undefined' && createPortal(
+    {(showStartPicker || showEndPicker || showTypeDrop) && typeof window !== 'undefined' && createPortal(
       <>
         <div
           className="fixed inset-0 z-[9998]"
-          onClick={() => { setShowStartPicker(false); setShowEndPicker(false) }}
+          onClick={() => { setShowStartPicker(false); setShowEndPicker(false); setShowTypeDrop(false) }}
         />
+        {showTypeDrop && (
+          <div style={{ ...typeStyle, background: 'white', borderRadius: 10, border: '1px solid #E5E5E5', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+            {eventTypes.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => { set('type', t); setShowTypeDrop(false) }}
+                style={{
+                  display: 'block', width: '100%', padding: '10px 14px',
+                  textAlign: 'right', border: 'none', cursor: 'pointer',
+                  fontSize: 14, fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                  background: form.type === t ? '#FDF0F0' : 'white',
+                  color: form.type === t ? '#801A00' : '#171717',
+                  fontWeight: form.type === t ? 700 : 400,
+                  transition: 'background 150ms',
+                }}
+                onMouseEnter={(e) => { if (form.type !== t) e.currentTarget.style.background = '#F9F9F9' }}
+                onMouseLeave={(e) => { if (form.type !== t) e.currentTarget.style.background = 'white' }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
         {showStartPicker && (
           <div style={startStyle}>
             <JalaliDatePicker
