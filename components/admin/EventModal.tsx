@@ -350,12 +350,16 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, imageUrl: finalImageUrl, galleryImages: galleryUrls, isArchived: form.isArchived, endDate: form.endDate || null }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}))
+        throw new Error(errBody.detail || errBody.error || `HTTP ${res.status}`)
+      }
       toast.success(event ? 'رویداد با موفقیت ویرایش شد' : 'رویداد با موفقیت ایجاد شد')
       onSaved()
       onClose()
-    } catch {
-      toast.error('خطا در ذخیره رویداد')
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'خطای ناشناخته'
+      toast.error(`خطا در ذخیره رویداد: ${msg}`)
     } finally {
       setLoading(false)
     }

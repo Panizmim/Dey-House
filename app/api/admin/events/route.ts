@@ -39,7 +39,9 @@ export async function POST(req: NextRequest) {
       },
     })
     return NextResponse.json(event)
-  } catch {
-    return NextResponse.json({ error: 'خطا در ایجاد رویداد' }, { status: 500 })
+  } catch (e) {
+    console.error('[POST /api/admin/events]', e)
+    const msg = e instanceof Error ? e.message : String(e)
+    return NextResponse.json({ error: 'خطا در ایجاد رویداد', detail: msg }, { status: 500 })
   }
 }
