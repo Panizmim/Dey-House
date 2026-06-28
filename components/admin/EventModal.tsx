@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, ImagePlus, X } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
@@ -224,6 +225,8 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
   const [gallery, setGallery]           = useState<GallerySlot[]>([])
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [pickerStyle,   setPickerStyle]     = useState<React.CSSProperties>({})
+  const dateBtnRef                          = useRef<HTMLButtonElement>(null)
   const [selectedDate, setSelectedDate]     = useState<Date | null>(null)
   const [selectedDates, setSelectedDates]   = useState<Date[]>([])
   const [form, setForm] = useState({
@@ -352,6 +355,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const canAdd      = gallery.length < MAX_GALLERY
 
   return (
+    <>
     <Modal
       open={open}
       title={event ? 'ویرایش رویداد' : 'افزودن رویداد جدید'}
@@ -397,7 +401,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
 
         {/* تاریخ + ساعت */}
         <div className="grid grid-cols-2 gap-3">
-          <div style={{ position: 'relative' }}>
+          <div>
             <label className={labelClass}>
               تاریخ *
               <span style={{ fontSize: 11, color: '#A0A0A0', fontWeight: 400, marginRight: 6 }}>
@@ -405,8 +409,15 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
               </span>
             </label>
             <button
+              ref={dateBtnRef}
               type="button"
-              onClick={() => setShowDatePicker((v) => !v)}
+              onClick={() => {
+                if (dateBtnRef.current) {
+                  const r = dateBtnRef.current.getBoundingClientRect()
+                  setPickerStyle({ position: 'fixed', top: r.bottom + 4, right: window.innerWidth - r.right, zIndex: 9999 })
+                }
+                setShowDatePicker((v) => !v)
+              }}
               className={inputClass}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'white' }}
             >
@@ -417,43 +428,8 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
                     ? jalaliToDisplay(selectedDates[0])
                     : `${selectedDates.length} روز انتخاب شده`}
               </span>
-              <ChevronDown size={14} color="#A0A0A0" />
+              <ChevronDown size={14} color="#A0A0A0" style={{ transition: 'transform 200ms', transform: showDatePicker ? 'rotate(180deg)' : 'rotate(0)' }} />
             </button>
-            {showDatePicker && (
-              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 50 }}>
-                <JalaliDatePicker
-                  multiSelect
-                  selectedDates={selectedDates}
-                  disablePast={false}
-                  onSelectMultiple={(dates) => {
-                    const sorted = dates.slice().sort((a, b) => a.getTime() - b.getTime())
-                    setSelectedDates(sorted)
-                    const first = sorted[0]
-                    if (first) {
-                      setSelectedDate(first)
-                      const iso = `${first.getFullYear()}-${String(first.getMonth()+1).padStart(2,'0')}-${String(first.getDate()).padStart(2,'0')}`
-                      set('date', iso)
-                    } else {
-                      setSelectedDate(null)
-                      set('date', '')
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowDatePicker(false)}
-                  style={{
-                    width: '100%', marginTop: 6,
-                    padding: '10px 0', borderRadius: 10,
-                    border: 'none', background: '#801A00',
-                    color: 'white', fontSize: 14, fontWeight: 700,
-                    cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
-                  }}
-                >
-                  تأیید{selectedDates.length > 0 ? ` (${selectedDates.length} روز)` : ''}
-                </button>
-              </div>
-            )}
           </div>
           <div style={{ position: 'relative' }}>
             <label className={labelClass}>ساعت *</label>
@@ -613,5 +589,46 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         </div>
       </div>
     </Modal>
+
+    {showDatePicker && typeof window !== 'undefined' && createPortal(
+      <>
+        <div className="fixed inset-0 z-[9998]" onClick={() => setShowDatePicker(false)} />
+        <div style={pickerStyle}>
+          <JalaliDatePicker
+            multiSelect
+            selectedDates={selectedDates}
+            disablePast={false}
+            onSelectMultiple={(dates) => {
+              const sorted = dates.slice().sort((a, b) => a.getTime() - b.getTime())
+              setSelectedDates(sorted)
+              const first = sorted[0]
+              if (first) {
+                setSelectedDate(first)
+                const iso = `${first.getFullYear()}-${String(first.getMonth()+1).padStart(2,'0')}-${String(first.getDate()).padStart(2,'0')}`
+                set('date', iso)
+              } else {
+                setSelectedDate(null)
+                set('date', '')
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowDatePicker(false)}
+            style={{
+              width: '100%', marginTop: 6,
+              padding: '10px 0', borderRadius: 10,
+              border: 'none', background: '#801A00',
+              color: 'white', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'YekanBakh, Tahoma, sans-serif',
+            }}
+          >
+            تأیید{selectedDates.length > 0 ? ` (${selectedDates.length} روز)` : ''}
+          </button>
+        </div>
+      </>,
+      document.body
+    )}
+    </>
   )
 }
