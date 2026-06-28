@@ -201,7 +201,21 @@ export default function CafePage() {
   const [loading,       setLoading]       = useState(true)
   const [activeSection, setActiveSection] = useState(categories[0].id)
   const [selected,      setSelected]      = useState<{ item: MenuItem; index: number } | null>(null)
-  const observerRef = useRef<IntersectionObserver | null>(null)
+  const observerRef  = useRef<IntersectionObserver | null>(null)
+  const navScrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const nav = navScrollRef.current
+    if (!nav) return
+    const activeBtn = nav.querySelector<HTMLElement>(`[data-cat="${activeSection}"]`)
+    if (!activeBtn) return
+    const navLeft   = nav.scrollLeft
+    const navWidth  = nav.offsetWidth
+    const btnLeft   = activeBtn.offsetLeft
+    const btnWidth  = activeBtn.offsetWidth
+    const target    = btnLeft - navWidth / 2 + btnWidth / 2
+    nav.scrollTo({ left: target, behavior: 'smooth' })
+  }, [activeSection])
 
   useEffect(() => {
     fetch('/api/cafe-menu')
@@ -248,10 +262,11 @@ export default function CafePage() {
 
       {/* ناوبار افقی موبایل */}
       <div className="lg:hidden sticky z-40 bg-white border-b border-[#EFEFEF]" style={{ top: '60px' }}>
-        <div className="flex gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
+        <div ref={navScrollRef} className="flex gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
           {visibleCategories.map((cat) => (
             <button
               key={cat.id}
+              data-cat={cat.id}
               onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all duration-150 ${
                 activeSection === cat.id
