@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { createPortal } from 'react-dom'
 import PageHero from '@/components/ui/PageHero'
 
 type MenuItem = {
@@ -63,10 +64,118 @@ function scrollToSection(id: string) {
   }, 50)
 }
 
-function MenuItemCard({ item, index }: { item: MenuItem; index: number }) {
+/* ─── پاپ‌آپ جزئیات آیتم ─── */
+function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number; onClose: () => void }) {
+  const gradient = placeholderGradients[index % 6]
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [onClose])
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4"
+      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', animation: 'fadeInOverlay 180ms ease' }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl overflow-hidden"
+        style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', maxHeight: '90vh', overflowY: 'auto' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* تصویر / پلیس‌هولدر */}
+        <div className="relative w-full" style={{ aspectRatio: '4/3', background: gradient, flexShrink: 0 }}>
+          {item.imageUrl && (
+            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+          )}
+          {/* دکمه بستن */}
+          <button
+            onClick={onClose}
+            style={{
+              position: 'absolute', top: 12, left: 12,
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)', border: 'none',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white', fontSize: 18, lineHeight: 1,
+            }}
+            aria-label="بستن"
+          >
+            ✕
+          </button>
+          {/* badge موجودی */}
+          {!item.isAvailable && (
+            <div style={{
+              position: 'absolute', top: 12, right: 12,
+              background: 'rgba(0,0,0,0.6)', color: 'white',
+              fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20,
+            }}>
+              ناموجود
+            </div>
+          )}
+        </div>
+
+        {/* اطلاعات */}
+        <div className="p-5 flex flex-col gap-4">
+          {/* نام + دسته */}
+          <div>
+            <span style={{ fontSize: 11, color: '#801A00', background: '#FDF5F5', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>
+              {item.category}
+            </span>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#171717', marginTop: 10, lineHeight: 1.3 }}>
+              {item.name}
+            </h2>
+          </div>
+
+          {/* توضیحات */}
+          {item.description && (
+            <p style={{ fontSize: 14, color: '#555', lineHeight: 1.8, fontWeight: 300 }}>
+              {item.description}
+            </p>
+          )}
+
+          {/* قیمت */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 16px', background: '#FAFAFA', borderRadius: 12,
+          }}>
+            <span style={{ fontSize: 13, color: '#717171', fontWeight: 500 }}>قیمت</span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span style={{ fontSize: 22, fontWeight: 900, color: '#801A00' }}>
+                {item.price.toLocaleString('fa-IR')}
+              </span>
+              <span style={{ fontSize: 12, color: '#999', fontWeight: 600 }}>تومان</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeInOverlay { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideUpCard {
+          from { opacity: 0; transform: translateY(24px) scale(0.97) }
+          to   { opacity: 1; transform: translateY(0)    scale(1)    }
+        }
+      `}</style>
+    </div>,
+    document.body,
+  )
+}
+
+/* ─── کارت آیتم ─── */
+function MenuItemCard({ item, index, onClick }: { item: MenuItem; index: number; onClick: () => void }) {
   const gradient = placeholderGradients[index % 6]
   return (
-    <div className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg bg-white">
+    <button
+      onClick={onClick}
+      className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg bg-white text-right w-full transition-all duration-150 hover:border-[#D0A0A0] hover:shadow-sm active:scale-[0.98]"
+      style={{ cursor: 'pointer' }}
+    >
       <div
         className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
         style={{ background: gradient, position: 'relative' }}
@@ -89,7 +198,7 @@ function MenuItemCard({ item, index }: { item: MenuItem; index: number }) {
         </span>
         <span className="text-xs text-[#999] font-bold mr-1">تومان</span>
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -110,6 +219,7 @@ export default function CafePage() {
   const [items,         setItems]         = useState<MenuItem[]>([])
   const [loading,       setLoading]       = useState(true)
   const [activeSection, setActiveSection] = useState(categories[0].id)
+  const [selected,      setSelected]      = useState<{ item: MenuItem; index: number } | null>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
@@ -147,9 +257,7 @@ export default function CafePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero
-        title="منوی کافه"
-      />
+      <PageHero title="منوی کافه" />
 
       <div className="bg-[#FDF5F5] border-b border-[#F0D5D5] py-3 px-6 text-center">
         <p className="text-xs text-[#801A00]">
@@ -226,7 +334,12 @@ export default function CafePage() {
                     {loading
                       ? catItems.map((_, idx) => <SkeletonCard key={idx} />)
                       : (catItems as MenuItem[]).map((item, idx) => (
-                          <MenuItemCard key={item.id} item={item} index={idx} />
+                          <MenuItemCard
+                            key={item.id}
+                            item={item}
+                            index={idx}
+                            onClick={() => setSelected({ item, index: idx })}
+                          />
                         ))
                     }
                   </div>
@@ -243,6 +356,15 @@ export default function CafePage() {
         </main>
 
       </div>
+
+      {/* پاپ‌آپ جزئیات */}
+      {selected && (
+        <CafeItemPopup
+          item={selected.item}
+          index={selected.index}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   )
 }
