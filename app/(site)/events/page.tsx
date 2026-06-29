@@ -151,13 +151,6 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* تعداد نتایج */}
-      <div className="px-4 pt-4 pb-2">
-        <p style={{ fontSize: 13, color: '#A0A0A0' }}>
-          {loading ? 'در حال بارگذاری...' : `${filtered.length} رویداد`}
-        </p>
-      </div>
-
       {/* گرید کارت‌ها */}
       <div className="px-4 pb-10">
         {loading ? (
@@ -273,10 +266,6 @@ export default function EventsPage() {
             </>
           ) : (
             <>
-              <p style={{ fontSize: 13, color: '#A0A0A0', marginBottom: 20 }}>
-                {filtered.length} رویداد یافت شد
-              </p>
-
               {filtered.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '80px 0', color: '#A0A0A0', fontSize: 14 }}>
                   رویدادی با این فیلترها یافت نشد
