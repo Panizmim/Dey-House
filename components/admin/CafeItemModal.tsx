@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
 import ImageUploadZone, { type UploadStatus } from './ImageUploadZone'
+import ImageCropModal from './ImageCropModal'
 import { ChevronDown } from '@/components/ui/icons'
 import { convertIfHeic } from '@/lib/convertHeic'
 
@@ -45,6 +46,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageUrl,     setImageUrl]     = useState<string | null>(null)
   const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
+  const [cropSrc,      setCropSrc]      = useState<string | null>(null)
   const [form, setForm] = useState({
     name: '', price: '', category: CATEGORIES[0], description: '', isAvailable: true,
   })
@@ -54,6 +56,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
     setImagePreview(null)
     setImageUrl(null)
     setImageStatus('idle')
+    setCropSrc(null)
     if (item) {
       setForm({
         name:        item.name,
@@ -112,7 +115,25 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
     }
   }
 
+  function handleCropConfirm(croppedFile: File) {
+    setCropSrc(null)
+    setImagePreview(URL.createObjectURL(croppedFile))
+    setImageUrl(null)
+    setImageStatus('uploading')
+    uploadImage(croppedFile, 'cafe-menu')
+      .then((url) => { setImageUrl(url); setImageStatus('success') })
+      .catch(() => setImageStatus('error'))
+  }
+
   return (
+    <>
+      {cropSrc && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          onCrop={handleCropConfirm}
+          onCancel={() => setCropSrc(null)}
+        />
+      )}
     <Modal
       open={open}
       title={item ? 'ویرایش آیتم منو' : 'افزودن آیتم جدید'}
@@ -198,12 +219,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
             preview={imagePreview}
             status={imageStatus}
             onFileSelect={(file) => {
-              setImagePreview(URL.createObjectURL(file))
-              setImageUrl(null)
-              setImageStatus('uploading')
-              uploadImage(file, 'cafe-menu')
-                .then((url) => { setImageUrl(url); setImageStatus('success') })
-                .catch(() => setImageStatus('error'))
+              setCropSrc(URL.createObjectURL(file))
             }}
             onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
           />
@@ -221,5 +237,6 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
         </label>
       </div>
     </Modal>
+    </>
   )
 }

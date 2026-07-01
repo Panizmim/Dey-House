@@ -9,11 +9,23 @@ import { db }                   from '@/lib/db'
 export const revalidate = 0
 
 export default async function HomePage() {
-  const banners = await db.heroBanner.findMany({
-    where:   { isActive: true },
-    orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
-    select:  { id: true, imageUrl: true, showText: true },
-  })
+  const FALLBACK_BANNERS = [
+    { id: 'f1', imageUrl: '/images/hero/slide1.JPG', showText: true  },
+    { id: 'f2', imageUrl: '/images/hero/slide2.JPG', showText: false },
+    { id: 'f3', imageUrl: '/images/hero/slide3.JPG', showText: false },
+  ]
+
+  let banners: { id: string; imageUrl: string; showText: boolean }[] = []
+  try {
+    const rows = await db.heroBanner.findMany({
+      where:   { isActive: true },
+      orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+      select:  { id: true, imageUrl: true, showText: true },
+    })
+    banners = rows.length > 0 ? rows : FALLBACK_BANNERS
+  } catch {
+    banners = FALLBACK_BANNERS
+  }
 
   return (
     <>
