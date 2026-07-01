@@ -71,12 +71,12 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
       onClick={onClose}
     >
       <div
-        className="bg-white w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl overflow-hidden"
+        className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl overflow-hidden"
         style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', maxHeight: '90vh', overflowY: 'auto' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* تصویر / پلیس‌هولدر */}
-        <div className="relative w-full" style={{ aspectRatio: '4/3', background: gradient, flexShrink: 0 }}>
+        <div className="relative w-full" style={{ aspectRatio: '1/1', background: gradient, flexShrink: 0 }}>
           {item.imageUrl && (
             <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
           )}
@@ -85,10 +85,9 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
             onClick={onClose}
             style={{
               position: 'absolute', top: 12, left: 12,
-              width: 34, height: 34, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.45)', border: 'none',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontSize: 18, lineHeight: 1,
+              background: 'none', border: 'none',
+              cursor: 'pointer', color: 'white', fontSize: 22, lineHeight: 1,
+              padding: 4,
             }}
             aria-label="بستن"
           >
