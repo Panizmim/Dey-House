@@ -29,8 +29,7 @@ export default function Modal({ open, title, onClose, children, footer, maxWidth
           <p style={{ fontSize: 16, fontWeight: 700, color: '#171717' }}>{title}</p>
           <button
             onClick={onClose}
-            className="flex items-center justify-center rounded-lg transition-colors duration-150 hover:bg-[#F5F5F5]"
-            style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer' }}
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 4, lineHeight: 0 }}
           >
             <X size={18} color="#717171" />
           </button>

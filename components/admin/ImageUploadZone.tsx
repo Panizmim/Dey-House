@@ -39,7 +39,7 @@ export default function ImageUploadZone({
     <div>
       {currentUrl && !preview && (
         <div style={{ marginBottom: 12 }}>
-          <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', width: 120, height: 120 }}>
+          <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', width: 200, height: 200 }}>
             <Image
               src={currentUrl}
               alt="تصویر فعلی"
@@ -80,7 +80,7 @@ export default function ImageUploadZone({
       {preview ? (
         <div style={{ marginBottom: 4 }}>
           {/* پیش‌نمایش مربعی */}
-          <div style={{ position: 'relative', width: 120, height: 120, borderRadius: 10, overflow: 'hidden' }}>
+          <div style={{ position: 'relative', width: 200, height: 200, borderRadius: 10, overflow: 'hidden' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={preview}
