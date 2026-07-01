@@ -12,12 +12,13 @@ interface ImageUploadZoneProps {
   preview: string | null
   onFileSelect: (file: File) => void
   onClear: () => void
+  onCropExisting?: () => void
   status?: UploadStatus
   errorMessage?: string | null
 }
 
 export default function ImageUploadZone({
-  currentUrl, preview, onFileSelect, onClear,
+  currentUrl, preview, onFileSelect, onClear, onCropExisting,
   status = 'idle', errorMessage,
 }: ImageUploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -37,24 +38,41 @@ export default function ImageUploadZone({
   return (
     <div>
       {currentUrl && !preview && (
-        <div
-          onClick={() => status !== 'uploading' && inputRef.current?.click()}
-          style={{ position: 'relative', marginBottom: 12, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', maxWidth: 200 }}
-        >
-          <Image
-            src={currentUrl}
-            alt="تصویر فعلی"
-            width={200}
-            height={280}
-            className="object-cover w-full"
-            style={{ display: 'block', borderRadius: 10 }}
-          />
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity"
-            style={{ background: 'rgba(0,0,0,0.5)', borderRadius: 10 }}
-          >
-            <ImagePlus size={22} color="white" />
-            <span style={{ color: 'white', fontSize: 12, fontWeight: 600 }}>تغییر پوستر</span>
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', width: 120, height: 120 }}>
+            <Image
+              src={currentUrl}
+              alt="تصویر فعلی"
+              fill
+              className="object-cover"
+              style={{ borderRadius: 10 }}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            {onCropExisting && (
+              <button
+                type="button"
+                onClick={onCropExisting}
+                style={{
+                  padding: '5px 12px', borderRadius: 6, border: '1px solid #8C2020',
+                  background: 'white', color: '#8C2020', fontSize: 12, fontWeight: 600,
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                }}
+              >
+                ✂️ برش تصویر
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => status !== 'uploading' && inputRef.current?.click()}
+              style={{
+                padding: '5px 12px', borderRadius: 6, border: '1px solid #E5E5E5',
+                background: 'white', color: '#717171', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              تغییر تصویر
+            </button>
           </div>
         </div>
       )}
