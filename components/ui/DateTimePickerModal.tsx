@@ -91,7 +91,7 @@ export default function DateTimePickerModal({ open, onClose, studioId, mode = 'r
         })
         .catch(() => { fetchedMonths.current.delete(key) })
     })
-  }, [studioId, open, leftYear, leftMonth, isMobile])
+  }, [studioId, open, leftYear, leftMonth, leftNextYear, leftNextMonth, rightYear, rightMonth, isMobile])
 
   useEffect(() => {
     if (!studioId || !startDate || mode !== 'single') {
