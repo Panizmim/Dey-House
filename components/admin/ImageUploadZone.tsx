@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useRef, useState } from 'react'
-import { ImagePlus, X } from '@/components/ui/icons'
+import { ImagePlus } from '@/components/ui/icons'
 import { convertIfHeic } from '@/lib/convertHeic'
 
 export type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
