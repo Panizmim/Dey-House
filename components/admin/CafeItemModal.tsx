@@ -148,6 +148,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
   return (
     <Modal
       open={open}
+      maxWidth={680}
       title={isCrop ? 'برش تصویر' : item ? 'ویرایش آیتم منو' : 'افزودن آیتم جدید'}
       onClose={isCrop ? () => setMode('form') : onClose}
       footer={

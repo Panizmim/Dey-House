@@ -8,9 +8,10 @@ interface ModalProps {
   onClose: () => void
   children: React.ReactNode
   footer?: React.ReactNode
+  maxWidth?: number
 }
 
-export default function Modal({ open, title, onClose, children, footer }: ModalProps) {
+export default function Modal({ open, title, onClose, children, footer, maxWidth = 540 }: ModalProps) {
   if (!open) return null
   return (
     <div
@@ -20,7 +21,7 @@ export default function Modal({ open, title, onClose, children, footer }: ModalP
     >
       <div
         className="bg-white rounded-lg w-full mx-4 overflow-y-auto"
-        style={{ maxWidth: 540, maxHeight: '90vh' }}
+        style={{ maxWidth, maxHeight: '90vh' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* هدر */}

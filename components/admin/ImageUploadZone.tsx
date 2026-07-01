@@ -78,65 +78,87 @@ export default function ImageUploadZone({
       )}
 
       {preview ? (
-        <div style={{ position: 'relative' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt="پیش‌نمایش" className="w-full rounded-lg object-cover" style={{ height: 160 }} />
+        <div style={{ marginBottom: 4 }}>
+          {/* پیش‌نمایش مربعی */}
+          <div style={{ position: 'relative', width: 120, height: 120, borderRadius: 10, overflow: 'hidden' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preview}
+              alt="پیش‌نمایش"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
 
-          {/* overlay وضعیت آپلود */}
-          {status === 'uploading' && (
-            <div style={{
-              position: 'absolute', inset: 0, borderRadius: 8,
-              background: 'rgba(0,0,0,0.5)',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-            }}>
+            {status === 'uploading' && (
               <div style={{
-                width: 32, height: 32, borderRadius: '50%',
-                border: '3px solid rgba(255,255,255,0.3)',
-                borderTopColor: 'white',
-                animation: 'spin 0.8s linear infinite',
-              }} />
-              <p style={{ color: 'white', fontSize: 12, fontWeight: 600 }}>در حال آپلود...</p>
-            </div>
-          )}
+                position: 'absolute', inset: 0,
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}>
+                <div style={{
+                  width: 26, height: 26, borderRadius: '50%',
+                  border: '3px solid rgba(255,255,255,0.3)',
+                  borderTopColor: 'white',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
+                <p style={{ color: 'white', fontSize: 10, fontWeight: 600 }}>آپلود...</p>
+              </div>
+            )}
 
-          {status === 'success' && (
-            <div style={{
-              position: 'absolute', top: 8, right: 8,
-              background: '#16A34A', borderRadius: '50%',
-              width: 24, height: 24,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 7l4 4 6-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-          )}
+            {status === 'success' && (
+              <div style={{
+                position: 'absolute', top: 6, right: 6,
+                background: '#16A34A', borderRadius: '50%',
+                width: 22, height: 22,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 7l4 4 6-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            )}
 
-          {status === 'error' && (
-            <div style={{
-              position: 'absolute', inset: 0, borderRadius: 8,
-              background: 'rgba(220,38,38,0.15)',
-              border: '2px solid #DC2626',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <p style={{ color: '#DC2626', fontSize: 12, fontWeight: 700, background: 'white', padding: '4px 10px', borderRadius: 6 }}>
-                {errorMessage ?? 'خطا در آپلود'}
-              </p>
-            </div>
-          )}
+            {status === 'error' && (
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(220,38,38,0.15)',
+                border: '2px solid #DC2626',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <p style={{ color: '#DC2626', fontSize: 10, fontWeight: 700, background: 'white', padding: '3px 8px', borderRadius: 4 }}>
+                  {errorMessage ?? 'خطا'}
+                </p>
+              </div>
+            )}
+          </div>
 
+          {/* دکمه‌های زیر پیش‌نمایش */}
           {status !== 'uploading' && (
-            <button
-              onClick={onClear}
-              style={{
-                position: 'absolute', top: 8, left: 8,
-                width: 28, height: 28, borderRadius: '50%',
-                background: 'rgba(0,0,0,0.55)', border: 'none',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <X size={14} color="white" />
-            </button>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              {onCropExisting && (
+                <button
+                  type="button"
+                  onClick={onCropExisting}
+                  style={{
+                    padding: '5px 12px', borderRadius: 6, border: '1px solid #8C2020',
+                    background: 'white', color: '#8C2020', fontSize: 12, fontWeight: 600,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  ✂️ برش مجدد
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClear}
+                style={{
+                  padding: '5px 12px', borderRadius: 6, border: '1px solid #E5E5E5',
+                  background: 'white', color: '#717171', fontSize: 12, fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                حذف تصویر
+              </button>
+            </div>
           )}
         </div>
       ) : (
