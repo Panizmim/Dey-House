@@ -223,17 +223,30 @@ export default function EventsPage() {
 
             {typeOpen && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {EVENT_TYPES.map((t) => (
-                  <label key={t} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedTypes.includes(t)}
-                      onChange={() => toggleType(t)}
-                      style={{ accentColor: '#801A00', width: 15, height: 15, cursor: 'pointer' }}
-                    />
-                    <span style={{ fontSize: 13, color: '#404040' }}>{t}</span>
-                  </label>
-                ))}
+                {EVENT_TYPES.map((t) => {
+                  const checked = selectedTypes.includes(t)
+                  return (
+                    <label key={t} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                      <div
+                        onClick={() => toggleType(t)}
+                        style={{
+                          width: 15, height: 15, flexShrink: 0,
+                          border: `1.5px solid ${checked ? '#801A00' : '#CCCCCC'}`,
+                          background: checked ? '#801A00' : 'white',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {checked && (
+                          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                            <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 13, color: '#404040' }}>{t}</span>
+                    </label>
+                  )
+                })}
               </div>
             )}
           </div>
