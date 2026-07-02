@@ -17,7 +17,6 @@ type MenuItem = {
 
 type Category = { id: string; name: string; order: number }
 
-
 const placeholderGradients = [
   'linear-gradient(135deg, #f5e6d3, #e8c9a0)',
   'linear-gradient(135deg, #d3e8f5, #a0c9e8)',
@@ -31,13 +30,12 @@ function scrollToSection(id: string) {
   setTimeout(() => {
     const el = document.getElementById(id)
     if (!el) return
-    const OFFSET = 120
-    const top = el.getBoundingClientRect().top + window.scrollY - OFFSET
+    const top = el.getBoundingClientRect().top + window.scrollY - 130
     window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
   }, 50)
 }
 
-/* ─── پاپ‌آپ جزئیات آیتم ─── */
+/* ─── پاپ‌آپ ─── */
 function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number; onClose: () => void }) {
   const gradient = placeholderGradients[index % 6]
 
@@ -54,66 +52,56 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
   return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', animation: 'fadeInOverlay 180ms ease' }}
+      style={{ background: 'rgba(10,8,6,0.7)', backdropFilter: 'blur(8px)', animation: 'pdpFadeIn 200ms ease' }}
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-md rounded-2xl overflow-hidden max-h-[90vh]"
-        style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', overflowY: 'auto', position: 'relative' }}
+        className="bg-white w-full max-w-[360px] overflow-hidden"
+        style={{
+          maxHeight: '88vh', overflowY: 'auto',
+          animation: 'pdpSlideUp 280ms cubic-bezier(0.22,1,0.36,1)',
+          position: 'relative', borderRadius: 20,
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* دکمه بستن */}
+        {/* بستن */}
         <button
           onClick={onClose}
           style={{
-            position: 'absolute', top: 12, left: 12, zIndex: 2,
-            background: item.imageUrl ? 'none' : 'rgba(0,0,0,0.08)',
-            border: 'none', borderRadius: '50%', width: 30, height: 30,
-            cursor: 'pointer', color: item.imageUrl ? 'white' : '#404040',
-            fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'absolute', top: 12, left: 12, zIndex: 10,
+            width: 30, height: 30, borderRadius: '50%', border: 'none',
+            background: item.imageUrl ? 'rgba(0,0,0,0.38)' : 'rgba(0,0,0,0.07)',
+            color: item.imageUrl ? 'white' : '#555',
+            cursor: 'pointer', fontSize: 14,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: item.imageUrl ? 'blur(4px)' : 'none',
           }}
-          aria-label="بستن"
         >
           ✕
         </button>
 
-        {/* تصویر — فقط اگه imageUrl داشته باشه */}
+        {/* تصویر */}
         {item.imageUrl && (
-          <div className="relative w-full aspect-square" style={{ background: gradient, flexShrink: 0 }}>
+          <div className="relative w-full" style={{ aspectRatio: '1/1', background: gradient }}>
             <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
-            {/* badge موجودی */}
-            {!item.isAvailable && (
-              <div style={{
-                position: 'absolute', top: 12, right: 12,
-                background: 'rgba(0,0,0,0.6)', color: 'white',
-                fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20,
-              }}>
-                ناموجود
-              </div>
-            )}
           </div>
         )}
 
-        {/* اطلاعات */}
-        <div className="p-5 flex flex-col gap-4" style={{ paddingTop: item.imageUrl ? 20 : 44 }}>
-          {/* نام + badge ناموجود (برای آیتم‌های بدون عکس) */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#171717', lineHeight: 1.3, flex: 1 }}>
-              {item.name}
-            </h2>
-            {!item.isAvailable && !item.imageUrl && (
-              <span style={{
-                background: 'rgba(0,0,0,0.08)', color: '#555',
-                fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, whiteSpace: 'nowrap', marginTop: 4,
-              }}>
-                ناموجود
-              </span>
-            )}
-          </div>
+        {/* محتوا */}
+        <div style={{ padding: '24px 24px 32px', paddingTop: item.imageUrl ? 20 : 52 }}>
+          <h2 style={{
+            fontSize: 22, fontWeight: 900, color: '#171717',
+            lineHeight: 1.3, marginBottom: 10, textAlign: 'right',
+            letterSpacing: '-0.02em',
+          }}>
+            {item.name}
+          </h2>
 
-          {/* توضیحات */}
           {item.description && (
-            <p style={{ fontSize: 14, color: '#555', lineHeight: 1.8, fontWeight: 300 }}>
+            <p style={{
+              fontSize: 14, color: '#888', lineHeight: 1.9,
+              fontWeight: 300, marginBottom: 20, textAlign: 'right',
+            }}>
               {item.description}
             </p>
           )}
@@ -121,25 +109,23 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
           {/* قیمت */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '14px 16px', background: '#FAFAFA', borderRadius: 12,
+            padding: '16px 18px', background: '#F7F4F1', borderRadius: 12,
+            marginTop: !item.description ? 8 : 0,
           }}>
-            <span style={{ fontSize: 13, color: '#717171', fontWeight: 500 }}>قیمت</span>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: '#801A00' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <span style={{ fontSize: 26, fontWeight: 900, color: '#8C2020', letterSpacing: '-0.03em' }}>
                 {item.price.toLocaleString('fa-IR')}
               </span>
-              <span style={{ fontSize: 12, color: '#999', fontWeight: 600 }}>تومان</span>
+              <span style={{ fontSize: 12, color: '#B8B0A8', fontWeight: 500 }}>تومان</span>
             </div>
+            <span style={{ fontSize: 12, color: '#AAA', fontWeight: 400 }}>قیمت</span>
           </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes fadeInOverlay { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes slideUpCard {
-          from { opacity: 0; transform: translateY(24px) scale(0.97) }
-          to   { opacity: 1; transform: translateY(0)    scale(1)    }
-        }
+        @keyframes pdpFadeIn  { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes pdpSlideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
       `}</style>
     </div>,
     document.body,
@@ -147,35 +133,60 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
 }
 
 /* ─── کارت آیتم ─── */
-function MenuItemCard({ item, index, onClick }: { item: MenuItem; index: number; onClick: () => void }) {
-  const gradient = placeholderGradients[index % 6]
+function MenuItemCard({
+  item, index, onClick, isLast,
+}: {
+  item: MenuItem; index: number; onClick: () => void; isLast: boolean
+}) {
+  const [hovered, setHovered] = useState(false)
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded bg-white text-right w-full transition-all duration-150 hover:border-[#D0A0A0] hover:shadow-sm active:scale-[0.98]"
-      style={{ cursor: 'pointer' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="flex items-center w-full text-right"
+      style={{
+        gap: 16, padding: '18px 0',
+        background: 'transparent', border: 'none',
+        borderBottom: isLast ? 'none' : '1px solid #F0EDE9',
+        cursor: 'pointer',
+        opacity: hovered ? 0.6 : 1,
+        transition: 'opacity 180ms',
+      }}
     >
+      {/* تصویر — راست در RTL */}
       {item.imageUrl && (
-        <div
-          className="w-20 h-20 overflow-hidden flex-shrink-0 rounded"
-          style={{ background: gradient, position: 'relative' }}
-        >
+        <div style={{
+          width: 70, height: 70, flexShrink: 0,
+          overflow: 'hidden', position: 'relative',
+          background: placeholderGradients[index % 6],
+        }}>
           <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
         </div>
       )}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-[#171717] leading-tight mb-1 truncate">
+
+      {/* متن */}
+      <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+        <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.4, marginBottom: item.description ? 5 : 0 }}>
           {item.name}
         </p>
         {item.description && (
-          <p className="text-xs text-[#717171] font-light" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{item.description}</p>
+          <p style={{
+            fontSize: 12, color: '#A0A0A0', fontWeight: 300, lineHeight: 1.7,
+            display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          } as React.CSSProperties}>
+            {item.description}
+          </p>
         )}
       </div>
-      <div className="flex-shrink-0 text-left">
-        <span className="text-sm font-black text-[#801A00]">
+
+      {/* قیمت — چپ در RTL */}
+      <div style={{ flexShrink: 0, textAlign: 'left', minWidth: 58 }}>
+        <span style={{ display: 'block', fontSize: 16, fontWeight: 900, color: '#8C2020', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
           {item.price.toLocaleString('fa-IR')}
         </span>
-        <span className="text-xs text-[#999] font-bold mr-1">تومان</span>
+        <span style={{ fontSize: 10, color: '#C4BDB6', fontWeight: 400 }}>تومان</span>
       </div>
     </button>
   )
@@ -183,17 +194,17 @@ function MenuItemCard({ item, index, onClick }: { item: MenuItem; index: number;
 
 function SkeletonCard() {
   return (
-    <div className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg bg-white">
-      <div className="w-20 h-20 rounded-lg animate-pulse" style={{ background: '#F0F0F0', flexShrink: 0 }} />
-      <div className="flex-1">
-        <div className="h-4 rounded animate-pulse mb-2" style={{ background: '#F0F0F0', width: '60%' }} />
-        <div className="h-3 rounded animate-pulse" style={{ background: '#F0F0F0', width: '40%' }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '18px 0', borderBottom: '1px solid #F0EDE9' }}>
+      <div style={{ flex: 1 }}>
+        <div className="animate-pulse" style={{ height: 15, background: '#F0EDE9', borderRadius: 4, width: '42%', marginBottom: 8 }} />
+        <div className="animate-pulse" style={{ height: 12, background: '#F0EDE9', borderRadius: 4, width: '68%' }} />
       </div>
-      <div className="h-4 w-16 rounded animate-pulse" style={{ background: '#F0F0F0' }} />
+      <div className="animate-pulse" style={{ height: 18, width: 56, background: '#F0EDE9', borderRadius: 4, flexShrink: 0 }} />
     </div>
   )
 }
 
+/* ─── صفحه اصلی ─── */
 export default function CafePage() {
   const [items,         setItems]         = useState<MenuItem[]>([])
   const [categories,    setCategories]    = useState<Category[]>([])
@@ -261,101 +272,104 @@ export default function CafePage() {
     <div className="min-h-screen bg-white">
       <PageHero title="منوی کافه" />
 
-      <div className="bg-[#FDF5F5] border-b border-[#F0D5D5] py-3 px-6 text-center">
-        <p className="text-xs text-[#801A00]">
+      {/* نوار هشدار حساسیت */}
+      <div style={{ borderBottom: '1px solid #F0EDE9', padding: '10px 24px', textAlign: 'center' }}>
+        <p style={{ fontSize: 12, color: '#B0A89E', fontWeight: 300, fontStyle: 'italic' }}>
           در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید
         </p>
       </div>
 
-      {/* ناوبار افقی موبایل */}
-      <div className="lg:hidden sticky z-40 bg-white border-b border-[#EFEFEF]" style={{ top: '60px' }}>
-        <div ref={navScrollRef} className="flex gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
-          {visibleCategories.map((cat) => (
-            <button
-              key={cat.id}
-              data-cat={cat.id}
-              onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all duration-150 ${
-                activeSection === cat.id
-                  ? 'bg-[#801A00] border-[#801A00] text-white'
-                  : 'bg-white border-[#EFEFEF] text-[#404040]'
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
+      {/* ── ناوبار موبایل — underline tab ── */}
+      <div className="lg:hidden sticky z-40 bg-white" style={{ top: 60, borderBottom: '1px solid #F0EDE9' }}>
+        <div ref={navScrollRef} className="flex overflow-x-auto no-scrollbar" style={{ padding: '0 16px' }}>
+          {visibleCategories.map((cat) => {
+            const isActive = activeSection === cat.id
+            return (
+              <button
+                key={cat.id}
+                data-cat={cat.id}
+                onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
+                style={{
+                  flexShrink: 0, padding: '13px 14px',
+                  background: 'transparent', border: 'none',
+                  borderBottom: isActive ? '2px solid #8C2020' : '2px solid transparent',
+                  fontSize: 13, fontWeight: isActive ? 700 : 400,
+                  color: isActive ? '#8C2020' : '#999',
+                  cursor: 'pointer', transition: 'all 150ms',
+                  whiteSpace: 'nowrap', marginBottom: -1,
+                }}
+              >
+                {cat.name}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-6 py-8 flex gap-8">
+      <div className="max-w-[1080px] mx-auto px-6 py-10 flex gap-14">
 
-        {/* Sidebar desktop */}
-        <aside className="hidden lg:block w-[220px] flex-shrink-0">
-          <div style={{ position: 'sticky', top: '88px', alignSelf: 'start' }}>
+        {/* ── Sidebar دسکتاپ ── */}
+        <aside className="hidden lg:block flex-shrink-0" style={{ width: 190 }}>
+          <div style={{ position: 'sticky', top: 100 }}>
             {visibleCategories.map((cat) => {
               const isActive = activeSection === cat.id
               return (
                 <button
                   key={cat.id}
                   onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
-                  className="w-full text-right transition-all duration-150 hover:bg-[#FAFAFA]"
+                  className="w-full text-right"
                   style={{
-                    padding: '10px 14px', cursor: 'pointer',
-                    display: 'flex', flexDirection: 'column', gap: '2px',
-                    background: isActive ? '#FDF5F5' : 'transparent',
-                    borderRight: isActive ? '3px solid #801A00' : '3px solid transparent',
-                    border: 'none',
+                    padding: '11px 0', background: 'transparent',
+                    border: 'none', borderBottom: '1px solid #F0EDE9',
+                    cursor: 'pointer', fontSize: 13,
+                    fontWeight: isActive ? 700 : 400,
+                    color: isActive ? '#8C2020' : '#707070',
+                    transition: 'color 150ms',
                   }}
                 >
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: isActive ? '#801A00' : '#171717' }}>
-                    {cat.name}
-                  </span>
+                  {cat.name}
                 </button>
               )
             })}
           </div>
         </aside>
 
-        {/* محتوای اصلی */}
+        {/* ── محتوا ── */}
         <main style={{ flex: 1, minWidth: 0 }}>
           {visibleCategories.map((cat) => {
             const catItems = loading
-              ? Array.from({ length: 4 })
+              ? Array.from({ length: 5 })
               : itemsByCategory(cat.name)
 
             return (
-              <div key={cat.id}>
-                <section id={cat.id} className="mb-12 scroll-mt-36">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div>
-                      <h2 className="text-lg font-black text-[#171717]">{cat.name}</h2>
-                    </div>
-                    <div className="flex-1 h-px bg-[#EFEFEF]" />
-                  </div>
+              <section key={cat.id} id={cat.id} className="mb-14 scroll-mt-36">
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {loading
-                      ? catItems.map((_, idx) => <SkeletonCard key={idx} />)
-                      : (catItems as MenuItem[]).map((item, idx) => (
-                          <MenuItemCard
-                            key={item.id}
-                            item={item}
-                            index={idx}
-                            onClick={() => setSelected({ item, index: idx })}
-                          />
-                        ))
-                    }
-                  </div>
-                </section>
+                {/* هدر دسته‌بندی */}
+                <div style={{ paddingBottom: 12, marginBottom: 0, borderBottom: '1.5px solid #1A1A1A' }}>
+                  <h2 style={{ fontSize: 17, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.01em' }}>
+                    {cat.name}
+                  </h2>
+                </div>
 
-              </div>
+                {/* آیتم‌ها */}
+                {loading
+                  ? (catItems as unknown[]).map((_, idx) => <SkeletonCard key={idx} />)
+                  : (catItems as MenuItem[]).map((item, idx) => (
+                      <MenuItemCard
+                        key={item.id}
+                        item={item}
+                        index={idx}
+                        onClick={() => setSelected({ item, index: idx })}
+                        isLast={idx === (catItems as MenuItem[]).length - 1}
+                      />
+                    ))
+                }
+              </section>
             )
           })}
         </main>
-
       </div>
 
-      {/* پاپ‌آپ جزئیات */}
       {selected && (
         <CafeItemPopup
           item={selected.item}
