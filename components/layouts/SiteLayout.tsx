@@ -243,16 +243,23 @@ function Navbar() {
 
           {/* وسط — لینک‌ها */}
           <div className="flex items-center justify-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                style={{ fontSize: '15px', fontWeight: 400 }}
-                className="px-3 py-1.5 transition-opacity duration-200 hover:opacity-70 whitespace-nowrap"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: isActive ? 700 : 400,
+                    color: isActive ? '#8C2020' : 'inherit',
+                  }}
+                  className="px-3 py-1.5 transition-all duration-200 hover:opacity-70 whitespace-nowrap"
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
 
           {/* چپ — دکمه‌ها */}
@@ -316,22 +323,26 @@ function Navbar() {
 
           {/* لینک‌ها */}
           <div className="flex flex-col flex-1 overflow-y-auto">
-            {[...navLinks, { href: '/contact', label: 'تماس با ما' }].map((link, i, arr) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={close}
-                style={{
-                  display: 'flex', alignItems: 'center',
-                  padding: '18px 24px',
-                  fontSize: 18, fontWeight: 600, color: '#171717',
-                  borderBottom: i === arr.length - 1 ? 'none' : '1px solid #F0F0F0',
-                  textDecoration: 'none',
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {[...navLinks, { href: '/contact', label: 'تماس با ما' }].map((link, i, arr) => {
+              const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={close}
+                  style={{
+                    display: 'flex', alignItems: 'center',
+                    padding: '18px 24px',
+                    fontSize: 18, fontWeight: isActive ? 700 : 600,
+                    color: isActive ? '#8C2020' : '#171717',
+                    borderBottom: i === arr.length - 1 ? 'none' : '1px solid #F0F0F0',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
 
           {/* دکمه‌های اکشن */}
