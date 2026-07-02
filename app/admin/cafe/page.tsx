@@ -232,53 +232,47 @@ export default function AdminCafePage() {
           const isActive = activeTab === cat.name
           const isAll    = cat.id === '__all__'
           return (
-            <div key={cat.id} style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 2 }}>
-              <button
-                onClick={() => setActiveTab(cat.name)}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: 20, fontSize: 13,
-                  fontWeight: isActive ? 700 : 400,
-                  cursor: 'pointer', transition: 'all 0.15s',
-                  background: isActive ? '#801A00' : 'white',
-                  color:      isActive ? 'white' : '#404040',
-                  border:     isActive ? 'none' : '1px solid #E5E5E5',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <div
+              key={cat.id}
+              onClick={() => setActiveTab(cat.name)}
+              style={{
+                flexShrink: 0, borderRadius: 20, fontSize: 13, cursor: 'pointer',
+                fontWeight: isActive ? 700 : 400, transition: 'all 0.15s',
+                background: isActive ? '#801A00' : 'white',
+                color:      isActive ? 'white' : '#404040',
+                border:     isActive ? 'none' : '1px solid #E5E5E5',
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px', whiteSpace: 'nowrap',
+              }}
+            >
+              <span>
                 {cat.name}
                 {!isAll && (
                   <span style={{ marginRight: 4, fontSize: 11, opacity: isActive ? 0.8 : 0.5 }}>
                     ({items.filter((i) => i.category === cat.name).length})
                   </span>
                 )}
-              </button>
+              </span>
 
               {!isAll && (
-                <>
-                  <button
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span
+                    role="button"
                     onClick={(e) => { e.stopPropagation(); setEditingCat(cat as CafeCategory); setCatModal(true) }}
                     title="ویرایش دسته‌بندی"
-                    style={{
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 3,
-                      display: 'flex', alignItems: 'center',
-                      color: isActive ? 'rgba(255,255,255,0.8)' : '#717171',
-                    }}
+                    style={{ display: 'flex', cursor: 'pointer', opacity: isActive ? 0.8 : 0.5 }}
                   >
                     <Pencil size={12} />
-                  </button>
-                  <button
+                  </span>
+                  <span
+                    role="button"
                     onClick={(e) => { e.stopPropagation(); deleteCategory(cat as CafeCategory) }}
                     title="حذف دسته‌بندی"
-                    style={{
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 3,
-                      display: 'flex', alignItems: 'center',
-                      color: isActive ? 'rgba(255,255,255,0.7)' : '#DC2626',
-                    }}
+                    style={{ display: 'flex', cursor: 'pointer', color: isActive ? 'rgba(255,255,255,0.8)' : '#DC2626' }}
                   >
                     <Trash2 size={12} />
-                  </button>
-                </>
+                  </span>
+                </span>
               )}
             </div>
           )
