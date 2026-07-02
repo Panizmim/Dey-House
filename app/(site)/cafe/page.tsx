@@ -109,17 +109,14 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
 
           {/* قیمت */}
           <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '16px 18px', background: '#F7F4F1', borderRadius: 12,
-            marginTop: !item.description ? 8 : 0,
+            borderTop: '1px solid #F0EDE9',
+            paddingTop: 16, marginTop: 16,
+            display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 5,
           }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{ fontSize: 26, fontWeight: 900, color: '#8C2020', letterSpacing: '-0.03em' }}>
-                {item.price.toLocaleString('fa-IR')}
-              </span>
-              <span style={{ fontSize: 12, color: '#B8B0A8', fontWeight: 500 }}>تومان</span>
-            </div>
-            <span style={{ fontSize: 12, color: '#AAA', fontWeight: 400 }}>قیمت</span>
+            <span style={{ fontSize: 26, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.03em' }}>
+              {item.price.toLocaleString('fa-IR')}
+            </span>
+            <span style={{ fontSize: 12, color: '#B8B0A8', fontWeight: 500 }}>تومان</span>
           </div>
         </div>
       </div>
