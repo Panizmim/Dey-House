@@ -165,12 +165,12 @@ function MenuItemCard({ item, index, onClick }: { item: MenuItem; index: number;
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg bg-white text-right w-full transition-all duration-150 hover:border-[#D0A0A0] hover:shadow-sm active:scale-[0.98]"
+      className="flex items-center gap-3 p-3 border border-[#EFEFEF] bg-white text-right w-full transition-all duration-150 hover:border-[#D0A0A0] hover:shadow-sm active:scale-[0.98]"
       style={{ cursor: 'pointer' }}
     >
       {item.imageUrl && (
         <div
-          className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
+          className="w-20 h-20 overflow-hidden flex-shrink-0"
           style={{ background: gradient, position: 'relative' }}
         >
           <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
