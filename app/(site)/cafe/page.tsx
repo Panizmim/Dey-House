@@ -245,9 +245,17 @@ export default function CafePage() {
   const itemsByCategory = (catName: string) =>
     items.filter((i) => i.category === catName)
 
+  const LAST_CATS = ['تاپینگ', 'نوشیدنی ساده']
+
   const visibleCategories = loading
     ? categories
-    : categories.filter((cat) => itemsByCategory(cat.name).length > 0)
+    : categories
+        .filter((cat) => itemsByCategory(cat.name).length > 0)
+        .sort((a, b) => {
+          const aLast = LAST_CATS.includes(a.name) ? 1 : 0
+          const bLast = LAST_CATS.includes(b.name) ? 1 : 0
+          return aLast - bLast
+        })
 
   return (
     <div className="min-h-screen bg-white">
@@ -318,11 +326,8 @@ export default function CafePage() {
             return (
               <div key={cat.id}>
                 <section id={cat.id} className="mb-12 scroll-mt-36">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div>
-                      <h2 className="text-lg font-black text-[#171717]">{cat.name}</h2>
-                    </div>
-                    <div className="flex-1 h-px bg-[#EFEFEF]" />
+                  <div className="text-center mb-6">
+                    <h2 className="text-lg font-black text-[#171717]">{cat.name}</h2>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
