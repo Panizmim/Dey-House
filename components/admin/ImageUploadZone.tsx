@@ -41,53 +41,52 @@ export default function ImageUploadZone({
       {currentUrl && !preview && (
         <div style={{ marginBottom: 12 }}>
           <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', width: 200, height: 200 }}>
-            <Image
-              src={currentUrl}
-              alt="تصویر فعلی"
-              fill
-              className="object-cover"
-              style={{ borderRadius: 10 }}
-            />
+            <Image src={currentUrl} alt="تصویر فعلی" fill className="object-cover" />
+            {/* دکمه‌های overlay روی عکس */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              display: 'flex', borderTop: '1px solid rgba(255,255,255,0.15)',
+            }}>
+              {onCropExisting && (
+                <button
+                  type="button"
+                  onClick={onCropExisting}
+                  style={{
+                    flex: 1, padding: '8px 0', border: 'none', borderRight: '1px solid rgba(255,255,255,0.2)',
+                    background: 'rgba(0,0,0,0.52)', color: 'white',
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  برش
+                </button>
+              )}
+              {onDeleteExisting && (
+                <button
+                  type="button"
+                  onClick={onDeleteExisting}
+                  style={{
+                    flex: 1, padding: '8px 0', border: 'none',
+                    background: 'rgba(185,28,28,0.72)', color: 'white',
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  حذف
+                </button>
+              )}
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            {onCropExisting && (
-              <button
-                type="button"
-                onClick={onCropExisting}
-                style={{
-                  padding: '5px 12px', borderRadius: 6, border: '1px solid #8C2020',
-                  background: 'white', color: '#8C2020', fontSize: 12, fontWeight: 600,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
-                }}
-              >
-                ✂️ برش تصویر
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => status !== 'uploading' && inputRef.current?.click()}
-              style={{
-                padding: '5px 12px', borderRadius: 6, border: '1px solid #E5E5E5',
-                background: 'white', color: '#717171', fontSize: 12, fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              تغییر تصویر
-            </button>
-            {onDeleteExisting && (
-              <button
-                type="button"
-                onClick={onDeleteExisting}
-                style={{
-                  padding: '5px 12px', borderRadius: 6, border: '1px solid #FEE2E2',
-                  background: 'white', color: '#DC2626', fontSize: 12, fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                حذف تصویر
-              </button>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={() => status !== 'uploading' && inputRef.current?.click()}
+            style={{
+              marginTop: 8, padding: '4px 12px', borderRadius: 6, border: '1px solid #E5E5E5',
+              background: 'white', color: '#717171', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            تغییر تصویر
+          </button>
         </div>
       )}
 
@@ -143,37 +142,42 @@ export default function ImageUploadZone({
                 </p>
               </div>
             )}
-          </div>
 
-          {/* دکمه‌های زیر پیش‌نمایش */}
-          {status !== 'uploading' && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-              {onCropExisting && (
+            {/* دکمه‌های overlay روی پیش‌نمایش */}
+            {status !== 'uploading' && (
+              <div style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0,
+                display: 'flex', borderTop: '1px solid rgba(255,255,255,0.15)',
+              }}>
+                {onCropExisting && (
+                  <button
+                    type="button"
+                    onClick={onCropExisting}
+                    style={{
+                      flex: 1, padding: '8px 0', border: 'none', borderRight: '1px solid rgba(255,255,255,0.2)',
+                      background: 'rgba(0,0,0,0.52)', color: 'white',
+                      fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      backdropFilter: 'blur(4px)',
+                    }}
+                  >
+                    برش مجدد
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={onCropExisting}
+                  onClick={onClear}
                   style={{
-                    padding: '5px 12px', borderRadius: 6, border: '1px solid #8C2020',
-                    background: 'white', color: '#8C2020', fontSize: 12, fontWeight: 600,
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                    flex: 1, padding: '8px 0', border: 'none',
+                    background: 'rgba(185,28,28,0.72)', color: 'white',
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    backdropFilter: 'blur(4px)',
                   }}
                 >
-                  ✂️ برش مجدد
+                  حذف
                 </button>
-              )}
-              <button
-                type="button"
-                onClick={onClear}
-                style={{
-                  padding: '5px 12px', borderRadius: 6, border: '1px solid #E5E5E5',
-                  background: 'white', color: '#717171', fontSize: 12, fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                حذف تصویر
-              </button>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div
