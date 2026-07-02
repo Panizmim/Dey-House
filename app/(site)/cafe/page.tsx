@@ -111,12 +111,15 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
           <div style={{
             borderTop: '1px solid #F0EDE9',
             paddingTop: 16, marginTop: 16,
-            display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 5,
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
           }}>
-            <span style={{ fontSize: 26, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.03em' }}>
-              {item.price.toLocaleString('fa-IR')}
-            </span>
-            <span style={{ fontSize: 12, color: '#B8B0A8', fontWeight: 500 }}>تومان</span>
+            <span style={{ fontSize: 13, color: 'rgba(140,32,32,0.4)', fontWeight: 400 }}>قیمت</span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <span style={{ fontSize: 26, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.03em' }}>
+                {item.price.toLocaleString('fa-IR')}
+              </span>
+              <span style={{ fontSize: 12, color: '#B8B0A8', fontWeight: 500 }}>تومان</span>
+            </div>
           </div>
         </div>
       </div>
@@ -333,7 +336,7 @@ export default function CafePage() {
                   className="w-full text-right"
                   style={{
                     padding: '11px 0', background: 'transparent',
-                    border: 'none', borderBottom: '1px solid #F0EDE9',
+                    border: 'none',
                     cursor: 'pointer', fontSize: 13,
                     fontWeight: isActive ? 700 : 400,
                     color: isActive ? '#8C2020' : '#707070',
