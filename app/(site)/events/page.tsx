@@ -138,7 +138,7 @@ export default function EventsPage() {
             <button
               key={t}
               onClick={() => toggleType(t)}
-              className="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150"
+              className="flex-shrink-0 px-3 py-1.5 text-sm font-medium border transition-all duration-150"
               style={{
                 background: selectedTypes.includes(t) ? '#801A00' : 'white',
                 borderColor: selectedTypes.includes(t) ? '#801A00' : '#EFEFEF',
