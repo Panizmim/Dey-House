@@ -368,10 +368,13 @@ export default function CafePage() {
                   style={{
                     padding: '16px 0', background: 'transparent', border: 'none',
                     borderBottom: isOpen ? 'none' : '1px solid #F0EDE9',
-                    borderTop: '1.5px solid #1A1A1A',
+                    borderTop: '1px solid #F0EDE9',
                     cursor: 'pointer',
                   }}
                 >
+                  <h2 style={{ fontSize: 17, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.01em' }}>
+                    {cat.name}
+                  </h2>
                   <ChevronDown
                     size={17}
                     style={{
@@ -380,9 +383,6 @@ export default function CafePage() {
                       transition: 'transform 250ms ease',
                     }}
                   />
-                  <h2 style={{ fontSize: 17, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.01em' }}>
-                    {cat.name}
-                  </h2>
                 </button>
 
                 {/* آیتم‌ها — accordion body */}
@@ -391,7 +391,7 @@ export default function CafePage() {
                   overflow: 'hidden',
                   transition: isOpen ? 'max-height 420ms ease' : 'max-height 250ms ease',
                 }}>
-                  <div style={{ borderBottom: '1.5px solid #1A1A1A', paddingBottom: 0 }}>
+                  <div style={{ borderBottom: '1px solid #F0EDE9', paddingBottom: 0 }}>
                     {loading
                       ? (catItems as unknown[]).map((_, idx) => <SkeletonCard key={idx} />)
                       : (catItems as MenuItem[]).map((item, idx) => (
