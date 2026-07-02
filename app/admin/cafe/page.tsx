@@ -232,17 +232,18 @@ export default function AdminCafePage() {
           const isActive = activeTab === cat.name
           const isAll    = cat.id === '__all__'
           return (
-            <div key={cat.id} style={{ position: 'relative', flexShrink: 0 }}>
+            <div key={cat.id} style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 2 }}>
               <button
                 onClick={() => setActiveTab(cat.name)}
                 style={{
-                  padding: isAll ? '6px 14px' : '6px 14px 6px 38px',
+                  padding: '6px 14px',
                   borderRadius: 20, fontSize: 13,
                   fontWeight: isActive ? 700 : 400,
                   cursor: 'pointer', transition: 'all 0.15s',
                   background: isActive ? '#801A00' : 'white',
                   color:      isActive ? 'white' : '#404040',
                   border:     isActive ? 'none' : '1px solid #E5E5E5',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {cat.name}
@@ -253,37 +254,31 @@ export default function AdminCafePage() {
                 )}
               </button>
 
-              {/* دکمه‌های ویرایش و حذف دسته */}
               {!isAll && (
-                <div style={{
-                  position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)',
-                  display: 'flex', gap: 2,
-                }}>
+                <>
                   <button
                     onClick={(e) => { e.stopPropagation(); setEditingCat(cat as CafeCategory); setCatModal(true) }}
                     title="ویرایش دسته‌بندی"
                     style={{
-                      width: 18, height: 18, borderRadius: '50%', border: 'none', cursor: 'pointer',
-                      background: isActive ? 'rgba(255,255,255,0.25)' : '#E5E5E5',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: isActive ? 'white' : '#717171',
+                      background: 'none', border: 'none', cursor: 'pointer', padding: 3,
+                      display: 'flex', alignItems: 'center',
+                      color: isActive ? 'rgba(255,255,255,0.8)' : '#717171',
                     }}
                   >
-                    <Pencil size={10} />
+                    <Pencil size={12} />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteCategory(cat as CafeCategory) }}
                     title="حذف دسته‌بندی"
                     style={{
-                      width: 18, height: 18, borderRadius: '50%', border: 'none', cursor: 'pointer',
-                      background: isActive ? 'rgba(255,255,255,0.25)' : '#FEE2E2',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: isActive ? 'white' : '#DC2626',
+                      background: 'none', border: 'none', cursor: 'pointer', padding: 3,
+                      display: 'flex', alignItems: 'center',
+                      color: isActive ? 'rgba(255,255,255,0.7)' : '#DC2626',
                     }}
                   >
-                    <Trash2 size={10} />
+                    <Trash2 size={12} />
                   </button>
-                </div>
+                </>
               )}
             </div>
           )
