@@ -17,6 +17,7 @@ export interface CafeMenuItem {
   description: string | null
   imageUrl: string | null
   isAvailable: boolean
+  order: number
 }
 
 interface CafeItemModalProps {

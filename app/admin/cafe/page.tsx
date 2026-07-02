@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, ImageOff, X } from '@/components/ui/icons'
+import { Plus, Pencil, Trash2, ImageOff, X, ChevronUp, ChevronDown } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import CafeItemModal, { type CafeMenuItem } from '@/components/admin/CafeItemModal'
 
@@ -159,7 +159,7 @@ export default function AdminCafePage() {
   const allTabs = [{ id: '__all__', name: 'همه', order: -1 }, ...categories]
   const displayed = activeTab === 'همه'
     ? items
-    : items.filter((i) => i.category === activeTab)
+    : items.filter((i) => i.category === activeTab).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 
   async function toggleAvailability(item: CafeMenuItem) {
     const res = await fetch(`/api/admin/cafe-menu/${item.id}/toggle`, { method: 'PATCH' })
@@ -187,6 +187,44 @@ export default function AdminCafePage() {
       fetchAll()
     } else toast.error('خطا در حذف دسته‌بندی')
   }
+
+  async function moveCategory(catId: string, dir: 'up' | 'down') {
+    const idx = categories.findIndex((c) => c.id === catId)
+    if (dir === 'up' && idx === 0) return
+    if (dir === 'down' && idx === categories.length - 1) return
+    const newCats = [...categories]
+    const swap = dir === 'up' ? idx - 1 : idx + 1
+    ;[newCats[idx], newCats[swap]] = [newCats[swap], newCats[idx]]
+    const updated = newCats.map((c, i) => ({ ...c, order: i + 1 }))
+    setCategories(updated)
+    await fetch('/api/admin/cafe-categories/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orders: updated.map(({ id, order }) => ({ id, order })) }),
+    })
+  }
+
+  async function moveItem(itemId: string, dir: 'up' | 'down') {
+    const catItems = displayed
+    const idx = catItems.findIndex((i) => i.id === itemId)
+    if (dir === 'up' && idx === 0) return
+    if (dir === 'down' && idx === catItems.length - 1) return
+    const newItems = [...catItems]
+    const swap = dir === 'up' ? idx - 1 : idx + 1
+    ;[newItems[idx], newItems[swap]] = [newItems[swap], newItems[idx]]
+    const orders = newItems.map((item, i) => ({ id: item.id, order: i + 1 }))
+    setItems((prev) => {
+      const others = prev.filter((i) => i.category !== activeTab)
+      return [...others, ...newItems.map((item, i) => ({ ...item, order: i + 1 }))]
+    })
+    await fetch('/api/admin/cafe-menu/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orders }),
+    })
+  }
+
+  const isFiltered = activeTab !== 'همه'
 
   return (
     <div>
@@ -228,9 +266,10 @@ export default function AdminCafePage() {
 
       {/* تب‌های دسته‌بندی */}
       <div className="flex gap-2 pb-2 mb-5" style={{ overflowX: 'auto', scrollbarWidth: 'none' }}>
-        {allTabs.map((cat) => {
+        {allTabs.map((cat, tabIdx) => {
           const isActive = activeTab === cat.name
           const isAll    = cat.id === '__all__'
+          const realIdx  = tabIdx - 1 // چون اول "همه" داریم
           return (
             <div
               key={cat.id}
@@ -241,10 +280,38 @@ export default function AdminCafePage() {
                 background: isActive ? '#801A00' : 'white',
                 color:      isActive ? 'white' : '#404040',
                 border:     isActive ? 'none' : '1px solid #E5E5E5',
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '6px 14px', whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', gap: 4,
+                padding: '6px 12px', whiteSpace: 'nowrap',
               }}
             >
+              {/* دکمه‌های ترتیب دسته‌بندی */}
+              {!isAll && (
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); moveCategory(cat.id, 'up') }}
+                    disabled={realIdx === 0}
+                    style={{
+                      background: 'none', border: 'none', cursor: realIdx === 0 ? 'default' : 'pointer',
+                      padding: 0, lineHeight: 1, display: 'flex', color: 'inherit',
+                      opacity: realIdx === 0 ? 0.25 : 0.7,
+                    }}
+                  >
+                    <ChevronUp size={11} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); moveCategory(cat.id, 'down') }}
+                    disabled={realIdx === categories.length - 1}
+                    style={{
+                      background: 'none', border: 'none', cursor: realIdx === categories.length - 1 ? 'default' : 'pointer',
+                      padding: 0, lineHeight: 1, display: 'flex', color: 'inherit',
+                      opacity: realIdx === categories.length - 1 ? 0.25 : 0.7,
+                    }}
+                  >
+                    <ChevronDown size={11} />
+                  </button>
+                </span>
+              )}
+
               <span>
                 {cat.name}
                 {!isAll && (
@@ -279,6 +346,13 @@ export default function AdminCafePage() {
         })}
       </div>
 
+      {/* راهنمای ترتیب آیتم‌ها */}
+      {isFiltered && !loading && displayed.length > 1 && (
+        <div style={{ marginBottom: 12, padding: '8px 12px', background: '#FDF5F5', borderRadius: 8, fontSize: 12, color: '#801A00' }}>
+          برای تغییر ترتیب آیتم‌ها از دکمه‌های ↑↓ در ستون عملیات استفاده کنید
+        </div>
+      )}
+
       {/* جدول */}
       <div style={{ background: 'white', border: '1px solid #EFEFEF', borderRadius: 10, overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
@@ -310,7 +384,7 @@ export default function AdminCafePage() {
                   </td>
                 </tr>
               ) : (
-                displayed.map((item) => (
+                displayed.map((item, itemIdx) => (
                   <tr
                     key={item.id}
                     style={{ borderBottom: '1px solid #EFEFEF' }}
@@ -343,6 +417,39 @@ export default function AdminCafePage() {
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <div className="flex items-center gap-2">
+                        {/* دکمه‌های ترتیب — فقط وقتی دسته‌بندی مشخص انتخاب شده */}
+                        {isFiltered && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <button
+                              onClick={() => moveItem(item.id, 'up')}
+                              disabled={itemIdx === 0}
+                              title="انتقال به بالا"
+                              style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                width: 22, height: 18, borderRadius: 4,
+                                border: '1px solid #E5E5E5', background: 'white',
+                                cursor: itemIdx === 0 ? 'default' : 'pointer',
+                                opacity: itemIdx === 0 ? 0.3 : 1, color: '#717171',
+                              }}
+                            >
+                              <ChevronUp size={12} />
+                            </button>
+                            <button
+                              onClick={() => moveItem(item.id, 'down')}
+                              disabled={itemIdx === displayed.length - 1}
+                              title="انتقال به پایین"
+                              style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                width: 22, height: 18, borderRadius: 4,
+                                border: '1px solid #E5E5E5', background: 'white',
+                                cursor: itemIdx === displayed.length - 1 ? 'default' : 'pointer',
+                                opacity: itemIdx === displayed.length - 1 ? 0.3 : 1, color: '#717171',
+                              }}
+                            >
+                              <ChevronDown size={12} />
+                            </button>
+                          </div>
+                        )}
                         <button
                           onClick={() => { setEditingItem(item); setItemModal(true) }}
                           style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', borderRadius: 6, border: '1px solid #E5E5E5', background: 'white', fontSize: 12, color: '#717171', cursor: 'pointer', transition: 'all 0.15s' }}

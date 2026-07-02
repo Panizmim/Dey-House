@@ -10,7 +10,7 @@ async function checkAdmin() {
 
 export async function GET() {
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-  const items = await db.cafeMenuItem.findMany({ orderBy: [{ category: 'asc' }, { name: 'asc' }] })
+  const items = await db.cafeMenuItem.findMany({ orderBy: [{ category: 'asc' }, { order: 'asc' }, { name: 'asc' }] })
   return NextResponse.json(items)
 }
 
