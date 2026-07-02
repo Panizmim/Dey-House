@@ -19,10 +19,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   try {
-    const { imageUrl, showText, order } = await req.json()
+    const { imageUrl, mobileImageUrl, showText, order } = await req.json()
     const banner = await db.heroBanner.create({
       data: {
         imageUrl,
+        mobileImageUrl: mobileImageUrl ?? null,
         showText: showText ?? true,
         order:    order    ?? 0,
       },

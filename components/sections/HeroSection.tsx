@@ -4,9 +4,10 @@ import Image from 'next/image'
 import { useEffect, useState, useCallback, useRef } from 'react'
 
 type Slide = {
-  id:       string
-  imageUrl: string
-  showText: boolean
+  id:             string
+  imageUrl:       string
+  mobileImageUrl: string | null
+  showText:       boolean
 }
 
 const INTERVAL_MS = 5000
@@ -15,7 +16,15 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
   const [slides,       setSlides]       = useState<Slide[]>(initialSlides ?? [])
   const [loaded,       setLoaded]       = useState(initialSlides != null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isMobile,     setIsMobile]     = useState(false)
   const touchStartX = useRef<number>(0)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check, { passive: true })
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     if (initialSlides != null) return
@@ -73,7 +82,7 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
             style={{ opacity: index === currentIndex ? 1 : 0 }}
           >
             <Image
-              src={slide.imageUrl}
+              src={isMobile && slide.mobileImageUrl ? slide.mobileImageUrl : slide.imageUrl}
               alt=""
               fill
               className="object-cover"

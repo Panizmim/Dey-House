@@ -10,17 +10,17 @@ export const revalidate = 0
 
 export default async function HomePage() {
   const FALLBACK_BANNERS = [
-    { id: 'f1', imageUrl: '/images/hero/slide1.JPG', showText: true  },
-    { id: 'f2', imageUrl: '/images/hero/slide2.JPG', showText: false },
-    { id: 'f3', imageUrl: '/images/hero/slide3.JPG', showText: false },
+    { id: 'f1', imageUrl: '/images/hero/slide1.JPG', mobileImageUrl: null, showText: true  },
+    { id: 'f2', imageUrl: '/images/hero/slide2.JPG', mobileImageUrl: null, showText: false },
+    { id: 'f3', imageUrl: '/images/hero/slide3.JPG', mobileImageUrl: null, showText: false },
   ]
 
-  let banners: { id: string; imageUrl: string; showText: boolean }[] = []
+  let banners: { id: string; imageUrl: string; mobileImageUrl: string | null; showText: boolean }[] = []
   try {
     const rows = await db.heroBanner.findMany({
       where:   { isActive: true },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
-      select:  { id: true, imageUrl: true, showText: true },
+      select:  { id: true, imageUrl: true, mobileImageUrl: true, showText: true },
     })
     banners = rows.length > 0 ? rows : FALLBACK_BANNERS
   } catch {

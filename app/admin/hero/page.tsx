@@ -7,49 +7,111 @@ import toast from 'react-hot-toast'
 import { convertIfHeic } from '@/lib/convertHeic'
 
 type HeroBanner = {
-  id:       string
-  imageUrl: string
-  showText: boolean
-  order:    number
-  isActive: boolean
+  id:             string
+  imageUrl:       string
+  mobileImageUrl: string | null
+  showText:       boolean
+  order:          number
+  isActive:       boolean
 }
 
-const BANNER_SIZE_HINT = '۱۹۲۰ × ۱۰۸۰ پیکسل — نسبت ۱۶:۹'
+const DESKTOP_HINT = '۱۹۲۰ × ۱۰۸۰ — نسبت ۱۶:۹'
+const MOBILE_HINT  = '۱۰۸۰ × ۱۹۲۰ — نسبت ۹:۱۶'
+
+/* ─── Upload Zone ─── */
+function UploadZone({
+  preview, onFile, onClear, aspectRatio, hint, inputId,
+}: {
+  preview: string | null
+  onFile: (f: File) => void
+  onClear: () => void
+  aspectRatio: string
+  hint: string
+  inputId: string
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  return (
+    <div>
+      {preview ? (
+        <div style={{ position: 'relative' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview} alt="" style={{ width: '100%', aspectRatio, objectFit: 'cover', borderRadius: 8 }} />
+          <button
+            onClick={onClear}
+            style={{
+              position: 'absolute', top: 8, left: 8,
+              width: 28, height: 28, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.55)', border: 'none',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <X size={14} color="white" />
+          </button>
+        </div>
+      ) : (
+        <div
+          onClick={() => inputRef.current?.click()}
+          style={{
+            border: '1px dashed #E5E5E5', borderRadius: 8,
+            aspectRatio, cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+            minHeight: 80,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.background = '#FAFAFA' }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.background = 'white' }}
+        >
+          <ImagePlus size={24} color="#B0B0B0" />
+          <p style={{ fontSize: 11, color: '#B0B0B0', margin: 0 }}>{hint}</p>
+        </div>
+      )}
+      <input
+        id={inputId}
+        ref={inputRef}
+        type="file"
+        accept="image/*,.heic,.heif,.heics"
+        style={{ display: 'none' }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = '' }}
+      />
+    </div>
+  )
+}
+
+async function uploadFile(file: File): Promise<string> {
+  const converted = await convertIfHeic(file)
+  const fd = new FormData()
+  fd.append('file', converted)
+  fd.append('folder', 'hero')
+  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error((err as { error?: string }).error || 'خطا در آپلود تصویر')
+  }
+  const { url } = await res.json()
+  return url as string
+}
 
 /* ─── Add Modal ─── */
 function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const [file,     setFile]     = useState<File | null>(null)
-  const [preview,  setPreview]  = useState<string | null>(null)
-  const [showText, setShowText] = useState(true)
-  const [saving,   setSaving]   = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  function handleFile(f: File) {
-    setFile(f)
-    setPreview(URL.createObjectURL(f))
-  }
+  const [desktopFile,    setDesktopFile]    = useState<File | null>(null)
+  const [desktopPreview, setDesktopPreview] = useState<string | null>(null)
+  const [mobileFile,     setMobileFile]     = useState<File | null>(null)
+  const [mobilePreview,  setMobilePreview]  = useState<string | null>(null)
+  const [showText,       setShowText]       = useState(true)
+  const [saving,         setSaving]         = useState(false)
 
   async function handleSave() {
-    if (!file) { toast.error('لطفاً یک تصویر انتخاب کنید'); return }
+    if (!desktopFile) { toast.error('لطفاً تصویر دسکتاپ را انتخاب کنید'); return }
     setSaving(true)
     try {
-      const converted = await convertIfHeic(file)
-      const fd = new FormData()
-      fd.append('file', converted)
-      fd.append('folder', 'hero')
-      toast.loading('در حال آپلود تصویر...', { id: 'hero-upload' })
-      const uploadRes = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+      toast.loading('در حال آپلود...', { id: 'hero-upload' })
+      const desktopUrl = await uploadFile(desktopFile)
+      const mobileUrl  = mobileFile ? await uploadFile(mobileFile) : null
       toast.dismiss('hero-upload')
-      if (!uploadRes.ok) {
-        const errData = await uploadRes.json().catch(() => ({}))
-        throw new Error((errData as { error?: string }).error || 'خطا در آپلود تصویر')
-      }
-      const { url } = await uploadRes.json()
 
       const res = await fetch('/api/admin/hero-banners', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ imageUrl: url, showText }),
+        body:    JSON.stringify({ imageUrl: desktopUrl, mobileImageUrl: mobileUrl, showText }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -59,6 +121,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
       onSaved()
       onClose()
     } catch (e) {
+      toast.dismiss('hero-upload')
       toast.error(e instanceof Error ? e.message : 'خطا در ذخیره')
     } finally {
       setSaving(false)
@@ -67,7 +130,7 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.45)' }}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F0]">
           <h2 style={{ fontSize: 16, fontWeight: 700, color: '#171717' }}>افزودن بنر هیرو</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#717171' }}>
@@ -75,56 +138,41 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
           </button>
         </div>
 
-        <div className="px-6 py-5 flex flex-col gap-4">
-          {/* آپلود تصویر */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#404040' }}>تصویر بنر *</label>
-              <span style={{ fontSize: 11, color: '#801A00', background: '#FDF5F5', padding: '2px 8px', borderRadius: 4 }}>
-                {BANNER_SIZE_HINT}
-              </span>
+        <div className="px-6 py-5 flex flex-col gap-5">
+          {/* دو ستون آپلود */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* دسکتاپ */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label style={{ fontSize: 13, fontWeight: 700, color: '#404040' }}>دسکتاپ *</label>
+                <span style={{ fontSize: 10, color: '#801A00', background: '#FDF5F5', padding: '1px 6px', borderRadius: 4 }}>{DESKTOP_HINT}</span>
+              </div>
+              <UploadZone
+                preview={desktopPreview}
+                onFile={(f) => { setDesktopFile(f); setDesktopPreview(URL.createObjectURL(f)) }}
+                onClear={() => { setDesktopFile(null); setDesktopPreview(null) }}
+                aspectRatio="16/9"
+                hint={DESKTOP_HINT}
+                inputId="hero-desktop"
+              />
             </div>
-
-            {preview ? (
-              <div style={{ position: 'relative' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={preview} alt="" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: 8 }} />
-                <button
-                  onClick={() => { setFile(null); setPreview(null) }}
-                  style={{
-                    position: 'absolute', top: 8, left: 8,
-                    width: 28, height: 28, borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.55)', border: 'none',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <X size={14} color="white" />
-                </button>
+            {/* موبایل */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label style={{ fontSize: 13, fontWeight: 700, color: '#404040' }}>موبایل</label>
+                <span style={{ fontSize: 10, color: '#555', background: '#F5F5F5', padding: '1px 6px', borderRadius: 4 }}>{MOBILE_HINT}</span>
               </div>
-            ) : (
-              <div
-                onClick={() => inputRef.current?.click()}
-                style={{
-                  border: '1px dashed #E5E5E5', borderRadius: 8,
-                  aspectRatio: '16/9', cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#801A00'; e.currentTarget.style.background = '#FAFAFA' }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.background = 'white' }}
-              >
-                <ImagePlus size={28} color="#B0B0B0" />
-                <p style={{ fontSize: 13, color: '#717171', margin: 0 }}>انتخاب تصویر</p>
-                <p style={{ fontSize: 11, color: '#B0B0B0', margin: 0 }}>{BANNER_SIZE_HINT}</p>
-              </div>
-            )}
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*,.heic,.heif,.heics"
-              style={{ display: 'none' }}
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
-            />
+              <UploadZone
+                preview={mobilePreview}
+                onFile={(f) => { setMobileFile(f); setMobilePreview(URL.createObjectURL(f)) }}
+                onClear={() => { setMobileFile(null); setMobilePreview(null) }}
+                aspectRatio="9/16"
+                hint={MOBILE_HINT}
+                inputId="hero-mobile"
+              />
+            </div>
           </div>
+          <p style={{ fontSize: 11, color: '#A0A0A0', margin: '-8px 0 0' }}>اگر تصویر موبایل انتخاب نشود، تصویر دسکتاپ برای هر دو استفاده می‌شود.</p>
 
           {/* حالت نمایش متن */}
           <div
@@ -169,8 +217,8 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
           </button>
           <button
             onClick={handleSave}
-            disabled={saving || !file}
-            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: (saving || !file) ? 0.5 : 1 }}
+            disabled={saving || !desktopFile}
+            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: (saving || !desktopFile) ? 0.5 : 1 }}
           >
             {saving ? 'در حال ذخیره...' : 'ذخیره'}
           </button>
@@ -220,7 +268,7 @@ export default function AdminHeroPage() {
           <h1 style={{ fontSize: 18, fontWeight: 800, color: '#171717', marginBottom: 4 }}>هیرو سکشن</h1>
           <p style={{ fontSize: 13, color: '#717171' }}>
             بنرهای اسلایدر صفحه اصلی را مدیریت کنید —{' '}
-            <span style={{ color: '#801A00', fontWeight: 600 }}>سایز توصیه‌شده: {BANNER_SIZE_HINT}</span>
+            <span style={{ color: '#801A00', fontWeight: 600 }}>دسکتاپ: {DESKTOP_HINT} &nbsp;|&nbsp; موبایل: {MOBILE_HINT}</span>
           </p>
         </div>
         <button
@@ -263,10 +311,9 @@ export default function AdminHeroPage() {
                 opacity: banner.isActive ? 1 : 0.55,
               }}
             >
-              {/* تصویر */}
+              {/* تصویر دسکتاپ */}
               <div style={{ position: 'relative', aspectRatio: '16/9' }}>
                 <Image src={banner.imageUrl} alt="" fill className="object-cover" />
-                {/* badge حالت */}
                 <div style={{
                   position: 'absolute', top: 8, right: 8,
                   background: banner.showText ? 'rgba(139,30,30,0.85)' : 'rgba(0,0,0,0.65)',
@@ -285,6 +332,15 @@ export default function AdminHeroPage() {
                     غیرفعال
                   </div>
                 )}
+                {/* نشانگر موبایل */}
+                <div style={{
+                  position: 'absolute', bottom: 8, left: 8,
+                  background: banner.mobileImageUrl ? 'rgba(22,163,74,0.85)' : 'rgba(0,0,0,0.45)',
+                  color: 'white', fontSize: 10, fontWeight: 600,
+                  padding: '2px 7px', borderRadius: 4,
+                }}>
+                  {banner.mobileImageUrl ? 'موبایل ✓' : 'موبایل: دسکتاپ'}
+                </div>
               </div>
 
               {/* اکشن‌ها */}

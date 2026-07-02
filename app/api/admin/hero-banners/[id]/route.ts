@@ -15,9 +15,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const banner = await db.heroBanner.update({
       where: { id: params.id },
       data: {
-        showText: body.showText !== undefined ? body.showText : undefined,
-        isActive: body.isActive !== undefined ? body.isActive : undefined,
-        order:    body.order    !== undefined ? body.order    : undefined,
+        showText:       body.showText       !== undefined ? body.showText       : undefined,
+        isActive:       body.isActive       !== undefined ? body.isActive       : undefined,
+        order:          body.order          !== undefined ? body.order          : undefined,
+        mobileImageUrl: body.mobileImageUrl !== undefined ? body.mobileImageUrl : undefined,
       },
     })
     revalidatePath('/')

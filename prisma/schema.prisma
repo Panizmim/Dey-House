@@ -131,12 +131,13 @@ model GalleryImage {
 }
 
 model HeroBanner {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  showText  Boolean  @default(true)
-  order     Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  imageUrl       String
+  mobileImageUrl String?
+  showText       Boolean  @default(true)
+  order          Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
 
   @@index([isActive])
   @@index([order])
