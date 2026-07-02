@@ -15,20 +15,7 @@ type MenuItem = {
   isAvailable: boolean
 }
 
-const categories = [
-  { id: 'cat-espresso-hot',  title: 'نوشیدنی گرم بر پایه اسپرسو' },
-  { id: 'cat-espresso-cold', title: 'نوشیدنی سرد بر پایه اسپرسو' },
-  { id: 'cat-tea',           title: 'چای و دمنوش'                 },
-  { id: 'cat-hot',           title: 'نوشیدنی گرم'                 },
-  { id: 'cat-cold',          title: 'نوشیدنی سرد'                 },
-  { id: 'cat-simple',        title: 'نوشیدنی ساده'                },
-  { id: 'cat-snacks',        title: 'میان وعده'                   },
-  { id: 'cat-salad',         title: 'سالاد'                       },
-  { id: 'cat-sandwich',      title: 'ساندویچ'                     },
-  { id: 'cat-pasta',         title: 'پاستا'                       },
-  { id: 'cat-plate',         title: 'بشقاب'                       },
-  { id: 'cat-topping',       title: 'تاپینگ'                      },
-]
+type Category = { id: string; name: string; order: number }
 
 
 const placeholderGradients = [
@@ -209,8 +196,9 @@ function SkeletonCard() {
 
 export default function CafePage() {
   const [items,         setItems]         = useState<MenuItem[]>([])
+  const [categories,    setCategories]    = useState<Category[]>([])
   const [loading,       setLoading]       = useState(true)
-  const [activeSection, setActiveSection] = useState(categories[0].id)
+  const [activeSection, setActiveSection] = useState('')
   const [selected,      setSelected]      = useState<{ item: MenuItem; index: number } | null>(null)
   const navScrollRef = useRef<HTMLDivElement>(null)
 
@@ -224,10 +212,16 @@ export default function CafePage() {
   }, [activeSection])
 
   useEffect(() => {
-    fetch('/api/cafe-menu')
-      .then((r) => r.json())
-      .then((data: MenuItem[]) => setItems(Array.isArray(data) ? data : []))
-      .catch(() => setItems([]))
+    Promise.all([
+      fetch('/api/cafe-menu').then((r) => r.json()),
+      fetch('/api/cafe-categories').then((r) => r.json()),
+    ])
+      .then(([menuData, catData]: [MenuItem[], Category[]]) => {
+        setItems(Array.isArray(menuData) ? menuData : [])
+        setCategories(Array.isArray(catData) ? catData : [])
+        if (Array.isArray(catData) && catData.length > 0) setActiveSection(catData[0].id)
+      })
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
@@ -246,14 +240,14 @@ export default function CafePage() {
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
-  }, [loading])
+  }, [loading, categories])
 
-  const itemsByCategory = (catTitle: string) =>
-    items.filter((i) => i.category === catTitle)
+  const itemsByCategory = (catName: string) =>
+    items.filter((i) => i.category === catName)
 
   const visibleCategories = loading
     ? categories
-    : categories.filter((cat) => itemsByCategory(cat.title).length > 0)
+    : categories.filter((cat) => itemsByCategory(cat.name).length > 0)
 
   return (
     <div className="min-h-screen bg-white">
@@ -279,7 +273,7 @@ export default function CafePage() {
                   : 'bg-white border-[#EFEFEF] text-[#404040]'
               }`}
             >
-              {cat.title}
+              {cat.name}
             </button>
           ))}
         </div>
@@ -306,7 +300,7 @@ export default function CafePage() {
                   }}
                 >
                   <span style={{ fontSize: '14px', fontWeight: 700, color: isActive ? '#801A00' : '#171717' }}>
-                    {cat.title}
+                    {cat.name}
                   </span>
                 </button>
               )
@@ -319,14 +313,14 @@ export default function CafePage() {
           {visibleCategories.map((cat) => {
             const catItems = loading
               ? Array.from({ length: 4 })
-              : itemsByCategory(cat.title)
+              : itemsByCategory(cat.name)
 
             return (
               <div key={cat.id}>
                 <section id={cat.id} className="mb-12 scroll-mt-36">
                   <div className="flex items-center gap-4 mb-6">
                     <div>
-                      <h2 className="text-lg font-black text-[#171717]">{cat.title}</h2>
+                      <h2 className="text-lg font-black text-[#171717]">{cat.name}</h2>
                     </div>
                     <div className="flex-1 h-px bg-[#EFEFEF]" />
                   </div>
