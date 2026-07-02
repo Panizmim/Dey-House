@@ -13,12 +13,13 @@ interface ImageUploadZoneProps {
   onFileSelect: (file: File) => void
   onClear: () => void
   onCropExisting?: () => void
+  onDeleteExisting?: () => void
   status?: UploadStatus
   errorMessage?: string | null
 }
 
 export default function ImageUploadZone({
-  currentUrl, preview, onFileSelect, onClear, onCropExisting,
+  currentUrl, preview, onFileSelect, onClear, onCropExisting, onDeleteExisting,
   status = 'idle', errorMessage,
 }: ImageUploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -73,6 +74,19 @@ export default function ImageUploadZone({
             >
               تغییر تصویر
             </button>
+            {onDeleteExisting && (
+              <button
+                type="button"
+                onClick={onDeleteExisting}
+                style={{
+                  padding: '5px 12px', borderRadius: 6, border: '1px solid #FEE2E2',
+                  background: 'white', color: '#DC2626', fontSize: 12, fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                حذف تصویر
+              </button>
+            )}
           </div>
         </div>
       )}

@@ -44,14 +44,15 @@ async function uploadImage(file: File): Promise<string> {
 type Mode = 'form' | 'crop'
 
 export default function CafeItemModal({ open, item, categories = [], onClose, onSave }: CafeItemModalProps) {
-  const [mode,         setMode]         = useState<Mode>('form')
-  const [loading,      setLoading]      = useState(false)
-  const [cropLoading,  setCropLoading]  = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [imageUrl,     setImageUrl]     = useState<string | null>(null)
-  const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
-  const [cropSrc,      setCropSrc]      = useState<string | null>(null)
-  const [cropArea,     setCropArea]     = useState<Area | null>(null)
+  const [mode,          setMode]         = useState<Mode>('form')
+  const [loading,       setLoading]      = useState(false)
+  const [cropLoading,   setCropLoading]  = useState(false)
+  const [imagePreview,  setImagePreview] = useState<string | null>(null)
+  const [imageUrl,      setImageUrl]     = useState<string | null>(null)
+  const [imageStatus,   setImageStatus]  = useState<UploadStatus>('idle')
+  const [imageDeleted,  setImageDeleted] = useState(false)
+  const [cropSrc,       setCropSrc]      = useState<string | null>(null)
+  const [cropArea,      setCropArea]     = useState<Area | null>(null)
   const [form, setForm] = useState({
     name: '', price: '', category: categories[0] ?? '', description: '', isAvailable: true,
   })
@@ -62,6 +63,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
     setImagePreview(null)
     setImageUrl(null)
     setImageStatus('idle')
+    setImageDeleted(false)
     setCropSrc(null)
     setCropArea(null)
     if (item) {
@@ -120,7 +122,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
 
     setLoading(true)
     try {
-      const finalImageUrl = imageUrl ?? item?.imageUrl ?? null
+      const finalImageUrl = imageDeleted ? null : (imageUrl ?? item?.imageUrl ?? null)
       const body = {
         name:        form.name,
         price,
@@ -254,13 +256,19 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
           <div>
             <label className={labelClass}>تصویر آیتم</label>
             <ImageUploadZone
-              currentUrl={imageUrl ?? item?.imageUrl}
+              currentUrl={imageDeleted ? null : (imageUrl ?? item?.imageUrl)}
               preview={imagePreview}
               status={imageStatus}
-              onFileSelect={(file) => openCropFor(URL.createObjectURL(file))}
+              onFileSelect={(file) => { setImageDeleted(false); openCropFor(URL.createObjectURL(file)) }}
               onCropExisting={() => {
                 const src = imageUrl ?? imagePreview ?? item?.imageUrl ?? null
                 if (src) openCropFor(src)
+              }}
+              onDeleteExisting={() => {
+                setImageDeleted(true)
+                setImagePreview(null)
+                setImageUrl(null)
+                setImageStatus('idle')
               }}
               onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
             />
