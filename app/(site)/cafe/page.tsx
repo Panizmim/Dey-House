@@ -115,7 +115,7 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
           }}>
             <span style={{ fontSize: 13, color: 'rgba(140,32,32,0.4)', fontWeight: 400 }}>قیمت</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{ fontSize: 26, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.03em' }}>
+              <span style={{ fontSize: 26, fontWeight: 900, color: '#B8B0A8', letterSpacing: '-0.03em' }}>
                 {item.price.toLocaleString('fa-IR')}
               </span>
               <span style={{ fontSize: 12, color: '#B8B0A8', fontWeight: 500 }}>تومان</span>
