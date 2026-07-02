@@ -66,17 +66,17 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', animation: 'fadeInOverlay 180ms ease' }}
       onClick={onClose}
     >
       <div
-        className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[82vh] sm:max-h-[90vh]"
+        className="bg-white w-full max-w-md rounded-2xl overflow-hidden max-h-[90vh]"
         style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', overflowY: 'auto' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* تصویر / پلیس‌هولدر */}
-        <div className="relative w-full aspect-[4/3] sm:aspect-square" style={{ background: gradient, flexShrink: 0 }}>
+        <div className="relative w-full aspect-square" style={{ background: gradient, flexShrink: 0 }}>
           {item.imageUrl && (
             <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
           )}
