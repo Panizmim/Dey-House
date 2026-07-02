@@ -176,6 +176,33 @@ export default function EventsPage() {
         {/* ─── Sidebar ─── */}
         <aside style={{ position: 'sticky', top: 96 }}>
 
+          {/* فقط رویدادهای فعال */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>فقط رویدادهای فعال</span>
+            <button
+              onClick={() => setActiveOnly(!activeOnly)}
+              role="switch"
+              aria-checked={activeOnly}
+              style={{
+                width: 42, height: 24, borderRadius: 12,
+                background: activeOnly ? '#801A00' : '#D0D0D0',
+                border: 'none', cursor: 'pointer', position: 'relative',
+                transition: 'background 200ms', flexShrink: 0,
+              }}
+            >
+              <span style={{
+                position: 'absolute', top: 4,
+                right: activeOnly ? 4 : undefined,
+                left:  activeOnly ? undefined : 4,
+                width: 16, height: 16, borderRadius: '50%', background: 'white',
+                transition: 'right 200ms, left 200ms',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }} />
+            </button>
+          </div>
+
+          <div style={{ height: 1, background: '#F0F0F0', marginBottom: 20 }} />
+
           {/* نوع رویداد */}
           <div style={{ marginBottom: 20 }}>
             <button
@@ -209,33 +236,6 @@ export default function EventsPage() {
                 ))}
               </div>
             )}
-          </div>
-
-          <div style={{ height: 1, background: '#F0F0F0', marginBottom: 20 }} />
-
-          {/* فقط رویدادهای فعال */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#171717' }}>فقط رویدادهای فعال</span>
-            <button
-              onClick={() => setActiveOnly(!activeOnly)}
-              role="switch"
-              aria-checked={activeOnly}
-              style={{
-                width: 42, height: 24, borderRadius: 12,
-                background: activeOnly ? '#801A00' : '#D0D0D0',
-                border: 'none', cursor: 'pointer', position: 'relative',
-                transition: 'background 200ms', flexShrink: 0,
-              }}
-            >
-              <span style={{
-                position: 'absolute', top: 4,
-                right: activeOnly ? 4 : undefined,
-                left:  activeOnly ? undefined : 4,
-                width: 16, height: 16, borderRadius: '50%', background: 'white',
-                transition: 'right 200ms, left 200ms',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-              }} />
-            </button>
           </div>
 
           {hasFilters && (
