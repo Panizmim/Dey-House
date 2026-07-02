@@ -18,10 +18,11 @@ type Gallery = {
   startDate:   string
   endDate:     string
   status:      string
-  coverImage:  string | null
-  images:      string
-  venueImages: string
-  isActive:    boolean
+  coverImage:    string | null
+  pdpCoverImage: string | null
+  images:        string
+  venueImages:   string
+  isActive:      boolean
 }
 
 const statusLabel: Record<string, string> = {
@@ -147,9 +148,12 @@ function GalleryModal({
   const [startDate,   setStartDate]   = useState<Date | null>(null)
   const [endDate,     setEndDate]     = useState<Date | null>(null)
   const [status,      setStatus]      = useState('UPCOMING')
-  const [coverPreview,    setCoverPreview]    = useState<string | null>(null)
-  const [coverUrl,        setCoverUrl]        = useState<string | null>(null)
-  const [coverStatus,     setCoverStatus]     = useState<UploadStatus>('idle')
+  const [coverPreview,       setCoverPreview]       = useState<string | null>(null)
+  const [coverUrl,           setCoverUrl]           = useState<string | null>(null)
+  const [coverStatus,        setCoverStatus]        = useState<UploadStatus>('idle')
+  const [pdpCoverPreview,    setPdpCoverPreview]    = useState<string | null>(null)
+  const [pdpCoverUrl,        setPdpCoverUrl]        = useState<string | null>(null)
+  const [pdpCoverStatus,     setPdpCoverStatus]     = useState<UploadStatus>('idle')
   const [showStartPicker, setShowStartPicker] = useState(false)
   const [showEndPicker,   setShowEndPicker]   = useState(false)
   const [startStyle,      setStartStyle]      = useState<React.CSSProperties>({})
@@ -176,6 +180,9 @@ function GalleryModal({
       setCoverPreview(null)
       setCoverUrl(null)
       setCoverStatus('idle')
+      setPdpCoverPreview(null)
+      setPdpCoverUrl(null)
+      setPdpCoverStatus('idle')
       setShowStartPicker(false)
       setShowEndPicker(false)
       setArtworkUrls(gallery ? JSON.parse(gallery.images || '[]') : [])
@@ -227,6 +234,16 @@ function GalleryModal({
       .catch(() => { setCoverStatus('error') })
   }
 
+  function handlePdpCoverFile(file: File) {
+    const preview = URL.createObjectURL(file)
+    setPdpCoverPreview(preview)
+    setPdpCoverUrl(null)
+    setPdpCoverStatus('uploading')
+    doUpload(file, 'galleries/pdp')
+      .then((url) => { setPdpCoverUrl(url); setPdpCoverStatus('success') })
+      .catch(() => { setPdpCoverStatus('error') })
+  }
+
   function addArtworkFiles(files: FileList) {
     Array.from(files).forEach((file) => {
       const id      = `${Date.now()}-${Math.random()}`
@@ -263,6 +280,7 @@ function GalleryModal({
     }
     const pendingUploads = [
       coverStatus === 'uploading',
+      pdpCoverStatus === 'uploading',
       artworkSlots.some((s) => s.status === 'uploading'),
       venueSlots.some((s) => s.status === 'uploading'),
     ]
@@ -272,6 +290,7 @@ function GalleryModal({
     }
     const failedUploads = [
       coverStatus === 'error',
+      pdpCoverStatus === 'error',
       artworkSlots.some((s) => s.status === 'error'),
       venueSlots.some((s) => s.status === 'error'),
     ]
@@ -282,7 +301,8 @@ function GalleryModal({
 
     setSaving(true)
     try {
-      const coverImage = coverUrl ?? gallery?.coverImage ?? null
+      const coverImage    = coverUrl    ?? gallery?.coverImage    ?? null
+      const pdpCoverImage = pdpCoverUrl ?? gallery?.pdpCoverImage ?? null
       const newArtworkUrls = artworkSlots.filter((s) => s.url).map((s) => s.url!)
       const newVenueUrls   = venueSlots.filter((s) => s.url).map((s) => s.url!)
 
@@ -290,7 +310,7 @@ function GalleryModal({
         title, artistName, description,
         startDate:   startDate.toISOString(),
         endDate:     endDate.toISOString(),
-        status, coverImage,
+        status, coverImage, pdpCoverImage,
         images:      JSON.stringify([...artworkUrls, ...newArtworkUrls]),
         venueImages: JSON.stringify([...venueUrls,   ...newVenueUrls]),
       }
@@ -406,13 +426,24 @@ function GalleryModal({
             </div>
 
             <div>
-              <label className={labelClass}>تصویر کاور</label>
+              <label className={labelClass}>تصویر کاور — هوم‌پیج (مربعی ۱:۱)</label>
               <ImageUploadZone
                 currentUrl={gallery?.coverImage}
                 preview={coverPreview}
                 status={coverStatus}
                 onFileSelect={handleCoverFile}
                 onClear={() => { setCoverPreview(null); setCoverUrl(null); setCoverStatus('idle') }}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>تصویر کاور — صفحه نمایشگاه (نسبت A4 — ۲۱۰۰ × ۲۹۷۰ پیکسل)</label>
+              <ImageUploadZone
+                currentUrl={gallery?.pdpCoverImage}
+                preview={pdpCoverPreview}
+                status={pdpCoverStatus}
+                onFileSelect={handlePdpCoverFile}
+                onClear={() => { setPdpCoverPreview(null); setPdpCoverUrl(null); setPdpCoverStatus('idle') }}
               />
             </div>
 

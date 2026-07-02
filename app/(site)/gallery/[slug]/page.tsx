@@ -17,9 +17,10 @@ type GalleryDetail = {
   startDate:   string
   endDate:     string
   status:      string
-  coverImage:  string | null
-  images:      string
-  venueImages: string
+  coverImage:    string | null
+  pdpCoverImage: string | null
+  images:        string
+  venueImages:   string
 }
 
 function formatJalali(dateStr: string, withYear = true) {
@@ -74,11 +75,14 @@ export default function GalleryDetailPage() {
 
       {/* ─── header + cover ─── */}
       <div className="flex gap-6 mb-8 items-start">
-        {/* کاور — سمت راست در RTL (اول در DOM) */}
-        {gallery.coverImage && (
-          <div className="relative flex-shrink-0 w-[190px] h-[190px] md:w-[300px] md:h-[300px]">
+        {/* کاور PDP — نسبت A4 — سمت راست در RTL (اول در DOM) */}
+        {(gallery.pdpCoverImage ?? gallery.coverImage) && (
+          <div
+            className="relative flex-shrink-0"
+            style={{ width: 'clamp(120px, 20vw, 212px)', aspectRatio: '210 / 297' }}
+          >
             <Image
-              src={gallery.coverImage}
+              src={(gallery.pdpCoverImage ?? gallery.coverImage)!}
               alt={gallery.title}
               fill
               className="object-cover"

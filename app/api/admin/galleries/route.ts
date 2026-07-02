@@ -22,20 +22,21 @@ export async function POST(req: NextRequest) {
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   try {
     const body = await req.json()
-    const { title, artistName, description, startDate, endDate, status, coverImage, images, venueImages } = body
+    const { title, artistName, description, startDate, endDate, status, coverImage, pdpCoverImage, images, venueImages } = body
 
     const gallery = await db.gallery.create({
       data: {
         title,
         artistName,
-        slug:        slugify(title),
-        description: description || null,
-        startDate:   new Date(startDate),
-        endDate:     new Date(endDate),
-        status:      status || 'UPCOMING',
-        coverImage:  coverImage || null,
-        images:      images      || '[]',
-        venueImages: venueImages || '[]',
+        slug:          slugify(title),
+        description:   description || null,
+        startDate:     new Date(startDate),
+        endDate:       new Date(endDate),
+        status:        status || 'UPCOMING',
+        coverImage:    coverImage    || null,
+        pdpCoverImage: pdpCoverImage || null,
+        images:        images        || '[]',
+        venueImages:   venueImages   || '[]',
       },
     })
     return NextResponse.json(gallery)

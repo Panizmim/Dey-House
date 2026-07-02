@@ -152,8 +152,9 @@ model Gallery {
   startDate   DateTime
   endDate     DateTime
   status      String   @default("UPCOMING")
-  coverImage  String?
-  images      String   @default("[]")
+  coverImage    String?
+  pdpCoverImage String?
+  images        String   @default("[]")
   venueImages String   @default("[]")
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())

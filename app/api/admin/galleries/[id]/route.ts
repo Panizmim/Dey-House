@@ -12,21 +12,22 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   try {
     const body = await req.json()
-    const { title, artistName, description, startDate, endDate, status, coverImage, isActive, images, venueImages } = body
+    const { title, artistName, description, startDate, endDate, status, coverImage, pdpCoverImage, isActive, images, venueImages } = body
 
     const gallery = await db.gallery.update({
       where: { id: params.id },
       data: {
         title,
         artistName,
-        description: description || null,
-        startDate:   new Date(startDate),
-        endDate:     new Date(endDate),
-        status:      status || 'UPCOMING',
-        coverImage:  coverImage || null,
-        isActive:    isActive !== undefined ? !!isActive : undefined,
-        images:      images      !== undefined ? images      : undefined,
-        venueImages: venueImages !== undefined ? venueImages : undefined,
+        description:   description || null,
+        startDate:     new Date(startDate),
+        endDate:       new Date(endDate),
+        status:        status || 'UPCOMING',
+        coverImage:    coverImage    !== undefined ? coverImage    || null : undefined,
+        pdpCoverImage: pdpCoverImage !== undefined ? pdpCoverImage || null : undefined,
+        isActive:      isActive !== undefined ? !!isActive : undefined,
+        images:        images      !== undefined ? images      : undefined,
+        venueImages:   venueImages !== undefined ? venueImages : undefined,
       },
     })
     return NextResponse.json(gallery)
