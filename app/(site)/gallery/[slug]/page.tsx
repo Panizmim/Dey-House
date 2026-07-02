@@ -77,13 +77,12 @@ export default function GalleryDetailPage() {
       <div className="flex gap-6 mb-8 items-start">
         {/* کاور PDP — نسبت A4 — سمت راست در RTL (اول در DOM) */}
         {(gallery.pdpCoverImage ?? gallery.coverImage) && (
-          <div className="relative flex-shrink-0 w-[150px] h-[212px] md:w-[240px] md:h-[340px]" style={{ overflow: 'hidden' }}>
-            <Image
+          <div className="flex-shrink-0 w-[150px] h-[212px] md:w-[240px] md:h-[340px]" style={{ overflow: 'hidden' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={(gallery.pdpCoverImage ?? gallery.coverImage)!}
               alt={gallery.title}
-              fill
-              className="object-cover"
-              priority
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
         )}
