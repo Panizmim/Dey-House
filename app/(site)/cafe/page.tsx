@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { createPortal } from 'react-dom'
+import { ChevronDown } from '@/components/ui/icons'
 import PageHero from '@/components/ui/PageHero'
 
 type MenuItem = {
@@ -60,7 +61,7 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
         style={{
           maxHeight: '88vh', overflowY: 'auto',
           animation: 'pdpSlideUp 280ms cubic-bezier(0.22,1,0.36,1)',
-          position: 'relative', borderRadius: 20,
+          position: 'relative', borderRadius: 0,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -206,12 +207,27 @@ function SkeletonCard() {
 
 /* ─── صفحه اصلی ─── */
 export default function CafePage() {
-  const [items,         setItems]         = useState<MenuItem[]>([])
-  const [categories,    setCategories]    = useState<Category[]>([])
-  const [loading,       setLoading]       = useState(true)
-  const [activeSection, setActiveSection] = useState('')
-  const [selected,      setSelected]      = useState<{ item: MenuItem; index: number } | null>(null)
+  const [items,          setItems]          = useState<MenuItem[]>([])
+  const [categories,     setCategories]     = useState<Category[]>([])
+  const [loading,        setLoading]        = useState(true)
+  const [activeSection,  setActiveSection]  = useState('')
+  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
+  const [selected,       setSelected]       = useState<{ item: MenuItem; index: number } | null>(null)
   const navScrollRef = useRef<HTMLDivElement>(null)
+
+  function toggleCategory(id: string) {
+    setOpenCategories((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function openAndScroll(id: string) {
+    setOpenCategories((prev) => { const next = new Set(prev); next.add(id); return next })
+    setActiveSection(id)
+    scrollToSection(id)
+  }
 
   useEffect(() => {
     const nav = navScrollRef.current
@@ -288,7 +304,7 @@ export default function CafePage() {
               <button
                 key={cat.id}
                 data-cat={cat.id}
-                onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
+                onClick={() => openAndScroll(cat.id)}
                 style={{
                   flexShrink: 0, padding: '13px 14px',
                   background: 'transparent', border: 'none',
@@ -316,7 +332,7 @@ export default function CafePage() {
               return (
                 <button
                   key={cat.id}
-                  onClick={() => { setActiveSection(cat.id); scrollToSection(cat.id) }}
+                  onClick={() => openAndScroll(cat.id)}
                   className="w-full text-right"
                   style={{
                     padding: '11px 0', background: 'transparent',
@@ -337,33 +353,59 @@ export default function CafePage() {
         {/* ── محتوا ── */}
         <main style={{ flex: 1, minWidth: 0 }}>
           {visibleCategories.map((cat) => {
+            const isOpen   = openCategories.has(cat.id)
             const catItems = loading
               ? Array.from({ length: 5 })
               : itemsByCategory(cat.name)
 
             return (
-              <section key={cat.id} id={cat.id} className="mb-14 scroll-mt-36">
+              <section key={cat.id} id={cat.id} className="scroll-mt-36" style={{ marginBottom: isOpen ? 56 : 0 }}>
 
-                {/* هدر دسته‌بندی */}
-                <div style={{ paddingBottom: 12, marginBottom: 0, borderBottom: '1.5px solid #1A1A1A' }}>
+                {/* هدر accordion */}
+                <button
+                  onClick={() => toggleCategory(cat.id)}
+                  className="w-full flex items-center justify-between"
+                  style={{
+                    padding: '16px 0', background: 'transparent', border: 'none',
+                    borderBottom: isOpen ? 'none' : '1px solid #F0EDE9',
+                    borderTop: '1.5px solid #1A1A1A',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <ChevronDown
+                    size={17}
+                    style={{
+                      color: '#1A1A1A', flexShrink: 0,
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 250ms ease',
+                    }}
+                  />
                   <h2 style={{ fontSize: 17, fontWeight: 900, color: '#1A1A1A', letterSpacing: '-0.01em' }}>
                     {cat.name}
                   </h2>
-                </div>
+                </button>
 
-                {/* آیتم‌ها */}
-                {loading
-                  ? (catItems as unknown[]).map((_, idx) => <SkeletonCard key={idx} />)
-                  : (catItems as MenuItem[]).map((item, idx) => (
-                      <MenuItemCard
-                        key={item.id}
-                        item={item}
-                        index={idx}
-                        onClick={() => setSelected({ item, index: idx })}
-                        isLast={idx === (catItems as MenuItem[]).length - 1}
-                      />
-                    ))
-                }
+                {/* آیتم‌ها — accordion body */}
+                <div style={{
+                  maxHeight: isOpen ? '4000px' : '0',
+                  overflow: 'hidden',
+                  transition: isOpen ? 'max-height 420ms ease' : 'max-height 250ms ease',
+                }}>
+                  <div style={{ borderBottom: '1.5px solid #1A1A1A', paddingBottom: 0 }}>
+                    {loading
+                      ? (catItems as unknown[]).map((_, idx) => <SkeletonCard key={idx} />)
+                      : (catItems as MenuItem[]).map((item, idx) => (
+                          <MenuItemCard
+                            key={item.id}
+                            item={item}
+                            index={idx}
+                            onClick={() => setSelected({ item, index: idx })}
+                            isLast={idx === (catItems as MenuItem[]).length - 1}
+                          />
+                        ))
+                    }
+                  </div>
+                </div>
               </section>
             )
           })}
