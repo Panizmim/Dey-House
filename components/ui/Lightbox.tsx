@@ -52,21 +52,26 @@ export function Lightbox({ images, index, onChange, alt = '', gradient }: Props)
         {toPersianNum(index + 1)} / {toPersianNum(total)}
       </div>
 
-      {/* تصویر */}
+      {/* تصویر — مربع ۱:۱ */}
       <div
-        className="relative w-full max-w-5xl max-h-[85vh] mx-8"
+        style={{
+          position: 'relative',
+          aspectRatio: '1 / 1',
+          width: 'min(85vh, 85vw)',
+          flexShrink: 0,
+        }}
         onClick={(e) => e.stopPropagation()}
       >
+        {gradient && (
+          <div className="absolute inset-0 -z-10" style={{ background: gradient }} />
+        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[index]}
           alt={alt}
-          className="w-full h-full object-contain max-h-[85vh] rounded-lg"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           onError={(e) => { e.currentTarget.style.display = 'none' }}
         />
-        {gradient && (
-          <div className="absolute inset-0 -z-10 rounded-lg" style={{ background: gradient }} />
-        )}
       </div>
 
       {/* قبلی — RTL: دکمه سمت راست */}
