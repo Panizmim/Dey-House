@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, ImagePlus, X } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
+import type { Area } from 'react-easy-crop'
 import Modal from './Modal'
 import ImageUploadZone, { type UploadStatus } from './ImageUploadZone'
+import ImageCropper, { getCroppedFile } from './ImageCropModal'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
 import { convertIfHeic } from '@/lib/convertHeic'
@@ -227,8 +229,14 @@ function GallerySlotCard({
   )
 }
 
+type Mode = 'form' | 'crop'
+
 export default function EventModal({ open, event, onClose, onSaved }: EventModalProps) {
-  const [loading, setLoading]           = useState(false)
+  const [mode,         setMode]         = useState<Mode>('form')
+  const [loading,      setLoading]      = useState(false)
+  const [cropLoading,  setCropLoading]  = useState(false)
+  const [cropSrc,      setCropSrc]      = useState<string | null>(null)
+  const [cropArea,     setCropArea]     = useState<Area | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageUrl,     setImageUrl]     = useState<string | null>(null)
   const [imageStatus,  setImageStatus]  = useState<UploadStatus>('idle')
@@ -276,11 +284,37 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
     setShowStartPicker(false)
   }
 
+  const handleAreaChange = useCallback((area: Area) => setCropArea(area), [])
+
+  async function handleCropConfirm() {
+    if (!cropSrc || !cropArea) return
+    setCropLoading(true)
+    try {
+      const file = await getCroppedFile(cropSrc, cropArea)
+      setMode('form')
+      setImagePreview(URL.createObjectURL(file))
+      setImageUrl(null)
+      setImageStatus('uploading')
+      const url = await uploadImage(file)
+      setImageUrl(url)
+      setImageStatus('success')
+    } catch {
+      setImageStatus('error')
+      toast.error('خطا در پردازش تصویر')
+      setMode('form')
+    } finally {
+      setCropLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (!open) return
+    setMode('form')
     setImagePreview(null)
     setImageUrl(null)
     setImageStatus('idle')
+    setCropSrc(null)
+    setCropArea(null)
     setShowStartPicker(false)
     setShowEndPicker(false)
     setShowTypeDrop(false)
@@ -377,30 +411,58 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   const filledCount = gallery.filter((s) => s.url || s.file).length
   const canAdd      = gallery.length < MAX_GALLERY
 
+  const isCrop = mode === 'crop'
+
   return (
     <>
     <Modal
       open={open}
-      title={event ? 'ویرایش رویداد' : 'افزودن رویداد جدید'}
-      onClose={onClose}
+      title={isCrop ? 'برش تصویر' : event ? 'ویرایش رویداد' : 'افزودن رویداد جدید'}
+      onClose={isCrop ? () => setMode('form') : onClose}
       footer={
-        <>
-          <button
-            onClick={onClose}
-            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 14, cursor: 'pointer' }}
-          >
-            انصراف
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
-          >
-            {loading ? 'در حال ذخیره...' : event ? 'ذخیره تغییرات' : 'افزودن رویداد'}
-          </button>
-        </>
+        isCrop ? (
+          <>
+            <button
+              onClick={() => setMode('form')}
+              style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 14, cursor: 'pointer' }}
+            >
+              انصراف
+            </button>
+            <button
+              onClick={handleCropConfirm}
+              disabled={cropLoading || !cropArea}
+              style={{
+                padding: '8px 22px', borderRadius: 8, border: 'none',
+                background: '#8C2020', color: 'white', fontSize: 14, fontWeight: 600,
+                cursor: (cropLoading || !cropArea) ? 'not-allowed' : 'pointer',
+                opacity: cropLoading ? 0.65 : 1,
+              }}
+            >
+              {cropLoading ? 'در حال پردازش...' : 'تأیید برش'}
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onClose}
+              style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 14, cursor: 'pointer' }}
+            >
+              انصراف
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
+            >
+              {loading ? 'در حال ذخیره...' : event ? 'ذخیره تغییرات' : 'افزودن رویداد'}
+            </button>
+          </>
+        )
       }
     >
+      {isCrop && cropSrc ? (
+        <ImageCropper imageSrc={cropSrc} onAreaChange={handleAreaChange} />
+      ) : (
       <div className="flex flex-col gap-4">
         {/* عنوان */}
         <div>
@@ -486,17 +548,20 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
         <div>
           <label className={labelClass}>تصویر پوستر</label>
           <ImageUploadZone
-            currentUrl={event?.imageUrl}
+            currentUrl={imageUrl ?? event?.imageUrl}
             preview={imagePreview}
             status={imageStatus}
-            onFileSelect={(file) => {
-              setImagePreview(URL.createObjectURL(file))
-              setImageUrl(null)
-              setImageStatus('uploading')
-              uploadImage(file)
-                .then((url) => { setImageUrl(url); setImageStatus('success') })
-                .catch(() => setImageStatus('error'))
+            onFileSelect={async (file) => {
+              const converted = await convertIfHeic(file)
+              setCropSrc(URL.createObjectURL(converted))
+              setCropArea(null)
+              setMode('crop')
             }}
+            onCropExisting={() => {
+              const src = imageUrl ?? imagePreview ?? event?.imageUrl ?? null
+              if (src) { setCropSrc(src); setCropArea(null); setMode('crop') }
+            }}
+            onDeleteExisting={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
             onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
           />
         </div>
@@ -620,6 +685,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
           </div>
         </div>
       </div>
+      )}
     </Modal>
 
     {(showStartPicker || showEndPicker || showTypeDrop) && typeof window !== 'undefined' && createPortal(
