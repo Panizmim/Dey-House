@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { db } from '@/lib/db'
 import EventGallery from './EventGallery'
-import EventShareButton from './EventShareButton'
 import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
 
 export const dynamic = 'force-dynamic'
@@ -98,9 +97,6 @@ export default async function EventDetailPage({ params }: Props) {
           {event.location && (
             <p className="font-light" style={{ fontSize: 15, color: '#555555' }}>{event.location}</p>
           )}
-          <div style={{ marginTop: 16 }}>
-            <EventShareButton title={event.title} />
-          </div>
         </div>
       </div>
 
