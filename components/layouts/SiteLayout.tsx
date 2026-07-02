@@ -11,11 +11,12 @@ import { LoginModal }    from '@/components/ui/LoginModal'
 import { RegisterModal } from '@/components/ui/RegisterModal'
 
 const navLinks = [
-  { href: '/events',  label: 'رویدادها' },
-  { href: '/gallery', label: 'گالری دیـ ده' },
-  { href: '/cafe',    label: 'منو' },
-  { href: '/artist',  label: 'همکاری هنرمندان' },
-  { href: '/about',   label: 'درباره ما' },
+  { href: '/events',    label: 'رویدادها' },
+  { href: '/gallery',   label: 'گالری دیـ ده' },
+  { href: '/workshops', label: 'ورکشاپ‌ها' },
+  { href: '/cafe',      label: 'منو' },
+  { href: '/artist',    label: 'همکاری هنرمندان' },
+  { href: '/about',     label: 'درباره ما' },
 ]
 
 /* ─── منوی کاربر لاگین‌شده ─── */
