@@ -50,7 +50,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
   const [imagePreview,  setImagePreview] = useState<string | null>(null)
   const [imageUrl,      setImageUrl]     = useState<string | null>(null)
   const [imageStatus,   setImageStatus]  = useState<UploadStatus>('idle')
-  const [imageDeleted,  setImageDeleted] = useState(false)
+  const [imageEnabled,  setImageEnabled] = useState(false)
   const [cropSrc,       setCropSrc]      = useState<string | null>(null)
   const [cropArea,      setCropArea]     = useState<Area | null>(null)
   const [form, setForm] = useState({
@@ -63,7 +63,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
     setImagePreview(null)
     setImageUrl(null)
     setImageStatus('idle')
-    setImageDeleted(false)
+    setImageEnabled(item?.imageUrl != null)
     setCropSrc(null)
     setCropArea(null)
     if (item) {
@@ -122,7 +122,7 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
 
     setLoading(true)
     try {
-      const finalImageUrl = imageDeleted ? null : (imageUrl ?? item?.imageUrl ?? null)
+      const finalImageUrl = imageEnabled ? (imageUrl ?? item?.imageUrl ?? null) : null
       const body = {
         name:        form.name,
         price,
@@ -254,24 +254,62 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
 
           {/* تصویر */}
           <div>
-            <label className={labelClass}>تصویر آیتم</label>
-            <ImageUploadZone
-              currentUrl={imageDeleted ? null : (imageUrl ?? item?.imageUrl)}
-              preview={imagePreview}
-              status={imageStatus}
-              onFileSelect={(file) => { setImageDeleted(false); openCropFor(URL.createObjectURL(file)) }}
-              onCropExisting={() => {
-                const src = imageUrl ?? imagePreview ?? item?.imageUrl ?? null
-                if (src) openCropFor(src)
-              }}
-              onDeleteExisting={() => {
-                setImageDeleted(true)
-                setImagePreview(null)
-                setImageUrl(null)
-                setImageStatus('idle')
-              }}
-              onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: imageEnabled ? 10 : 0 }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: '#404040' }}>تصویر آیتم</label>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !imageEnabled
+                  setImageEnabled(next)
+                  if (!next) {
+                    setImagePreview(null)
+                    setImageUrl(null)
+                    setImageStatus('idle')
+                    setCropSrc(null)
+                    setCropArea(null)
+                    if (mode === 'crop') setMode('form')
+                  }
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                <span style={{ fontSize: 12, color: imageEnabled ? '#801A00' : '#B0B0B0', fontWeight: 600 }}>
+                  {imageEnabled ? 'فعال' : 'غیرفعال'}
+                </span>
+                <div style={{
+                  width: 38, height: 20, borderRadius: 10,
+                  background: imageEnabled ? '#801A00' : '#D0D0D0',
+                  position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+                }}>
+                  <div style={{
+                    position: 'absolute', top: 2,
+                    ...(imageEnabled ? { right: 2 } : { left: 2 }),
+                    width: 16, height: 16, borderRadius: '50%',
+                    background: 'white', transition: 'all 0.2s',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                  }} />
+                </div>
+              </button>
+            </div>
+
+            {imageEnabled && (
+              <ImageUploadZone
+                currentUrl={imageUrl ?? item?.imageUrl}
+                preview={imagePreview}
+                status={imageStatus}
+                onFileSelect={(file) => openCropFor(URL.createObjectURL(file))}
+                onCropExisting={() => {
+                  const src = imageUrl ?? imagePreview ?? item?.imageUrl ?? null
+                  if (src) openCropFor(src)
+                }}
+                onDeleteExisting={() => {
+                  setImageEnabled(false)
+                  setImagePreview(null)
+                  setImageUrl(null)
+                  setImageStatus('idle')
+                }}
+                onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
+              />
+            )}
           </div>
 
           {/* وضعیت */}

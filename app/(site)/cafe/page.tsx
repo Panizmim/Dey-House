@@ -72,45 +72,57 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
     >
       <div
         className="bg-white w-full max-w-md rounded-2xl overflow-hidden max-h-[90vh]"
-        style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', overflowY: 'auto' }}
+        style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', overflowY: 'auto', position: 'relative' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* تصویر / پلیس‌هولدر */}
-        <div className="relative w-full aspect-square" style={{ background: gradient, flexShrink: 0 }}>
-          {item.imageUrl && (
+        {/* دکمه بستن */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute', top: 12, left: 12, zIndex: 2,
+            background: item.imageUrl ? 'none' : 'rgba(0,0,0,0.08)',
+            border: 'none', borderRadius: '50%', width: 30, height: 30,
+            cursor: 'pointer', color: item.imageUrl ? 'white' : '#404040',
+            fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          aria-label="بستن"
+        >
+          ✕
+        </button>
+
+        {/* تصویر — فقط اگه imageUrl داشته باشه */}
+        {item.imageUrl && (
+          <div className="relative w-full aspect-square" style={{ background: gradient, flexShrink: 0 }}>
             <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
-          )}
-          {/* دکمه بستن */}
-          <button
-            onClick={onClose}
-            style={{
-              position: 'absolute', top: 12, left: 12,
-              background: 'none', border: 'none',
-              cursor: 'pointer', color: 'white', fontSize: 22, lineHeight: 1,
-              padding: 4,
-            }}
-            aria-label="بستن"
-          >
-            ✕
-          </button>
-          {/* badge موجودی */}
-          {!item.isAvailable && (
-            <div style={{
-              position: 'absolute', top: 12, right: 12,
-              background: 'rgba(0,0,0,0.6)', color: 'white',
-              fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20,
-            }}>
-              ناموجود
-            </div>
-          )}
-        </div>
+            {/* badge موجودی */}
+            {!item.isAvailable && (
+              <div style={{
+                position: 'absolute', top: 12, right: 12,
+                background: 'rgba(0,0,0,0.6)', color: 'white',
+                fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20,
+              }}>
+                ناموجود
+              </div>
+            )}
+          </div>
+        )}
 
         {/* اطلاعات */}
-        <div className="p-5 flex flex-col gap-4">
-          {/* نام */}
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#171717', lineHeight: 1.3 }}>
-            {item.name}
-          </h2>
+        <div className="p-5 flex flex-col gap-4" style={{ paddingTop: item.imageUrl ? 20 : 44 }}>
+          {/* نام + badge ناموجود (برای آیتم‌های بدون عکس) */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#171717', lineHeight: 1.3, flex: 1 }}>
+              {item.name}
+            </h2>
+            {!item.isAvailable && !item.imageUrl && (
+              <span style={{
+                background: 'rgba(0,0,0,0.08)', color: '#555',
+                fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, whiteSpace: 'nowrap', marginTop: 4,
+              }}>
+                ناموجود
+              </span>
+            )}
+          </div>
 
           {/* توضیحات */}
           {item.description && (
@@ -156,14 +168,14 @@ function MenuItemCard({ item, index, onClick }: { item: MenuItem; index: number;
       className="flex items-center gap-3 p-3 border border-[#EFEFEF] rounded-lg bg-white text-right w-full transition-all duration-150 hover:border-[#D0A0A0] hover:shadow-sm active:scale-[0.98]"
       style={{ cursor: 'pointer' }}
     >
-      <div
-        className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
-        style={{ background: gradient, position: 'relative' }}
-      >
-        {item.imageUrl && (
+      {item.imageUrl && (
+        <div
+          className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
+          style={{ background: gradient, position: 'relative' }}
+        >
           <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
-        )}
-      </div>
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-[#171717] leading-tight mb-1 truncate">
           {item.name}
