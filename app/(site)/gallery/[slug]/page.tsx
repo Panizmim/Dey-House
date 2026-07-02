@@ -77,10 +77,7 @@ export default function GalleryDetailPage() {
       <div className="flex gap-6 mb-8 items-start">
         {/* کاور PDP — نسبت A4 — سمت راست در RTL (اول در DOM) */}
         {(gallery.pdpCoverImage ?? gallery.coverImage) && (
-          <div
-            className="relative flex-shrink-0"
-            style={{ width: 'clamp(120px, 20vw, 212px)', aspectRatio: '210 / 297' }}
-          >
+          <div className="relative flex-shrink-0 w-[150px] h-[212px] md:w-[240px] md:h-[340px]" style={{ overflow: 'hidden' }}>
             <Image
               src={(gallery.pdpCoverImage ?? gallery.coverImage)!}
               alt={gallery.title}
