@@ -326,8 +326,11 @@ export default function CafePage() {
             return (
               <div key={cat.id}>
                 <section id={cat.id} className="mb-12 scroll-mt-36">
-                  <div className="text-center mb-6">
-                    <h2 className="text-lg font-black text-[#171717]">{cat.name}</h2>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div>
+                      <h2 className="text-lg font-black text-[#171717]">{cat.name}</h2>
+                    </div>
+                    <div className="flex-1 h-px bg-[#EFEFEF]" />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
