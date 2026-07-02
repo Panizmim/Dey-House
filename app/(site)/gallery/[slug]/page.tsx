@@ -127,16 +127,19 @@ export default function GalleryDetailPage() {
 
           <div className="grid gap-1 grid-cols-3 sm:grid-cols-5">
             {artworks.map((img, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <div
                 key={i}
-                src={img}
-                alt={`اثر ${toPersian(i + 1)}`}
+                className="relative cursor-pointer overflow-hidden"
+                style={{ aspectRatio: '1/1' }}
                 onClick={() => setLightboxIndex(i)}
-                style={{ width: '100%', height: 'auto', display: 'block', cursor: 'pointer', transition: 'transform 300ms' }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.03)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
-              />
+              >
+                <Image
+                  src={img}
+                  alt={`اثر ${toPersian(i + 1)}`}
+                  fill
+                  className="object-cover transition-transform duration-300 hover:scale-[1.05]"
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -211,6 +214,7 @@ export default function GalleryDetailPage() {
         index={lightboxIndex}
         onChange={setLightboxIndex}
         alt={gallery.title}
+        naturalSize
       />
     </main>
   )

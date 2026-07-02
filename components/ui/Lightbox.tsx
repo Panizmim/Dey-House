@@ -5,14 +5,15 @@ import { X, ChevronRight, ChevronLeft } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
 interface Props {
-  images:    string[]
-  index:     number | null
-  onChange:  (index: number | null) => void
-  alt?:      string
-  gradient?: string
+  images:       string[]
+  index:        number | null
+  onChange:     (index: number | null) => void
+  alt?:         string
+  gradient?:    string
+  naturalSize?: boolean
 }
 
-export function Lightbox({ images, index, onChange, alt = '', gradient }: Props) {
+export function Lightbox({ images, index, onChange, alt = '', gradient, naturalSize }: Props) {
   const open  = index !== null
   const total = images.length
 
@@ -52,24 +53,25 @@ export function Lightbox({ images, index, onChange, alt = '', gradient }: Props)
         {toPersianNum(index + 1)} / {toPersianNum(total)}
       </div>
 
-      {/* تصویر — مربع ۱:۱ */}
+      {/* تصویر */}
       <div
-        style={{
-          position: 'relative',
-          aspectRatio: '1 / 1',
-          width: 'min(85vh, 85vw)',
-          flexShrink: 0,
-        }}
+        style={naturalSize
+          ? { flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }
+          : { position: 'relative', aspectRatio: '1 / 1', width: 'min(85vh, 85vw)', flexShrink: 0 }
+        }
         onClick={(e) => e.stopPropagation()}
       >
-        {gradient && (
+        {gradient && !naturalSize && (
           <div className="absolute inset-0 -z-10" style={{ background: gradient }} />
         )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[index]}
           alt={alt}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={naturalSize
+            ? { maxWidth: '90vw', maxHeight: '85vh', width: 'auto', height: 'auto', display: 'block' }
+            : { width: '100%', height: '100%', objectFit: 'cover', display: 'block' }
+          }
           onError={(e) => { e.currentTarget.style.display = 'none' }}
         />
       </div>
