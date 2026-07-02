@@ -298,8 +298,14 @@ export default function CafeItemModal({ open, item, categories = [], onClose, on
                 status={imageStatus}
                 onFileSelect={(file) => openCropFor(URL.createObjectURL(file))}
                 onCropExisting={() => {
-                  const src = imageUrl ?? imagePreview ?? item?.imageUrl ?? null
-                  if (src) openCropFor(src)
+                  if (cropSrc) {
+                    // عکس اصلی آپلود‌شده را نگه می‌داریم، فقط crop area ریست می‌شه
+                    setCropArea(null)
+                    setMode('crop')
+                  } else {
+                    const src = imageUrl ?? imagePreview ?? item?.imageUrl ?? null
+                    if (src) openCropFor(src)
+                  }
                 }}
                 onDeleteExisting={() => {
                   setImageEnabled(false)
