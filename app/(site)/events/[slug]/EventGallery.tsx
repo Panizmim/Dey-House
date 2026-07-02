@@ -28,12 +28,12 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
             key={i}
             onClick={() => setLightboxIndex(i)}
             style={{
-              position: 'relative', paddingTop: '100%',
+              aspectRatio: '1 / 1',
               border: 'none', cursor: 'pointer',
               overflow: 'hidden', borderRadius: 0,
               background: imageGradients[i] ?? '#E5E5E5',
               transition: 'transform 300ms',
-              display: 'block',
+              display: 'block', width: '100%',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)' }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
@@ -42,7 +42,7 @@ export default function EventGallery({ images, imageGradients, title }: Props) {
             <img
               src={img}
               alt={`${title} — تصویر ${toPersianNum(i + 1)}`}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               onError={(e) => { e.currentTarget.style.display = 'none' }}
             />
           </button>
