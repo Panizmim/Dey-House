@@ -61,7 +61,7 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
         style={{
           maxHeight: '88vh', overflowY: 'auto',
           animation: 'pdpSlideUp 280ms cubic-bezier(0.22,1,0.36,1)',
-          position: 'relative', borderRadius: 20,
+          position: 'relative', borderRadius: 0,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -158,6 +158,7 @@ function MenuItemCard({
         <div style={{
           width: 70, height: 70, flexShrink: 0,
           overflow: 'hidden', position: 'relative',
+          borderRadius: 16,
           background: placeholderGradients[index % 6],
         }}>
           <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
