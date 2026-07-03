@@ -398,6 +398,14 @@ export function BookOpen(props: IconProps) {
   )
 }
 
+export function GraduationCap(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M22 10L12 5L2 10L12 15L22 10ZM22 10V16M6 11.5V17C6 17 8 19 12 19C16 19 18 17 18 17V11.5" />
+    </Icon>
+  )
+}
+
 export function Building2(props: IconProps) {
   return (
     <Icon {...props}>
