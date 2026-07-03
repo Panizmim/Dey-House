@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, ImageOff, X, ChevronUp, ChevronDown } from '@/components/ui/icons'
+import { Plus, Pencil, Trash2, ImageOff, X, ChevronUp, ChevronDown, ChevronRight, ChevronLeft } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import CafeItemModal, { type CafeMenuItem } from '@/components/admin/CafeItemModal'
 
@@ -136,6 +136,22 @@ export default function AdminCafePage() {
   const [editingItem,  setEditingItem]  = useState<CafeMenuItem | null>(null)
   const [catModal,     setCatModal]     = useState(false)
   const [editingCat,   setEditingCat]   = useState<CafeCategory | null>(null)
+  const [canScrollL,   setCanScrollL]   = useState(false)
+  const [canScrollR,   setCanScrollR]   = useState(false)
+  const tabsRef = useRef<HTMLDivElement>(null)
+
+  function updateScrollState() {
+    const el = tabsRef.current
+    if (!el) return
+    setCanScrollL(el.scrollLeft > 4)
+    setCanScrollR(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
+  }
+
+  function scrollTabs(dir: 'left' | 'right') {
+    const el = tabsRef.current
+    if (!el) return
+    el.scrollBy({ left: dir === 'left' ? -220 : 220, behavior: 'smooth' })
+  }
 
   async function fetchAll() {
     setLoading(true)
@@ -155,6 +171,7 @@ export default function AdminCafePage() {
   }
 
   useEffect(() => { fetchAll() }, [])
+  useEffect(() => { setTimeout(updateScrollState, 50) }, [categories])
 
   const allTabs = [{ id: '__all__', name: 'همه', order: -1 }, ...categories]
   const displayed = activeTab === 'همه'
@@ -265,7 +282,27 @@ export default function AdminCafePage() {
       </div>
 
       {/* تب‌های دسته‌بندی */}
-      <div className="flex gap-2 pb-2 mb-5" style={{ overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div className="relative mb-5" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        {/* فلش راست (ابتدای محتوا در RTL) */}
+        {canScrollR && (
+          <button
+            onClick={() => scrollTabs('right')}
+            style={{
+              flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
+              border: '1px solid #E5E5E5', background: 'white', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+            }}
+          >
+            <ChevronRight size={15} />
+          </button>
+        )}
+        <div
+          ref={tabsRef}
+          onScroll={updateScrollState}
+          className="flex gap-2 pb-1"
+          style={{ overflowX: 'auto', scrollbarWidth: 'none', flex: 1 }}
+        >
         {allTabs.map((cat, tabIdx) => {
           const isActive = activeTab === cat.name
           const isAll    = cat.id === '__all__'
@@ -344,6 +381,21 @@ export default function AdminCafePage() {
             </div>
           )
         })}
+        </div>
+        {/* فلش چپ (انتهای محتوا در RTL) */}
+        {canScrollL && (
+          <button
+            onClick={() => scrollTabs('left')}
+            style={{
+              flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
+              border: '1px solid #E5E5E5', background: 'white', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+            }}
+          >
+            <ChevronLeft size={15} />
+          </button>
+        )}
       </div>
 
       {/* راهنمای ترتیب آیتم‌ها */}
