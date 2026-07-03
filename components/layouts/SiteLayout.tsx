@@ -105,15 +105,13 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
                   gap: 10, padding: '11px 20px',
-                  fontSize: 13, color: 'admin' in item && item.admin ? '#801A00' : '#404040',
+                  fontSize: 13, color: '#404040',
                   textDecoration: 'none', transition: 'background 150ms',
-                  fontWeight: 'admin' in item && item.admin ? 700 : 400,
-                  borderBottom: 'admin' in item && item.admin ? '1px solid #F5F5F5' : 'none',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'admin' in item && item.admin ? '#FDF5F5' : '#FAFAFA' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#FAFAFA' }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
               >
-                <span style={{ color: 'admin' in item && item.admin ? '#801A00' : '#A0A0A0' }}>{item.icon}</span>
+                <span style={{ color: '#A0A0A0' }}>{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
             ))}
