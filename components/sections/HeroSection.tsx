@@ -65,9 +65,85 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
     )
   }
 
+  /* ── موبایل: ارتفاع از ابعاد طبیعی عکس گرفته می‌شه ── */
+  if (isMobile) {
+    return (
+      <section
+        className="relative w-full"
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
+        onTouchEnd={(e) => {
+          const diff = touchStartX.current - e.changedTouches[0].clientX
+          if (Math.abs(diff) > 50) { if (diff > 0) next(); else prev() }
+        }}
+      >
+        <div className="relative w-full">
+          {slides.map((slide, index) => {
+            const src = slide.mobileImageUrl ?? slide.imageUrl
+            return (
+              <div
+                key={slide.id}
+                style={{
+                  position: index === currentIndex ? 'relative' : 'absolute',
+                  inset: index !== currentIndex ? 0 : undefined,
+                  width: '100%',
+                  opacity: index === currentIndex ? 1 : 0,
+                  transition: 'opacity 1000ms',
+                  pointerEvents: index === currentIndex ? 'auto' : 'none',
+                }}
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                  priority={index === 0}
+                />
+              </div>
+            )
+          })}
+          {/* overlay تیره */}
+          <div className="absolute inset-0 bg-black/40 z-10" />
+          {/* متن */}
+          <div
+            className="absolute inset-0 z-20 flex items-start justify-center px-6 pt-[32%] transition-opacity duration-700"
+            style={{ opacity: currentSlide?.showText ? 1 : 0, pointerEvents: 'none' }}
+          >
+            <p
+              className="text-white text-center leading-tight"
+              style={{ fontFamily: 'Paeez, YekanBakh, Tahoma, sans-serif', fontSize: 'clamp(28px, 6vw, 48px)', maxWidth: '700px' }}
+            >
+              بَرای زندگیِ تازه‌ای کِه هَنوز نَزیستهِ‌ایم.
+            </p>
+          </div>
+          {/* dots */}
+          {slides.length > 1 && (
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+              {slides.map((slide, idx) => (
+                <button
+                  key={slide.id}
+                  onClick={() => setCurrentIndex(idx)}
+                  aria-label={`اسلاید ${idx + 1}`}
+                  className="rounded-full transition-all duration-300"
+                  style={{
+                    background: idx === currentIndex ? '#ffffff' : 'rgba(255,255,255,0.4)',
+                    width: idx === currentIndex ? '24px' : '8px',
+                    height: '8px',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  /* ── دسکتاپ: فول‌اسکرین با object-cover ── */
   return (
     <section
-      className="relative w-full overflow-hidden h-[65vh] md:h-screen"
+      className="relative w-full overflow-hidden h-screen"
       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
       onTouchEnd={(e) => {
         const diff = touchStartX.current - e.changedTouches[0].clientX
@@ -82,7 +158,7 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
             style={{ opacity: index === currentIndex ? 1 : 0 }}
           >
             <Image
-              src={isMobile && slide.mobileImageUrl ? slide.mobileImageUrl : slide.imageUrl}
+              src={slide.imageUrl}
               alt=""
               fill
               className="object-cover"
@@ -94,18 +170,14 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
         <div className="absolute inset-0 bg-black/40 z-10" />
       </div>
 
-      {/* متن — فقط وقتی اسلاید جاری showText: true داشته باشه */}
+      {/* متن */}
       <div
         className="absolute inset-0 z-20 flex items-start justify-center px-6 pt-[32vh] transition-opacity duration-700"
         style={{ opacity: currentSlide?.showText ? 1 : 0, pointerEvents: 'none' }}
       >
         <p
           className="text-white text-center leading-tight"
-          style={{
-            fontFamily: 'Paeez, YekanBakh, Tahoma, sans-serif',
-            fontSize: 'clamp(32px, 5vw, 72px)',
-            maxWidth: '700px',
-          }}
+          style={{ fontFamily: 'Paeez, YekanBakh, Tahoma, sans-serif', fontSize: 'clamp(32px, 5vw, 72px)', maxWidth: '700px' }}
         >
           بَرای زندگیِ تازه‌ای کِه هَنوز نَزیستهِ‌ایم.
         </p>
