@@ -14,25 +14,25 @@ const navGroups = [
   {
     label: 'محتوا',
     items: [
-      { href: '/admin/hero',     label: 'هیرو سکشن', icon: Monitor,         exact: false },
-      { href: '/admin/events',    label: 'رویدادها',   icon: Calendar,       exact: false },
+      { href: '/admin/hero',      label: 'هیرو سکشن', icon: Monitor,         exact: false },
+      { href: '/admin/events',    label: 'رویدادها',  icon: Calendar,        exact: false },
       { href: '/admin/workshops', label: 'ورکشاپ‌ها', icon: GraduationCap,  exact: false },
-      { href: '/admin/gallery',  label: 'گالری',      icon: Grid2x2,        exact: false },
-      { href: '/admin/cafe',     label: 'منوی کافه', icon: UtensilsCrossed, exact: false },
+      { href: '/admin/gallery',   label: 'گالری',     icon: Grid2x2,         exact: false },
+      { href: '/admin/cafe',      label: 'منوی کافه', icon: UtensilsCrossed, exact: false },
     ],
   },
   {
     label: 'رزروها',
     items: [
-      { href: '/admin/bookings',          label: 'رزروها',              icon: BookOpen,  exact: false },
-      { href: '/admin/contact-requests',  label: 'درخواست‌های تماس',  icon: Phone,     exact: false },
+      { href: '/admin/bookings',         label: 'رزروها',             icon: BookOpen, exact: false },
+      { href: '/admin/contact-requests', label: 'درخواست‌های تماس', icon: Phone,    exact: false },
     ],
   },
   {
     label: 'کاربران',
     items: [
-      { href: '/admin/users',       label: 'کاربران',          icon: Users,    exact: false },
-      { href: '/admin/submissions', label: 'همکاری هنرمندان', icon: Palette,  exact: false },
+      { href: '/admin/users',       label: 'کاربران',         icon: Users,   exact: false },
+      { href: '/admin/submissions', label: 'همکاری هنرمندان', icon: Palette, exact: false },
     ],
   },
 ]
@@ -45,34 +45,43 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside
-      className="flex flex-col bg-white h-screen overflow-y-auto"
-      style={{ width: 240, borderLeft: '1px solid #EFEFEF', position: 'sticky', top: 0, flexShrink: 0 }}
-    >
+    <aside style={{
+      width: 260,
+      flexShrink: 0,
+      background: 'white',
+      borderRadius: 16,
+      padding: '28px 20px',
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 'calc(100vh - 40px)',
+      position: 'sticky',
+      top: 20,
+      overflowY: 'auto',
+    }}>
       {/* لوگو */}
-      <div style={{ padding: '24px 20px', borderBottom: '1px solid #EFEFEF' }}>
-        <div className="flex items-center gap-2">
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <Link href="/">
           <Image
-            src="/images/logo.png"
+            src="/images/logo.transparent.png"
             alt="خانه دی"
-            width={32}
-            height={32}
+            width={120}
+            height={40}
             className="object-contain"
-            style={{ mixBlendMode: 'multiply' }}
           />
-          <div>
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#171717', lineHeight: 1.2 }}>خانه دی</p>
-            <p style={{ fontSize: 11, color: '#717171' }}>پنل مدیریت</p>
-          </div>
-        </div>
+        </Link>
       </div>
 
-      {/* لینک‌های منو */}
-      <nav className="flex-1 py-2">
+      {/* برچسب پنل */}
+      <p style={{ textAlign: 'center', fontSize: 11, color: '#B0B0B0', marginBottom: 28, letterSpacing: '0.04em' }}>
+        پنل مدیریت
+      </p>
+
+      {/* منو */}
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: 0, flex: 1 }}>
         {navGroups.map((group) => (
-          <div key={group.label ?? 'main'}>
+          <div key={group.label ?? 'main'} style={{ marginBottom: group.label ? 8 : 0 }}>
             {group.label && (
-              <p style={{ fontSize: 10, color: '#B0B0B0', textTransform: 'uppercase', padding: '16px 20px 8px', letterSpacing: '0.08em' }}>
+              <p style={{ fontSize: 10, color: '#C0C0C0', padding: '12px 16px 6px', letterSpacing: '0.06em', fontWeight: 600 }}>
                 {group.label}
               </p>
             )}
@@ -83,53 +92,77 @@ export default function AdminSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex items-center gap-[10px] transition-colors duration-150"
                   style={{
-                    padding: '10px 20px',
-                    borderRadius: 8,
-                    margin: '2px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '11px 16px',
+                    borderRadius: active ? 0 : 12,
                     fontSize: 14,
                     fontWeight: active ? 700 : 400,
                     color: active ? '#801A00' : '#404040',
-                    background: active ? '#FDF5F5' : 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
+                    background: active ? '#FDF0F0' : 'transparent',
+                    borderRight: active ? '3px solid #801A00' : '3px solid transparent',
+                    textDecoration: 'none',
+                    transition: 'all 150ms',
                   }}
                   onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#F5F5F5' }}
                   onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
                 >
-                  <Icon size={16} color={active ? '#801A00' : '#717171'} />
+                  <Icon size={17} color={active ? '#801A00' : '#A0A0A0'} />
                   {item.label}
                 </Link>
               )
             })}
           </div>
         ))}
-      </nav>
 
-      {/* پایین */}
-      <div style={{ borderTop: '1px solid #EFEFEF', padding: '8px 0' }}>
-        <Link
-          href="/"
-          className="flex items-center gap-[10px] transition-colors duration-150"
-          style={{ padding: '10px 20px', margin: '2px 12px', borderRadius: 8, fontSize: 14, color: '#404040' }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5' }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-        >
-          <ArrowRight size={16} color="#717171" />
-          بازگشت به سایت
-        </Link>
-        <button
-          onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center gap-[10px] w-full text-right transition-colors duration-150"
-          style={{ padding: '10px 20px', margin: '2px 12px', borderRadius: 8, fontSize: 14, color: '#DC2626', background: 'transparent', border: 'none', cursor: 'pointer', width: 'calc(100% - 24px)' }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF2F2' }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-        >
-          <LogOut size={16} />
-          خروج
-        </button>
-      </div>
+        {/* جداکننده و لینک‌های پایین */}
+        <div style={{ borderTop: '1px solid #F0F0F0', marginTop: 16, paddingTop: 16 }}>
+          <Link
+            href="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '11px 16px',
+              borderRadius: 12,
+              fontSize: 14,
+              color: '#404040',
+              textDecoration: 'none',
+              transition: 'background 150ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+          >
+            <ArrowRight size={17} style={{ color: '#A0A0A0', flexShrink: 0 }} />
+            بازگشت به سایت
+          </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '11px 16px',
+              borderRadius: 12,
+              fontSize: 14,
+              color: '#717171',
+              background: 'transparent',
+              border: 'none',
+              width: '100%',
+              textAlign: 'right',
+              cursor: 'pointer',
+              transition: 'background 150ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+          >
+            <LogOut size={17} style={{ color: '#A0A0A0', flexShrink: 0 }} />
+            خروج از حساب
+          </button>
+        </div>
+      </nav>
     </aside>
   )
 }
