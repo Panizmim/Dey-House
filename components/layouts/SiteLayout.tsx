@@ -529,7 +529,7 @@ function Footer() {
         </div>
 
         <div className="border-t border-white/[0.08] mt-12 pt-6 flex items-center justify-between flex-wrap gap-3">
-          <p className="text-white/30 text-sm">© ۱۴۰۳ خانه دی — تمام حقوق محفوظ است</p>
+          <p className="text-white/30 text-sm">© ۱۴۰۵ خانه دی — تمام حقوق محفوظ است</p>
           <p className="text-white/20 text-sm">deyhouse.ir</p>
         </div>
       </div>
