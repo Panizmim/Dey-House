@@ -283,20 +283,20 @@ export default function AdminCafePage() {
 
       {/* تب‌های دسته‌بندی */}
       <div className="relative mb-5" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        {/* فلش راست (ابتدای محتوا در RTL) */}
-        {canScrollR && (
-          <button
-            onClick={() => scrollTabs('right')}
-            style={{
-              flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-              border: '1px solid #E5E5E5', background: 'white', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-            }}
-          >
-            <ChevronRight size={15} />
-          </button>
-        )}
+        {/* فلش راست */}
+        <button
+          onClick={() => scrollTabs('right')}
+          disabled={!canScrollR}
+          style={{
+            flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
+            border: '1px solid #E5E5E5', background: 'white', cursor: canScrollR ? 'pointer' : 'default',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            opacity: canScrollR ? 1 : 0.3, transition: 'opacity 150ms',
+          }}
+        >
+          <ChevronRight size={15} />
+        </button>
         <div
           ref={tabsRef}
           onScroll={updateScrollState}
@@ -382,20 +382,20 @@ export default function AdminCafePage() {
           )
         })}
         </div>
-        {/* فلش چپ (انتهای محتوا در RTL) */}
-        {canScrollL && (
-          <button
-            onClick={() => scrollTabs('left')}
-            style={{
-              flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-              border: '1px solid #E5E5E5', background: 'white', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-            }}
-          >
-            <ChevronLeft size={15} />
-          </button>
-        )}
+        {/* فلش چپ */}
+        <button
+          onClick={() => scrollTabs('left')}
+          disabled={!canScrollL}
+          style={{
+            flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
+            border: '1px solid #E5E5E5', background: 'white', cursor: canScrollL ? 'pointer' : 'default',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            opacity: canScrollL ? 1 : 0.3, transition: 'opacity 150ms',
+          }}
+        >
+          <ChevronLeft size={15} />
+        </button>
       </div>
 
       {/* راهنمای ترتیب آیتم‌ها */}
