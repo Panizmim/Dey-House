@@ -136,21 +136,13 @@ export default function AdminCafePage() {
   const [editingItem,  setEditingItem]  = useState<CafeMenuItem | null>(null)
   const [catModal,     setCatModal]     = useState(false)
   const [editingCat,   setEditingCat]   = useState<CafeCategory | null>(null)
-  const [canScrollL,   setCanScrollL]   = useState(false)
-  const [canScrollR,   setCanScrollR]   = useState(false)
   const tabsRef = useRef<HTMLDivElement>(null)
-
-  function updateScrollState() {
-    const el = tabsRef.current
-    if (!el) return
-    setCanScrollL(el.scrollLeft > 4)
-    setCanScrollR(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
-  }
 
   function scrollTabs(dir: 'left' | 'right') {
     const el = tabsRef.current
     if (!el) return
-    el.scrollBy({ left: dir === 'left' ? -220 : 220, behavior: 'smooth' })
+    const delta = dir === 'left' ? -220 : 220
+    el.scrollTo({ left: el.scrollLeft + delta, behavior: 'smooth' })
   }
 
   async function fetchAll() {
@@ -171,7 +163,6 @@ export default function AdminCafePage() {
   }
 
   useEffect(() => { fetchAll() }, [])
-  useEffect(() => { setTimeout(updateScrollState, 50) }, [categories])
 
   const allTabs = [{ id: '__all__', name: 'همه', order: -1 }, ...categories]
   const displayed = activeTab === 'همه'
@@ -286,20 +277,17 @@ export default function AdminCafePage() {
         {/* فلش راست */}
         <button
           onClick={() => scrollTabs('right')}
-          disabled={!canScrollR}
           style={{
             flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-            border: '1px solid #E5E5E5', background: 'white', cursor: canScrollR ? 'pointer' : 'default',
+            border: '1px solid #E5E5E5', background: 'white', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-            opacity: canScrollR ? 1 : 0.3, transition: 'opacity 150ms',
+            color: '#404040', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
           }}
         >
           <ChevronRight size={15} />
         </button>
         <div
           ref={tabsRef}
-          onScroll={updateScrollState}
           className="flex gap-2 pb-1"
           style={{ overflowX: 'auto', scrollbarWidth: 'none', flex: 1 }}
         >
@@ -385,13 +373,11 @@ export default function AdminCafePage() {
         {/* فلش چپ */}
         <button
           onClick={() => scrollTabs('left')}
-          disabled={!canScrollL}
           style={{
             flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-            border: '1px solid #E5E5E5', background: 'white', cursor: canScrollL ? 'pointer' : 'default',
+            border: '1px solid #E5E5E5', background: 'white', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#717171', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-            opacity: canScrollL ? 1 : 0.3, transition: 'opacity 150ms',
+            color: '#404040', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
           }}
         >
           <ChevronLeft size={15} />
