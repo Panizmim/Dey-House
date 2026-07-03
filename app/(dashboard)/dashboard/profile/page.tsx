@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useSession } from 'next-auth/react'
 import { Pencil, Eye, EyeOff, Lock, User, Phone, Mail } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
+import type { Area } from 'react-easy-crop'
+import ImageCropper, { getCroppedFile } from '@/components/admin/ImageCropModal'
 
 /* ────────────────────────────── helpers ───────────────────────────────── */
 
@@ -111,6 +114,11 @@ export default function ProfilePage() {
   const [avatarFile,    setAvatarFile]    = useState<File | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  /* کراپر */
+  const [cropSrc,  setCropSrc]  = useState<string | null>(null)
+  const [cropArea, setCropArea] = useState<Area | null>(null)
+  const [cropping, setCropping] = useState(false)
+
   /* تغییر رمز */
   const [pwSaving,  setPwSaving]  = useState(false)
   const [currentPw, setCurrentPw] = useState('')
@@ -127,9 +135,30 @@ export default function ProfilePage() {
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 2 * 1024 * 1024) { toast.error('حجم تصویر نباید بیشتر از ۲MB باشد'); return }
-    setAvatarFile(file)
-    setAvatarPreview(URL.createObjectURL(file))
+    e.target.value = ''
+    if (file.size > 5 * 1024 * 1024) { toast.error('حجم تصویر نباید بیشتر از ۵MB باشد'); return }
+    setCropSrc(URL.createObjectURL(file))
+    setCropArea(null)
+  }
+
+  const handleCropConfirm = useCallback(async () => {
+    if (!cropSrc || !cropArea) return
+    setCropping(true)
+    try {
+      const file = await getCroppedFile(cropSrc, cropArea)
+      setAvatarFile(file)
+      setAvatarPreview(URL.createObjectURL(file))
+      setCropSrc(null)
+    } catch {
+      toast.error('خطا در کراپ تصویر')
+    } finally {
+      setCropping(false)
+    }
+  }, [cropSrc, cropArea])
+
+  function handleCropCancel() {
+    setCropSrc(null)
+    setCropArea(null)
   }
 
   async function handleSaveProfile() {
@@ -215,7 +244,64 @@ export default function ProfilePage() {
   const firstName = name.split(' ')[0] ?? ''
   const lastName  = name.split(' ').slice(1).join(' ') ?? ''
 
+  const cropperPortal = cropSrc && typeof window !== 'undefined'
+    ? createPortal(
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.75)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: 16, overflow: 'hidden',
+            width: 'min(92vw, 480px)', display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #F0F0F0' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#171717', margin: 0 }}>برش تصویر پروفایل</p>
+              <p style={{ fontSize: 12, color: '#A0A0A0', margin: '4px 0 0' }}>محدوده مربعی را تنظیم کنید</p>
+            </div>
+            <div style={{ padding: '16px 20px', background: '#F9F9F9' }}>
+              <ImageCropper imageSrc={cropSrc} onAreaChange={setCropArea} />
+            </div>
+            <div style={{
+              padding: '14px 20px', display: 'flex', gap: 10, justifyContent: 'flex-end',
+              borderTop: '1px solid #F0F0F0',
+            }}>
+              <button
+                onClick={handleCropCancel}
+                style={{
+                  padding: '9px 20px', border: '1px solid #E5E5E5',
+                  borderRadius: 10, fontSize: 13, color: '#717171',
+                  background: 'white', cursor: 'pointer',
+                  fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                }}
+              >
+                انصراف
+              </button>
+              <button
+                onClick={handleCropConfirm}
+                disabled={!cropArea || cropping}
+                style={{
+                  padding: '9px 24px', background: '#801A00',
+                  border: 'none', borderRadius: 10, fontSize: 13,
+                  fontWeight: 700, color: 'white',
+                  cursor: (!cropArea || cropping) ? 'wait' : 'pointer',
+                  opacity: !cropArea ? 0.6 : 1,
+                  fontFamily: 'YekanBakh, Tahoma, sans-serif',
+                }}
+              >
+                {cropping ? 'در حال پردازش...' : 'تأیید و ادامه'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )
+    : null
+
   return (
+    <>
+    {cropperPortal}
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* ─── کارت اطلاعات پایه ─── */}
@@ -407,5 +493,6 @@ export default function ProfilePage() {
       </div>
 
     </div>
+    </>
   )
 }
