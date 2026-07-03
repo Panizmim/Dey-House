@@ -288,7 +288,7 @@ export default function CafePage() {
 
       {/* نوار هشدار حساسیت */}
       <div style={{ borderBottom: '1px solid #F0EDE9', padding: '10px 24px', textAlign: 'center' }}>
-        <p style={{ fontSize: 12, color: '#B0A89E', fontWeight: 300, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic' }}>
           در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید
         </p>
       </div>
