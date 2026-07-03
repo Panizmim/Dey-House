@@ -58,7 +58,7 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-md rounded-2xl overflow-hidden max-h-[90vh]"
+        className="bg-white w-full max-w-md overflow-hidden max-h-[90vh]"
         style={{ animation: 'slideUpCard 220ms cubic-bezier(0.34,1.56,0.64,1)', overflowY: 'auto', position: 'relative' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -157,7 +157,7 @@ function MenuItemCard({ item, index, onClick }: { item: MenuItem; index: number;
     >
       {item.imageUrl && (
         <div
-          className="w-20 h-20 overflow-hidden flex-shrink-0 rounded"
+          className="w-20 h-20 overflow-hidden flex-shrink-0 rounded-2xl"
           style={{ background: gradient, position: 'relative' }}
         >
           <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
