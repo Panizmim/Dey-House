@@ -61,7 +61,7 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
         style={{
           maxHeight: '88vh', overflowY: 'auto',
           animation: 'pdpSlideUp 280ms cubic-bezier(0.22,1,0.36,1)',
-          position: 'relative', borderRadius: 0,
+          position: 'relative', borderRadius: 20,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -69,13 +69,11 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
         <button
           onClick={onClose}
           style={{
-            position: 'absolute', top: 12, left: 12, zIndex: 10,
-            width: 30, height: 30, borderRadius: '50%', border: 'none',
-            background: item.imageUrl ? 'rgba(0,0,0,0.38)' : 'rgba(0,0,0,0.07)',
-            color: item.imageUrl ? 'white' : '#555',
-            cursor: 'pointer', fontSize: 14,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backdropFilter: item.imageUrl ? 'blur(4px)' : 'none',
+            position: 'absolute', top: 14, left: 14, zIndex: 10,
+            background: 'none', border: 'none',
+            color: item.imageUrl ? 'white' : '#A0A0A0',
+            cursor: 'pointer', fontSize: 16, lineHeight: 1,
+            padding: 4,
           }}
         >
           ✕
@@ -290,7 +288,7 @@ export default function CafePage() {
 
       {/* نوار هشدار حساسیت */}
       <div style={{ borderBottom: '1px solid #F0EDE9', padding: '10px 24px', textAlign: 'center' }}>
-        <p style={{ fontSize: 12, color: '#B0A89E', fontWeight: 300, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic' }}>
           در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید
         </p>
       </div>

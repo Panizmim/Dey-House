@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { User, CalendarDays, CreditCard, LogOut, MessageCircle } from '@/components/ui/icons'
+import { User, CalendarDays, CreditCard, LogOut, MessageCircle, ArrowRight } from '@/components/ui/icons'
 
 
 const menuItems = [
@@ -33,7 +33,7 @@ export function DashboardSidebar() {
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
         <Link href="/">
           <Image
-            src="/images/logo.png"
+            src="/images/logo.transparent.png"
             alt="خانه دی"
             width={120}
             height={40}
@@ -73,8 +73,27 @@ export function DashboardSidebar() {
           )
         })}
 
-        {/* خروج */}
+        {/* بازگشت به سایت + خروج */}
         <div style={{ borderTop: '1px solid #F0F0F0', marginTop: 16, paddingTop: 16 }}>
+          <Link
+            href="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '12px 16px',
+              borderRadius: 12,
+              fontSize: 14,
+              color: '#404040',
+              textDecoration: 'none',
+              transition: 'background 150ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+          >
+            <ArrowRight size={18} style={{ color: '#A0A0A0', flexShrink: 0 }} />
+            بازگشت به سایت
+          </Link>
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
             style={{
