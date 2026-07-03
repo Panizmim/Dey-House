@@ -132,7 +132,7 @@ export default async function EventDetailPage({ params }: Props) {
       {related.length > 0 && (
         <div style={{ marginTop: 64 }}>
           <h2 className="font-black text-[#171717]" style={{ fontSize: 20, marginBottom: 24 }}>رویدادهای دیگر</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {related.map((e) => {
               const relGradient = typeGradients[e.type] ?? 'linear-gradient(135deg, #1a1a2a, #2d2d4a)'
               const relDate     = new Date(e.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -140,20 +140,22 @@ export default async function EventDetailPage({ params }: Props) {
                 <a
                   key={e.id}
                   href={`/events/${e.slug}`}
-                  className="block transition-shadow hover:shadow-md"
-                  style={{ textDecoration: 'none', border: '1px solid #EFEFEF', borderRadius: 12, overflow: 'hidden', background: 'white' }}
+                  className="group block"
+                  style={{ textDecoration: 'none', border: '1px solid #EFEFEF', borderRadius: 8, overflow: 'hidden', background: 'white' }}
                 >
-                  <div style={{ position: 'relative', paddingTop: '141.4%', background: relGradient }}>
+                  <div style={{ position: 'relative', paddingTop: '130%', background: relGradient }}
+                    className="grayscale transition-all duration-500 group-hover:grayscale-0"
+                  >
                     {e.imageUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={e.imageUrl} alt={e.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
                   </div>
-                  <div style={{ padding: 16 }}>
-                    <h3 className="font-[800] text-[#171717] line-clamp-2" style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 8 }}>
+                  <div style={{ padding: '10px 12px 12px' }}>
+                    <h3 className="font-[800] text-[#171717] line-clamp-2" style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 4 }}>
                       {e.title}
                     </h3>
-                    <p style={{ fontSize: 12, color: '#A0A0A0' }}>{relDate}</p>
+                    <p style={{ fontSize: 11, color: '#A0A0A0' }}>{relDate}</p>
                   </div>
                 </a>
               )

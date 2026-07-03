@@ -122,6 +122,19 @@ model CafeMenuItem {
   order       Int     @default(0)
 }
 
+model Workshop {
+  id          String   @id @default(cuid())
+  title       String
+  date        DateTime
+  description String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+}
+
 model GalleryImage {
   id       String  @id @default(cuid())
   url      String

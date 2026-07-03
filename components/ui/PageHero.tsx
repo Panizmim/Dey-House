@@ -10,7 +10,6 @@ export default function PageHero({ title, subtitle }: PageHeroProps) {
         className="font-black text-[#171717] flex items-center gap-3 justify-center"
         style={{ fontSize: 'clamp(26px, 4vw, 40px)', letterSpacing: '-0.02em', lineHeight: 1.2 }}
       >
-        <span style={{ display: 'inline-block', width: 12, height: 12, background: '#801A00', borderRadius: 2, flexShrink: 0 }} />
         {title}
       </h1>
       {subtitle && (
