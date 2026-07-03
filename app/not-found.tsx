@@ -12,7 +12,7 @@ export default function NotFound() {
           className="font-black text-[#171717]"
           style={{ fontSize: 'clamp(28px, 5vw, 42px)', letterSpacing: '-0.02em', marginBottom: 16 }}
         >
-          صفحه یافت نشد
+          صفحه یافت نشد!
         </h1>
 
         <p
