@@ -61,7 +61,7 @@ function CafeItemPopup({ item, index, onClose }: { item: MenuItem; index: number
         style={{
           maxHeight: '88vh', overflowY: 'auto',
           animation: 'pdpSlideUp 280ms cubic-bezier(0.22,1,0.36,1)',
-          position: 'relative', borderRadius: 0,
+          position: 'relative', borderRadius: 20,
         }}
         onClick={(e) => e.stopPropagation()}
       >
