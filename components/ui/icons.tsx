@@ -398,6 +398,19 @@ export function BookOpen(props: IconProps) {
   )
 }
 
+export function GripVertical(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="9" cy="5"  r="1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="12" r="1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="19" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="5"  r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="12" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="19" r="1" fill="currentColor" stroke="none" />
+    </Icon>
+  )
+}
+
 export function GraduationCap(props: IconProps) {
   return (
     <Icon {...props}>
