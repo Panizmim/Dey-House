@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone } from '@/components/ui/icons'
+import { Menu, X, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone, LayoutDashboard } from '@/components/ui/icons'
 import { signOut } from 'next-auth/react'
 import { LoginModal }    from '@/components/ui/LoginModal'
 import { RegisterModal } from '@/components/ui/RegisterModal'
@@ -36,6 +36,7 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
   const name    = session?.user?.name  || 'کاربر'
   const email   = session?.user?.email || ''
   const initial = name.charAt(0)
+  const isAdmin = session?.user?.role === 'ADMIN'
 
   const textColor = scrolled ? '#171717' : 'white'
 
@@ -92,6 +93,7 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
           {/* آیتم‌های منو */}
           <div style={{ padding: '8px 0' }}>
             {[
+              ...(isAdmin ? [{ href: '/admin', icon: <LayoutDashboard size={16} />, label: 'داشبورد ادمین', admin: true }] : []),
               { href: '/dashboard/profile',  icon: <User size={16} />,         label: 'اطلاعات شخصی' },
               { href: '/dashboard/bookings', icon: <CalendarDays size={16} />, label: 'رزروهای قبلی'  },
               { href: '/dashboard/payments', icon: <CreditCard size={16} />,   label: 'پرداخت‌ها'     },
@@ -103,13 +105,15 @@ function UserDropdown({ scrolled }: { scrolled: boolean }) {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
                   gap: 10, padding: '11px 20px',
-                  fontSize: 13, color: '#404040', textDecoration: 'none',
-                  transition: 'background 150ms',
+                  fontSize: 13, color: 'admin' in item && item.admin ? '#801A00' : '#404040',
+                  textDecoration: 'none', transition: 'background 150ms',
+                  fontWeight: 'admin' in item && item.admin ? 700 : 400,
+                  borderBottom: 'admin' in item && item.admin ? '1px solid #F5F5F5' : 'none',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#FAFAFA' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'admin' in item && item.admin ? '#FDF5F5' : '#FAFAFA' }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
               >
-                <span style={{ color: '#A0A0A0' }}>{item.icon}</span>
+                <span style={{ color: 'admin' in item && item.admin ? '#801A00' : '#A0A0A0' }}>{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
             ))}
