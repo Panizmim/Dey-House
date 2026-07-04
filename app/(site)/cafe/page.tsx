@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { createPortal } from 'react-dom'
 import { ChevronDown } from '@/components/ui/icons'
@@ -212,8 +212,6 @@ export default function CafePage() {
   const [activeSection,  setActiveSection]  = useState('')
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
   const [selected,       setSelected]       = useState<{ item: MenuItem; index: number } | null>(null)
-  const navScrollRef = useRef<HTMLDivElement>(null)
-
   function toggleCategory(id: string) {
     setOpenCategories((prev) => {
       const next = new Set(prev)
@@ -227,15 +225,6 @@ export default function CafePage() {
     setActiveSection(id)
     scrollToSection(id)
   }
-
-  useEffect(() => {
-    const nav = navScrollRef.current
-    if (!nav) return
-    const activeBtn = nav.querySelector<HTMLElement>(`[data-cat="${activeSection}"]`)
-    if (!activeBtn) return
-    const target = activeBtn.offsetLeft - nav.offsetWidth / 2 + activeBtn.offsetWidth / 2
-    nav.scrollTo({ left: target, behavior: 'smooth' })
-  }, [activeSection])
 
   useEffect(() => {
     Promise.all([
@@ -294,32 +283,6 @@ export default function CafePage() {
         </p>
       </div>
 
-      {/* ── ناوبار موبایل — underline tab ── */}
-      <div className="lg:hidden sticky z-40 bg-white" style={{ top: 60, borderBottom: '1px solid #F0EDE9' }}>
-        <div ref={navScrollRef} className="flex overflow-x-auto no-scrollbar" style={{ padding: '0 16px' }}>
-          {visibleCategories.map((cat) => {
-            const isActive = activeSection === cat.id
-            return (
-              <button
-                key={cat.id}
-                data-cat={cat.id}
-                onClick={() => openAndScroll(cat.id)}
-                style={{
-                  flexShrink: 0, padding: '13px 14px',
-                  background: 'transparent', border: 'none',
-                  borderBottom: isActive ? '2px solid #8C2020' : '2px solid transparent',
-                  fontSize: 13, fontWeight: isActive ? 700 : 400,
-                  color: isActive ? '#8C2020' : '#999',
-                  cursor: 'pointer', transition: 'all 150ms',
-                  whiteSpace: 'nowrap', marginBottom: -1,
-                }}
-              >
-                {cat.name}
-              </button>
-            )
-          })}
-        </div>
-      </div>
 
       <div className="max-w-[1080px] mx-auto px-6 py-10 flex gap-14">
 
