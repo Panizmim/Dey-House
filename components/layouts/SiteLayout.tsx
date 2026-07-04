@@ -434,7 +434,7 @@ const footerInfo = [
 ]
 
 const socialLinks = [
-  { label: 'اینستاگرام', href: '#' },
+  { label: 'اینستاگرام', href: 'https://www.instagram.com/dey__house?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==' },
   { label: 'تلگرام',     href: '#' },
   { label: 'واتساپ',     href: '#' },
 ]
@@ -519,7 +519,7 @@ function Footer() {
               <h4 className="font-bold text-white/60" style={{ fontSize: '16px' }}>ارتباط</h4>
               <nav className="flex flex-col gap-3">
                 {socialLinks.map((item) => (
-                  <a key={item.label} href={item.href} className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
+                  <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" className="text-base text-white/55 hover:text-white/90 transition-colors duration-200">
                     {item.label}
                   </a>
                 ))}
