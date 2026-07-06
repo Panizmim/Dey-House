@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.deyhouse.com'),
   title: 'خانه دی | Dey House',
   description: 'خانه دی، فضایی برای هنر، فرهنگ و خلاقیت — کافه‌گالری و پلاتوهای تمرین در تهران',
+  other: {
+    enamad: '1200843',
+  },
 }
 
 export default function RootLayout({
