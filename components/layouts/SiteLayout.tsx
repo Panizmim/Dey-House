@@ -530,7 +530,13 @@ function Footer() {
 
         <div className="border-t border-white/[0.08] mt-12 pt-6 flex items-center justify-between flex-wrap gap-3">
           <p className="text-white/30 text-sm">© ۱۴۰۵ خانه دی — تمام حقوق محفوظ است</p>
-          <p className="text-white/20 text-sm">deyhouse.ir</p>
+          <div className="flex items-center gap-4">
+            <a referrerPolicy="origin" target="_blank" href="https://trustseal.enamad.ir/?id=754268&Code=gJrkEsq8dJ4VdfeXCbuOt4NdClsypqfv">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img referrerPolicy="origin" src="https://trustseal.enamad.ir/logo.aspx?id=754268&Code=gJrkEsq8dJ4VdfeXCbuOt4NdClsypqfv" alt="نماد اعتماد الکترونیکی" style={{ cursor: 'pointer' }} />
+            </a>
+            <p className="text-white/20 text-sm">deyhouse.ir</p>
+          </div>
         </div>
       </div>
     </footer>
