@@ -16,7 +16,7 @@ type Booking = {
   totalPrice:    number
   type:          string
   createdAt:     string
-  studio:        { name: string; imageUrl: string | null }
+  studio:        { name: string; images: string[] }
 }
 
 function formatPersianDate(d: Date) {
@@ -30,7 +30,7 @@ const studioImageFallback: Record<string, string> = {
 }
 
 function BookingRow({ booking, onCancelled }: { booking: Booking; onCancelled: () => void }) {
-  const imgSrc     = booking.studio.imageUrl ?? studioImageFallback[booking.studio.name] ?? null
+  const imgSrc     = booking.studio.images[0] ?? studioImageFallback[booking.studio.name] ?? null
   const [imgErr,       setImgErr]      = useState(false)
   const [confirming,   setConfirming]  = useState(false)
   const [cancelling,   setCancelling]  = useState(false)

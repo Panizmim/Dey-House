@@ -15,7 +15,7 @@ type Payment = {
   status:        string
   paymentStatus: string
   createdAt:     string
-  studio:        { name: string; imageUrl: string | null }
+  studio:        { name: string; images: string[] }
 }
 
 function formatPersianDate(d: Date) {
@@ -29,7 +29,7 @@ const studioImageFallback: Record<string, string> = {
 }
 
 function PaymentRow({ payment }: { payment: Payment }) {
-  const imgSrc = payment.studio.imageUrl ?? studioImageFallback[payment.studio.name] ?? null
+  const imgSrc = payment.studio.images[0] ?? studioImageFallback[payment.studio.name] ?? null
   const [imgErr, setImgErr] = useState(false)
 
   return (

@@ -27,7 +27,7 @@ model Studio {
   description  String?
   capacity     Int
   pricePerHour Int
-  imageUrl     String?
+  images       String[] @default([])
   isActive     Boolean   @default(true)
   bookings     Booking[]
 }

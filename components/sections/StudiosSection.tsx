@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft } from '@/components/ui/icons'
 import { toPersianNum } from '@/lib/utils'
 
-const studios = [
+const baseStudios = [
   {
     id:           'white-room',
     name:         'اتاق سفید',
@@ -56,8 +56,18 @@ const studios = [
   },
 ]
 
+type StudioView = typeof baseStudios[number]
+
+interface DbStudio {
+  id: string
+  name: string
+  capacity: number
+  pricePerHour: number
+  images: string[]
+}
+
 /* ─── StudioCard ─── */
-function StudioCard({ studio }: { studio: typeof studios[number] }) {
+function StudioCard({ studio }: { studio: StudioView }) {
   const [current, setCurrent] = useState(0)
 
   const prev = () => setCurrent((c) => (c - 1 + studio.images.length) % studio.images.length)
@@ -170,6 +180,29 @@ function StudioCard({ studio }: { studio: typeof studios[number] }) {
 
 /* ─── StudiosSection ─── */
 export function StudiosSection() {
+  const [studios, setStudios] = useState<StudioView[]>(baseStudios)
+
+  useEffect(() => {
+    fetch('/api/studios')
+      .then((res) => res.json())
+      .then((rows: DbStudio[]) => {
+        if (!Array.isArray(rows)) return
+        const byId = new Map(rows.map((s) => [s.id, s]))
+        setStudios(baseStudios.map((base) => {
+          const live = byId.get(base.id)
+          if (!live) return base
+          return {
+            ...base,
+            name:         live.name,
+            pricePerHour: live.pricePerHour,
+            chairCount:   live.capacity,
+            images:       live.images.length > 0 ? live.images : base.images,
+          }
+        }))
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <section className="max-w-container mx-auto px-6 md:px-8 lg:px-12 py-20">
 
