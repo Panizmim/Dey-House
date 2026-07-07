@@ -3,14 +3,15 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 
 const schema = z.object({
-  firstName: z.string().min(1),
-  lastName:  z.string().min(1),
-  phone:     z.string().min(1),
-  email:     z.string().email(),
-  artField:  z.string().min(1),
-  instagram: z.string().optional(),
-  website:   z.string().optional(),
-  bio:       z.string().optional(),
+  fullName:     z.string().min(2, 'نام باید حداقل ۲ کاراکتر باشد'),
+  phone:        z.string().regex(/^09[0-9]{9}$/, 'شماره موبایل معتبر نیست'),
+  email:        z.string().email('ایمیل معتبر نیست'),
+  website:      z.string().optional(),
+  instagram:    z.string().optional(),
+  artField:     z.string().min(1, 'رشته هنری را انتخاب کنید'),
+  notes:        z.string().optional(),
+  portfolioUrl: z.string().optional(),
+  artworkItems: z.array(z.object({ url: z.string(), description: z.string() })).optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -19,20 +20,23 @@ export async function POST(req: NextRequest) {
 
     const parsed = schema.safeParse(body)
     if (!parsed.success) {
-      return NextResponse.json({ error: 'اطلاعات ناقص است' }, { status: 400 })
+      return NextResponse.json({ error: 'اطلاعات وارد شده معتبر نیست' }, { status: 400 })
     }
 
-    const { firstName, lastName, phone, email, artField, bio } = parsed.data
+    const { fullName, phone, email, website, instagram, artField, notes, portfolioUrl, artworkItems } = parsed.data
+
+    const bio = [website, instagram].filter(Boolean).join(' | ') || null
 
     await db.artistSubmission.create({
       data: {
-        name:        `${firstName} ${lastName}`,
+        name:        fullName,
         email,
         phone,
         artField,
-        bio:         bio || null,
-        artworkUrls: '[]',
-        resumeUrl:   null,
+        bio,
+        notes:       notes || null,
+        artworkUrls: JSON.stringify(artworkItems ?? []),
+        resumeUrl:   portfolioUrl || null,
         status:      'PENDING',
       },
     })

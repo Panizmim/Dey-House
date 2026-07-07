@@ -75,6 +75,7 @@ model ArtistSubmission {
   phone       String
   artField    String
   bio         String?
+  notes       String?
   artworkUrls String   @default("[]")
   resumeUrl   String?
   status      String   @default("PENDING")

@@ -13,6 +13,7 @@ type Submission = {
   phone: string
   artField: string
   bio: string | null
+  notes: string | null
   status: string
   resumeUrl: string | null
   artworkUrls: string
@@ -180,6 +181,13 @@ export default function AdminSubmissionsPage() {
                       </span>
                     )}
                   </div>
+
+                  {/* توضیحات هنرمند */}
+                  {s.notes && (
+                    <p style={{ fontSize: 13, color: '#404040', lineHeight: 1.8, marginBottom: 12, background: '#FAFAFA', borderRadius: 8, padding: '10px 12px' }}>
+                      {s.notes}
+                    </p>
+                  )}
 
                   {/* فایل‌ها و دکمه باز کردن */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>

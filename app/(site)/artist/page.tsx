@@ -4,7 +4,8 @@ import { useState, useRef } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Upload, CheckCircle } from '@/components/ui/icons'
+import toast from 'react-hot-toast'
+import { Upload, CheckCircle, X } from '@/components/ui/icons'
 import PageHero from '@/components/ui/PageHero'
 
 /* ─── Validation ─── */
@@ -20,6 +21,12 @@ const schema = z.object({
 })
 
 type ArtistFormData = z.infer<typeof schema>
+
+type UploadState = {
+  status: 'idle' | 'uploading' | 'success' | 'error'
+  name?: string
+  url?: string
+}
 
 const artFields = [
   'نقاشی - طراحی',
@@ -55,60 +62,117 @@ const inputClass =
 const textareaClass =
   'w-full bg-white border border-[#E5E5E5] rounded-lg px-4 py-3 text-[13px] text-[#171717] placeholder:text-[#B0B0B0] outline-none focus:border-[#801A00] transition-colors duration-200 resize-none font-[family-name:var(--font-yekan)]'
 
+/* ─── نشانگر وضعیت آپلود ─── */
+function UploadStatusBadge({ state, onClear }: { state: UploadState; onClear: () => void }) {
+  if (state.status === 'uploading') {
+    return (
+      <div className="flex items-center gap-2 text-[12px]" style={{ color: '#717171' }}>
+        <span
+          style={{
+            width: 14, height: 14, borderRadius: '50%',
+            border: '2px solid #E5E5E5', borderTopColor: '#801A00',
+            display: 'inline-block', animation: 'spin 0.8s linear infinite',
+          }}
+        />
+        در حال آپلود {state.name}...
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
+  }
+  if (state.status === 'success') {
+    return (
+      <div className="flex items-center justify-between gap-2 text-[12px] rounded-lg px-3 py-2" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+        <span className="flex items-center gap-1.5" style={{ color: '#15803D' }}>
+          <CheckCircle size={14} />
+          آپلود شد — {state.name}
+        </span>
+        <button
+          type="button"
+          onClick={onClear}
+          className="hover:opacity-70"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#15803D' }}
+          aria-label="حذف فایل"
+        >
+          <X size={14} />
+        </button>
+      </div>
+    )
+  }
+  if (state.status === 'error') {
+    return (
+      <p className="text-[12px]" style={{ color: '#DC2626' }}>
+        آپلود {state.name} ناموفق بود — دوباره تلاش کنید
+      </p>
+    )
+  }
+  return null
+}
+
 /* ─── Upload Zone ─── */
 function UploadZone({
   accept,
   hint,
   onFile,
-  fileName,
+  state,
+  onClear,
 }: {
   accept: string
   hint: string
-  onFile?: (f: File) => void
-  fileName?: string
+  onFile: (f: File) => void
+  state: UploadState
+  onClear: () => void
 }) {
   const ref = useRef<HTMLInputElement>(null)
   return (
     <div>
       <div
-        onClick={() => ref.current?.click()}
-        className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:border-[#801A00] hover:bg-[#FAFAFA] p-10"
+        onClick={() => state.status !== 'uploading' && ref.current?.click()}
+        className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-2 transition-all duration-200 hover:border-[#801A00] hover:bg-[#FAFAFA] p-10"
+        style={{ cursor: state.status === 'uploading' ? 'not-allowed' : 'pointer' }}
       >
         <Upload size={28} className="text-[#B0B0B0]" />
         <span className="text-[13px] text-[#717171]">
-          {fileName ? fileName : 'Files +/↑'}
+          {state.name ? state.name : 'انتخاب فایل'}
         </span>
         <input
           ref={ref}
           type="file"
           accept={accept}
           className="hidden"
-          onChange={(e) => e.target.files?.[0] && onFile?.(e.target.files[0])}
+          onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
         />
       </div>
       <p className="text-[11px] text-[#B0B0B0] mt-2">{hint}</p>
+      <div className="mt-2">
+        <UploadStatusBadge state={state} onClear={onClear} />
+      </div>
     </div>
   )
 }
 
 /* ─── Artwork Upload ─── */
-function ArtworkUploadZone({ fileName, onFile }: { fileName?: string; onFile: (f: File) => void }) {
+function ArtworkUploadZone({ state, onFile, onClear }: { state: UploadState; onFile: (f: File) => void; onClear: () => void }) {
   const ref = useRef<HTMLInputElement>(null)
   return (
-    <div
-      onClick={() => ref.current?.click()}
-      className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200 hover:border-[#801A00] hover:bg-[#FAFAFA]"
-      style={{ height: '160px' }}
-    >
-      <span className="text-[13px] text-[#717171]">{fileName ? fileName : 'Files +/↑'}</span>
-      <span className="text-[11px] text-[#B0B0B0]">Allowed types: PNG, JPG</span>
-      <input
-        ref={ref}
-        type="file"
-        accept=".jpg,.jpeg,.png"
-        className="hidden"
-        onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
-      />
+    <div>
+      <div
+        onClick={() => state.status !== 'uploading' && ref.current?.click()}
+        className="border border-[#E5E5E5] rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:border-[#801A00] hover:bg-[#FAFAFA]"
+        style={{ height: '160px', cursor: state.status === 'uploading' ? 'not-allowed' : 'pointer' }}
+      >
+        <span className="text-[13px] text-[#717171]">{state.name ? state.name : 'انتخاب فایل'}</span>
+        <span className="text-[11px] text-[#B0B0B0]">فرمت‌های مجاز: PNG، JPG</span>
+        <input
+          ref={ref}
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
+        />
+      </div>
+      <div className="mt-2">
+        <UploadStatusBadge state={state} onClear={onClear} />
+      </div>
     </div>
   )
 }
@@ -127,13 +191,14 @@ async function uploadFile(file: File, folder: string): Promise<string> {
   return url as string
 }
 
+const emptyUpload: UploadState = { status: 'idle' }
+
 export default function ArtistPage() {
   const [submitted, setSubmitted]           = useState(false)
   const [loading, setLoading]               = useState(false)
-  const [portfolioFile, setPortfolioFile]   = useState<File | null>(null)
-  const [portfolioName, setPortfolioName]   = useState<string>()
+  const [portfolio, setPortfolio]           = useState<UploadState>(emptyUpload)
   const [portfolioError, setPortfolioError] = useState(false)
-  const [artworkFiles, setArtworkFiles]   = useState<Record<number, File>>({})
+  const [artworks, setArtworks]             = useState<Record<number, UploadState>>({})
 
   const {
     register,
@@ -154,34 +219,50 @@ export default function ArtistPage() {
 
   const selectedField = watch('artField')
 
+  async function handlePortfolioFile(file: File) {
+    setPortfolioError(false)
+    setPortfolio({ status: 'uploading', name: file.name })
+    try {
+      const url = await uploadFile(file, 'portfolios')
+      setPortfolio({ status: 'success', name: file.name, url })
+    } catch (err) {
+      setPortfolio({ status: 'error', name: file.name })
+      toast.error(err instanceof Error ? err.message : 'خطا در آپلود پرتفولیو')
+    }
+  }
+
+  async function handleArtworkFile(i: number, file: File) {
+    setArtworks((prev) => ({ ...prev, [i]: { status: 'uploading', name: file.name } }))
+    try {
+      const url = await uploadFile(file, 'artworks')
+      setArtworks((prev) => ({ ...prev, [i]: { status: 'success', name: file.name, url } }))
+    } catch (err) {
+      setArtworks((prev) => ({ ...prev, [i]: { status: 'error', name: file.name } }))
+      toast.error(err instanceof Error ? err.message : 'خطا در آپلود نمونه کار')
+    }
+  }
+
+  const isUploading = portfolio.status === 'uploading' || Object.values(artworks).some((a) => a.status === 'uploading')
+
   const onSubmit = async (data: ArtistFormData) => {
-    if (!portfolioFile) {
+    if (!portfolio.url) {
       setPortfolioError(true)
+      return
+    }
+    if (isUploading) {
+      toast.error('لطفاً صبر کنید تا آپلود فایل‌ها تمام شود')
       return
     }
     setLoading(true)
     try {
-      // آپلود پرتفولیو
-      let portfolioUrl: string | undefined
-      if (portfolioFile) {
-        portfolioUrl = await uploadFile(portfolioFile, 'portfolios')
-      }
-
-      // آپلود نمونه کارها + توضیحات
-      const artworkItems: { url: string; description: string }[] = []
-      for (let i = 0; i < 2; i++) {
-        const file = artworkFiles[i]
-        const description = data.artworks[i]?.description ?? ''
-        if (file || description) {
-          const url = file ? await uploadFile(file, 'artworks') : ''
-          artworkItems.push({ url, description })
-        }
-      }
+      const artworkItems = [0, 1]
+        .map((i) => ({ url: artworks[i]?.url ?? '', description: data.artworks[i]?.description ?? '' }))
+        .filter((item) => item.url || item.description)
 
       const res = await fetch('/api/artist-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, portfolioUrl, artworkItems }),
+        body: JSON.stringify({ ...data, portfolioUrl: portfolio.url, artworkItems }),
       })
 
       if (res.ok) {
@@ -192,7 +273,7 @@ export default function ArtistPage() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'خطا در ارسال فرم'
-      alert(msg)
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
@@ -240,7 +321,7 @@ export default function ArtistPage() {
             ابتدا خودتان را معرفی کنید.
           </h2>
           <p className="text-right text-[#717171] mb-6" style={{ fontSize: '13px', lineHeight: '1.7' }}>
-            اطلاعات فردی و هنری شما به صورت درپشت انجام مراحل بررسی موردنظر فرایند بررسی پروفایل شما را سریع‌تر خواهد کرد.
+            اطلاعات دقیق و کامل، فرایند بررسی پروفایل شما را سریع‌تر می‌کند.
           </p>
 
           <div className="mb-0">
@@ -315,13 +396,14 @@ export default function ArtistPage() {
               برای آشنایی کامل با شما، پرتفولیو خود را برایمان ارسال کنید.
             </h3>
             <p className="text-right text-[#717171] mb-4" style={{ fontSize: '12px' }}>
-              فایل از ارسال توجه داشته باشید: پرتفولیو باید شامل اطلاعات کامل رزومه و همچنین بهترین کارهای شما باشد. فرمت فایل PDF است.
+              پرتفولیو باید شامل اطلاعات کامل رزومه و همچنین بهترین کارهای شما باشد. فرمت فایل PDF است.
             </p>
             <UploadZone
               accept=".pdf"
-              hint="Allowed types: application/pdf"
-              fileName={portfolioName}
-              onFile={(f) => { setPortfolioFile(f); setPortfolioName(f.name); setPortfolioError(false) }}
+              hint="فرمت مجاز: PDF"
+              state={portfolio}
+              onFile={handlePortfolioFile}
+              onClear={() => setPortfolio(emptyUpload)}
             />
             {portfolioError && (
               <p className="text-xs text-red-500 mt-2">آپلود پرتفولیو الزامی است</p>
@@ -353,8 +435,9 @@ export default function ArtistPage() {
                   />
                   {/* upload — چپ */}
                   <ArtworkUploadZone
-                    fileName={artworkFiles[i]?.name}
-                    onFile={(f) => setArtworkFiles((prev) => ({ ...prev, [i]: f }))}
+                    state={artworks[i] ?? emptyUpload}
+                    onFile={(f) => handleArtworkFile(i, f)}
+                    onClear={() => setArtworks((prev) => { const next = { ...prev }; delete next[i]; return next })}
                   />
                 </div>
               ))}
@@ -381,7 +464,7 @@ export default function ArtistPage() {
           <div className="mt-10 flex justify-end">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isUploading}
               className="text-white font-[700] rounded-lg transition-colors duration-200 disabled:opacity-60"
               style={{
                 width: '200px',
@@ -390,12 +473,12 @@ export default function ArtistPage() {
                 fontSize: '16px',
                 fontFamily: 'YekanBakh, Tahoma, sans-serif',
                 border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: (loading || isUploading) ? 'not-allowed' : 'pointer',
               }}
               onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = '#2D2D2D' }}
               onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = '#171717' }}
             >
-              {loading ? 'در حال ارسال...' : 'ثبت نام'}
+              {loading ? 'در حال ارسال...' : isUploading ? 'در حال آپلود...' : 'ثبت نام'}
             </button>
           </div>
 
