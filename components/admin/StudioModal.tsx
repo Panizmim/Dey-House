@@ -50,6 +50,8 @@ function makeKey() {
   return Math.random().toString(36).slice(2)
 }
 
+const MAX_GALLERY_IMAGES = 5
+
 type Mode = 'form' | 'crop'
 
 export default function StudioModal({ open, studio, onClose, onSave }: StudioModalProps) {
@@ -273,7 +275,7 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
           {/* گالری تصاویر */}
           <div>
             <label style={{ fontSize: 14, fontWeight: 500, color: '#404040', display: 'block', marginBottom: 10 }}>
-              گالری تصاویر
+              گالری تصاویر ({gallery.length} از {MAX_GALLERY_IMAGES})
             </label>
             <div className="flex flex-wrap gap-3">
               {gallery.map((slot) => (
@@ -288,16 +290,21 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
                   />
                 </div>
               ))}
-              <div style={{ width: 200 }}>
-                <ImageUploadZone
-                  currentUrl={null}
-                  preview={null}
-                  status="idle"
-                  onFileSelect={(file) => openCropFor(URL.createObjectURL(file), 'new')}
-                  onClear={() => {}}
-                />
-              </div>
+              {gallery.length < MAX_GALLERY_IMAGES && (
+                <div style={{ width: 200 }}>
+                  <ImageUploadZone
+                    currentUrl={null}
+                    preview={null}
+                    status="idle"
+                    onFileSelect={(file) => openCropFor(URL.createObjectURL(file), 'new')}
+                    onClear={() => {}}
+                  />
+                </div>
+              )}
             </div>
+            <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>
+              حداکثر {MAX_GALLERY_IMAGES} عکس برای هر پلاتو
+            </p>
           </div>
 
           {/* وضعیت */}

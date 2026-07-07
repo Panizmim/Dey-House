@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         description:  description || null,
         capacity:     Number(capacity),
         pricePerHour: Number(pricePerHour),
-        images:       Array.isArray(images) ? images : [],
+        images:       Array.isArray(images) ? images.slice(0, 5) : [],
         ...(isActive !== undefined && { isActive: !!isActive }),
       },
     })
