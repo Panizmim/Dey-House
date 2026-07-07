@@ -9,7 +9,7 @@ const schema = z.object({
   phone:           z.string().regex(/^09[0-9]{9}$/).optional(),
   currentPassword: z.string().optional(),
   newPassword:     z.string().min(8).optional(),
-  image:           z.string().url().optional(),
+  image:           z.string().min(1).optional(),
 })
 
 export async function PATCH(req: Request) {

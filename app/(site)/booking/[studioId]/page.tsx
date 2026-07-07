@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { useSession, getSession } from 'next-auth/react'
 import {
   MapPin, Grid2x2, X, ChevronLeft, ChevronRight,
   Lightbulb, Monitor, Scan, Wind, Volume2, Square, Wifi,
@@ -11,6 +12,8 @@ import {
 } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import DateTimePickerModal from '@/components/ui/DateTimePickerModal'
+import { LoginModal } from '@/components/ui/LoginModal'
+import { RegisterModal } from '@/components/ui/RegisterModal'
 import { toPersianNum } from '@/lib/utils'
 import { PERSIAN_MONTHS, toJalali, toPersian, TIME_SLOTS } from '@/lib/jalali'
 
@@ -125,6 +128,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
     images:       liveData.images.length > 0 ? liveData.images : studioStatic.images,
   } : studioStatic
 
+  const { data: session } = useSession()
   const [showPicker, setShowPicker]               = useState(false)
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null)
   const [selectedEndDate, setSelectedEndDate]     = useState<Date | null>(null)
@@ -137,6 +141,8 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
   const [showSuccess, setShowSuccess]             = useState(false)
   const [showUsageSheet, setShowUsageSheet]       = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [loginOpen, setLoginOpen]                 = useState(false)
+  const [registerOpen, setRegisterOpen]           = useState(false)
   const galleryScrollRef = useRef<HTMLDivElement>(null)
 
   const resetSelection = () => {
@@ -152,7 +158,7 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
     toast.success('در حال انتقال به درگاه پرداخت...')
   }
 
-  const handleContactRequest = async () => {
+  const submitContactRequest = async (user: { name?: string | null; email?: string | null; phone?: string | null }) => {
     if (!selectedStartDate) return
     setLoading(true)
     try {
@@ -166,9 +172,9 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: 'کاربر مهمان',
-          email: '',
-          phone: '',
+          name: user.name || 'کاربر',
+          email: user.email || '',
+          phone: user.phone || '',
           usageType: 'سایر موارد',
           message: `درخواست رزرو ${studio.name} — تاریخ: ${dateStr}${endPart}`,
         }),
@@ -180,6 +186,20 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleContactRequest = () => {
+    if (!selectedStartDate) return
+    if (!session?.user) {
+      setLoginOpen(true)
+      return
+    }
+    submitContactRequest(session.user)
+  }
+
+  const handleAuthSuccess = async () => {
+    const freshSession = await getSession()
+    if (freshSession?.user) submitContactRequest(freshSession.user)
   }
 
   function handleGalleryScroll() {
@@ -434,7 +454,15 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
             className="px-7 py-3 rounded-xl text-white font-bold text-[16px] transition-all active:scale-[0.97] flex-shrink-0"
             style={{ background: '#801A00' }}
           >
-            {!usageType ? 'رزرو' : !selectedStartDate ? 'انتخاب تاریخ' : usageType === 'theater' ? 'پرداخت' : 'ثبت درخواست'}
+            {!usageType
+              ? 'رزرو'
+              : !selectedStartDate
+              ? 'انتخاب تاریخ'
+              : usageType === 'theater'
+              ? 'پرداخت'
+              : !session?.user
+              ? 'ورود و ثبت'
+              : 'ثبت درخواست'}
           </button>
         </div>
 
@@ -869,7 +897,13 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                       opacity: loading ? 0.6 : 1,
                     }}
                   >
-                    {loading ? 'در حال ثبت...' : !selectedStartDate ? 'تاریخ را انتخاب کنید' : 'ثبت درخواست رزرو رایگان'}
+                    {loading
+                      ? 'در حال ثبت...'
+                      : !selectedStartDate
+                      ? 'تاریخ را انتخاب کنید'
+                      : !session?.user
+                      ? 'ورود و ثبت درخواست'
+                      : 'ثبت درخواست رزرو رایگان'}
                   </button>
                   <p className="text-[11px] text-[#A0A0A0] text-center mt-2 font-light">
                     بدون پرداخت — تیم ما با شما تماس می‌گیرد
@@ -1010,6 +1044,19 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
           </div>
         </div>
       )}
+
+      <LoginModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true) }}
+        onSuccess={handleAuthSuccess}
+      />
+      <RegisterModal
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true) }}
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   )
 }

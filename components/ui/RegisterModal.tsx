@@ -25,9 +25,10 @@ interface Props {
   open:            boolean
   onClose:         () => void
   onSwitchToLogin: () => void
+  onSuccess?:      () => void
 }
 
-export function RegisterModal({ open, onClose, onSwitchToLogin }: Props) {
+export function RegisterModal({ open, onClose, onSwitchToLogin, onSuccess }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [showPass,    setShowPass]    = useState(false)
   const [serverError, setServerError] = useState('')
@@ -70,7 +71,8 @@ export function RegisterModal({ open, onClose, onSwitchToLogin }: Props) {
       const signInResult = await signIn('credentials', { email: data.email, password: data.password, redirect: false })
       if (signInResult?.error) { onSwitchToLogin(); return }
       onClose()
-      window.location.href = '/dashboard'
+      if (onSuccess) onSuccess()
+      else window.location.href = '/dashboard'
     } catch {
       setServerError('خطای شبکه. لطفاً دوباره تلاش کنید')
     } finally {

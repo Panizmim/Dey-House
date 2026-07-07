@@ -19,9 +19,10 @@ interface Props {
   open:               boolean
   onClose:            () => void
   onSwitchToRegister: () => void
+  onSuccess?:         () => void
 }
 
-export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
+export function LoginModal({ open, onClose, onSwitchToRegister, onSuccess }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [showPass,    setShowPass]    = useState(false)
   const [serverError, setServerError] = useState('')
@@ -57,7 +58,7 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: Props) {
     })
     if (!result) { setServerError('خطا در ارتباط با سرور'); return }
     if (result.error) { setServerError('ایمیل یا رمز عبور اشتباه است'); return }
-    if (result.ok) { onClose(); window.location.reload() }
+    if (result.ok) { onClose(); onSuccess?.() }
   }
 
   if (!open) return null
