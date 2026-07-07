@@ -7,7 +7,7 @@ import {
   MapPin, Grid2x2, X, ChevronLeft, ChevronRight,
   Lightbulb, Monitor, Scan, Wind, Volume2, Square, Wifi,
   Maximize2, Armchair, Layers, PaintBucket, Calendar,
-  MessageCircle, CheckCircle,
+  MessageCircle, CheckCircle, ExternalLink,
 } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import DateTimePickerModal from '@/components/ui/DateTimePickerModal'
@@ -18,6 +18,8 @@ import { PERSIAN_MONTHS, toJalali, toPersian, TIME_SLOTS } from '@/lib/jalali'
 const iconMap: Record<string, React.ElementType> = {
   Lightbulb, Monitor, Scan, Wind, Volume2, Square, Wifi,
 }
+
+const THEATER_BOOKING_URL = 'https://pelatoo.com/center/%D8%AE%D8%A7%D9%86%D9%87-%D8%AF%DB%8C'
 
 /* ─── داده‌ها ─── */
 const studiosData = {
@@ -444,18 +446,19 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
               <div className="w-10 h-1 bg-[#E0E0E0] rounded-full mx-auto mb-5" />
               <h3 className="text-[19px] font-black text-[#171717] mb-4 text-right">نوع کاربری را انتخاب کنید</h3>
               <div className="flex flex-col gap-2 mb-4">
-                <button
-                  onClick={() => { setUsageType('theater'); resetSelection() }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
+                <a
+                  href={THEATER_BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 border-[#EFEFEF] bg-white transition-all duration-200 text-right"
+                  style={{ textDecoration: 'none' }}
                 >
                   <div className="flex-1 text-right">
-                    <p className={`text-[16px] font-bold ${usageType === 'theater' ? 'text-[#801A00]' : 'text-[#171717]'}`}>تمرین تئاتر</p>
+                    <p className="text-[16px] font-bold text-[#171717]">تمرین تئاتر</p>
                     <p className="text-[14px] text-[#A0A0A0] font-light mt-0.5">رزرو آنلاین با پرداخت مستقیم</p>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#801A00] bg-[#801A00]' : 'border-[#D0D0D0] bg-white'}`}>
-                    {usageType === 'theater' && <div className="w-2 h-2 rounded-full bg-white" />}
-                  </div>
-                </button>
+                  <ExternalLink size={18} className="flex-shrink-0 mr-3" style={{ color: '#A0A0A0' }} />
+                </a>
                 <button
                   onClick={() => { setUsageType('other'); resetSelection() }}
                   className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'other' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white'}`}
@@ -705,22 +708,23 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                 <div className="flex flex-col gap-2">
 
                   {/* تمرین تئاتر */}
-                  <button
-                    onClick={() => { setUsageType('theater'); resetSelection() }}
-                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all duration-200 text-right ${usageType === 'theater' ? 'border-[#801A00] bg-[#FDF8F8]' : 'border-[#EFEFEF] bg-white hover:border-[#D0D0D0]'}`}
+                  <a
+                    href={THEATER_BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 border-[#EFEFEF] bg-white hover:border-[#D0D0D0] transition-all duration-200 text-right"
+                    style={{ textDecoration: 'none' }}
                   >
                     <div className="flex-1 text-right">
-                      <p className={`text-[14px] font-bold ${usageType === 'theater' ? 'text-[#801A00]' : 'text-[#171717]'}`}>
+                      <p className="text-[14px] font-bold text-[#171717]">
                         تمرین تئاتر
                       </p>
                       <p className="text-[12px] text-[#A0A0A0] font-light mt-0.5">
                         رزرو آنلاین با پرداخت مستقیم
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-all ${usageType === 'theater' ? 'border-[#801A00] bg-[#801A00]' : 'border-[#D0D0D0] bg-white'}`}>
-                      {usageType === 'theater' && <div className="w-2 h-2 rounded-full bg-white" />}
-                    </div>
-                  </button>
+                    <ExternalLink size={18} className="flex-shrink-0 mr-3" style={{ color: '#A0A0A0' }} />
+                  </a>
 
                   {/* سایر موارد */}
                   <button
