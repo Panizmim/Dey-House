@@ -11,7 +11,7 @@ export async function GET() {
   try {
     const bookings = await db.booking.findMany({
       where:   { userId: session.user.id },
-      include: { studio: { select: { name: true, imageUrl: true } } },
+      include: { studio: { select: { name: true, images: true } } },
       orderBy: { createdAt: 'desc' },
     })
 

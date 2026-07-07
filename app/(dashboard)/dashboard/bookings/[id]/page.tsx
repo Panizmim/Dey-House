@@ -19,7 +19,7 @@ type Booking = {
   type:          string
   zarinpalRef:   string | null
   createdAt:     string
-  studio:        { name: string; imageUrl: string | null }
+  studio:        { name: string; images: string[] }
 }
 
 function formatPersianDate(d: Date) {
@@ -148,7 +148,7 @@ export default function BookingDetailPage() {
     )
   }
 
-  const imgSrc = booking.studio.imageUrl ?? studioImageFallback[booking.studio.name] ?? null
+  const imgSrc = booking.studio.images[0] ?? studioImageFallback[booking.studio.name] ?? null
 
   return (
     <div style={{ background: 'white', borderRadius: 16, padding: 24 }}>

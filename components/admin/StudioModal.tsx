@@ -14,15 +14,22 @@ export interface Studio {
   description: string | null
   capacity: number
   pricePerHour: number
-  imageUrl: string | null
+  images: string[]
   isActive: boolean
 }
 
 interface StudioModalProps {
   open: boolean
-  studio?: Studio | null
+  studio: Studio
   onClose: () => void
   onSave: () => void
+}
+
+interface GallerySlot {
+  key: string
+  url: string | null
+  preview: string | null
+  status: UploadStatus
 }
 
 const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:outline-none focus:border-[#801A00] transition-colors'
@@ -39,18 +46,20 @@ async function uploadImage(file: File): Promise<string> {
   return data.url as string
 }
 
+function makeKey() {
+  return Math.random().toString(36).slice(2)
+}
+
 type Mode = 'form' | 'crop'
 
 export default function StudioModal({ open, studio, onClose, onSave }: StudioModalProps) {
-  const [mode,         setMode]        = useState<Mode>('form')
-  const [loading,      setLoading]     = useState(false)
-  const [cropLoading,  setCropLoading] = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [imageUrl,     setImageUrl]    = useState<string | null>(null)
-  const [imageRemoved, setImageRemoved] = useState(false)
-  const [imageStatus,  setImageStatus] = useState<UploadStatus>('idle')
-  const [cropSrc,      setCropSrc]     = useState<string | null>(null)
-  const [cropArea,     setCropArea]    = useState<Area | null>(null)
+  const [mode,        setMode]        = useState<Mode>('form')
+  const [loading,     setLoading]     = useState(false)
+  const [cropLoading, setCropLoading] = useState(false)
+  const [gallery,     setGallery]     = useState<GallerySlot[]>([])
+  const [cropTarget,  setCropTarget]  = useState<string | 'new' | null>(null)
+  const [cropSrc,     setCropSrc]     = useState<string | null>(null)
+  const [cropArea,    setCropArea]    = useState<Area | null>(null)
   const [form, setForm] = useState({
     name: '', description: '', capacity: '', pricePerHour: '', isActive: true,
   })
@@ -58,23 +67,17 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
   useEffect(() => {
     if (!open) return
     setMode('form')
-    setImagePreview(null)
-    setImageUrl(null)
-    setImageRemoved(false)
-    setImageStatus('idle')
+    setCropTarget(null)
     setCropSrc(null)
     setCropArea(null)
-    if (studio) {
-      setForm({
-        name:         studio.name,
-        description:  studio.description ?? '',
-        capacity:     String(studio.capacity),
-        pricePerHour: String(studio.pricePerHour),
-        isActive:     studio.isActive,
-      })
-    } else {
-      setForm({ name: '', description: '', capacity: '', pricePerHour: '', isActive: true })
-    }
+    setGallery(studio.images.map((url) => ({ key: makeKey(), url, preview: null, status: 'success' as const })))
+    setForm({
+      name:         studio.name,
+      description:  studio.description ?? '',
+      capacity:     String(studio.capacity),
+      pricePerHour: String(studio.pricePerHour),
+      isActive:     studio.isActive,
+    })
   }, [studio, open])
 
   const set = (field: string, value: string | boolean) =>
@@ -82,31 +85,45 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
 
   const handleAreaChange = useCallback((area: Area) => setCropArea(area), [])
 
-  function openCropFor(src: string) {
+  function openCropFor(src: string, target: string | 'new') {
     setCropSrc(src)
     setCropArea(null)
+    setCropTarget(target)
     setMode('crop')
   }
 
+  function removeSlot(key: string) {
+    setGallery((prev) => prev.filter((s) => s.key !== key))
+  }
+
   async function handleCropConfirm() {
-    if (!cropSrc || !cropArea) return
+    if (!cropSrc || !cropArea || !cropTarget) return
     setCropLoading(true)
     try {
       const file = await getCroppedFile(cropSrc, cropArea)
+      const preview = URL.createObjectURL(file)
       setMode('form')
-      setImagePreview(URL.createObjectURL(file))
-      setImageUrl(null)
-      setImageRemoved(false)
-      setImageStatus('uploading')
-      const url = await uploadImage(file)
-      setImageUrl(url)
-      setImageStatus('success')
+
+      const targetKey = cropTarget === 'new' ? makeKey() : cropTarget
+      if (cropTarget === 'new') {
+        setGallery((prev) => [...prev, { key: targetKey, url: null, preview, status: 'uploading' }])
+      } else {
+        setGallery((prev) => prev.map((s) => s.key === targetKey ? { ...s, preview, status: 'uploading' } : s))
+      }
+
+      try {
+        const url = await uploadImage(file)
+        setGallery((prev) => prev.map((s) => s.key === targetKey ? { ...s, url, preview: null, status: 'success' } : s))
+      } catch {
+        toast.error('خطا در آپلود تصویر')
+        setGallery((prev) => prev.map((s) => s.key === targetKey ? { ...s, status: 'error' } : s))
+      }
     } catch {
-      setImageStatus('error')
       toast.error('خطا در پردازش تصویر')
       setMode('form')
     } finally {
       setCropLoading(false)
+      setCropTarget(null)
     }
   }
 
@@ -119,24 +136,26 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
     const pricePerHour = parseInt(form.pricePerHour, 10)
     if (isNaN(capacity) || capacity <= 0) { toast.error('ظرفیت نامعتبر است'); return }
     if (isNaN(pricePerHour) || pricePerHour <= 0) { toast.error('قیمت نامعتبر است'); return }
-    if (imageStatus === 'uploading') { toast.error('لطفاً صبر کنید تا آپلود تمام شود'); return }
+    if (gallery.some((s) => s.status === 'uploading')) { toast.error('لطفاً صبر کنید تا آپلود تصاویر تمام شود'); return }
 
     setLoading(true)
     try {
-      const finalImageUrl = imageRemoved ? null : (imageUrl ?? studio?.imageUrl ?? null)
+      const images = gallery.filter((s) => s.url).map((s) => s.url as string)
       const body = {
         name:         form.name,
         description:  form.description || null,
         capacity,
         pricePerHour,
-        imageUrl:     finalImageUrl,
+        images,
         isActive:     form.isActive,
       }
-      const url    = studio ? `/api/admin/studios/${studio.id}` : '/api/admin/studios'
-      const method = studio ? 'PUT' : 'POST'
-      const res    = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const res = await fetch(`/api/admin/studios/${studio.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
       if (!res.ok) throw new Error()
-      toast.success(studio ? 'پلاتو با موفقیت ویرایش شد' : 'پلاتو با موفقیت اضافه شد')
+      toast.success('پلاتو با موفقیت ویرایش شد')
       onSave()
       onClose()
     } catch {
@@ -152,7 +171,7 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
     <Modal
       open={open}
       maxWidth={680}
-      title={isCrop ? 'برش تصویر' : studio ? 'ویرایش پلاتو' : 'افزودن پلاتو جدید'}
+      title={isCrop ? 'برش تصویر' : 'ویرایش پلاتو'}
       onClose={isCrop ? () => setMode('form') : onClose}
       footer={
         isCrop ? (
@@ -189,7 +208,7 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
               disabled={loading}
               style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#801A00', color: 'white', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
             >
-              {loading ? 'در حال ذخیره...' : studio ? 'ذخیره تغییرات' : 'افزودن پلاتو'}
+              {loading ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
             </button>
           </>
         )
@@ -251,33 +270,34 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
             />
           </div>
 
-          {/* تصویر */}
+          {/* گالری تصاویر */}
           <div>
             <label style={{ fontSize: 14, fontWeight: 500, color: '#404040', display: 'block', marginBottom: 10 }}>
-              تصویر پلاتو
+              گالری تصاویر
             </label>
-            <ImageUploadZone
-              currentUrl={imageRemoved ? null : (imageUrl ?? studio?.imageUrl)}
-              preview={imagePreview}
-              status={imageStatus}
-              onFileSelect={(file) => openCropFor(URL.createObjectURL(file))}
-              onCropExisting={() => {
-                if (cropSrc) {
-                  setCropArea(null)
-                  setMode('crop')
-                } else {
-                  const src = imageUrl ?? imagePreview ?? studio?.imageUrl ?? null
-                  if (src) openCropFor(src)
-                }
-              }}
-              onDeleteExisting={() => {
-                setImagePreview(null)
-                setImageUrl(null)
-                setImageRemoved(true)
-                setImageStatus('idle')
-              }}
-              onClear={() => { setImagePreview(null); setImageUrl(null); setImageStatus('idle') }}
-            />
+            <div className="flex flex-wrap gap-3">
+              {gallery.map((slot) => (
+                <div key={slot.key} style={{ width: 200 }}>
+                  <ImageUploadZone
+                    currentUrl={slot.url}
+                    preview={slot.preview}
+                    status={slot.status}
+                    onFileSelect={(file) => openCropFor(URL.createObjectURL(file), slot.key)}
+                    onDeleteExisting={() => removeSlot(slot.key)}
+                    onClear={() => removeSlot(slot.key)}
+                  />
+                </div>
+              ))}
+              <div style={{ width: 200 }}>
+                <ImageUploadZone
+                  currentUrl={null}
+                  preview={null}
+                  status="idle"
+                  onFileSelect={(file) => openCropFor(URL.createObjectURL(file), 'new')}
+                  onClear={() => {}}
+                />
+              </div>
+            </div>
           </div>
 
           {/* وضعیت */}

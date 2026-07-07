@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, ImageOff, Users } from '@/components/ui/icons'
+import { Pencil, ImageOff, Users } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import StudioModal, { type Studio } from '@/components/admin/StudioModal'
 
@@ -29,9 +29,9 @@ function ActiveToggle({ studio, onToggle }: { studio: Studio; onToggle: () => vo
 }
 
 export default function AdminStudiosPage() {
-  const [studios,      setStudios]      = useState<Studio[]>([])
-  const [loading,      setLoading]      = useState(true)
-  const [modalOpen,    setModalOpen]    = useState(false)
+  const [studios,       setStudios]       = useState<Studio[]>([])
+  const [loading,       setLoading]       = useState(true)
+  const [modalOpen,     setModalOpen]     = useState(false)
   const [editingStudio, setEditingStudio] = useState<Studio | null>(null)
 
   async function fetchStudios() {
@@ -55,16 +55,6 @@ export default function AdminStudiosPage() {
     else toast.error('خطا در تغییر وضعیت')
   }
 
-  async function deleteStudio(studio: Studio) {
-    if (!window.confirm(`آیا مطمئنید می‌خواهید «${studio.name}» را حذف کنید؟`)) return
-    const res = await fetch(`/api/admin/studios/${studio.id}`, { method: 'DELETE' })
-    if (res.ok) { toast.success('پلاتو حذف شد'); fetchStudios() }
-    else {
-      const data = await res.json().catch(() => null)
-      toast.error(data?.error || 'خطا در حذف پلاتو')
-    }
-  }
-
   return (
     <div>
       {/* هدر */}
@@ -72,21 +62,9 @@ export default function AdminStudiosPage() {
         <div>
           <h1 style={{ fontSize: 18, fontWeight: 800, color: '#171717' }}>مدیریت پلاتوها</h1>
           <p style={{ fontSize: 13, color: '#717171', marginTop: 2 }}>
-            {studios.length} پلاتو
+            {studios.length} پلاتو — قیمت و گالری تصاویر از همین‌جا قابل ویرایش است
           </p>
         </div>
-        <button
-          onClick={() => { setEditingStudio(null); setModalOpen(true) }}
-          className="flex items-center gap-2"
-          style={{
-            padding: '9px 18px', borderRadius: 8, border: 'none',
-            background: '#801A00', color: 'white', fontSize: 14,
-            fontWeight: 600, cursor: 'pointer',
-          }}
-        >
-          <Plus size={16} />
-          افزودن پلاتو جدید
-        </button>
       </div>
 
       {/* جدول */}
@@ -104,7 +82,7 @@ export default function AdminStudiosPage() {
             </thead>
             <tbody>
               {loading ? (
-                Array.from({ length: 4 }).map((_, i) => (
+                Array.from({ length: 3 }).map((_, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid #EFEFEF' }}>
                     {Array.from({ length: 6 }).map((_, j) => (
                       <td key={j} style={{ padding: '14px 16px' }}>
@@ -116,7 +94,7 @@ export default function AdminStudiosPage() {
               ) : studios.length === 0 ? (
                 <tr>
                   <td colSpan={6} style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: '#717171' }}>
-                    هنوز پلاتویی اضافه نشده است
+                    پلاتویی یافت نشد
                   </td>
                 </tr>
               ) : (
@@ -128,9 +106,9 @@ export default function AdminStudiosPage() {
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
                   >
                     <td style={{ padding: '12px 16px' }}>
-                      {studio.imageUrl ? (
+                      {studio.images[0] ? (
                         <div style={{ position: 'relative', width: 40, height: 40, borderRadius: 6, overflow: 'hidden' }}>
-                          <Image src={studio.imageUrl} alt={studio.name} fill className="object-cover" />
+                          <Image src={studio.images[0]} alt={studio.name} fill className="object-cover" />
                         </div>
                       ) : (
                         <div style={{ width: 40, height: 40, borderRadius: 6, background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -157,24 +135,14 @@ export default function AdminStudiosPage() {
                       <ActiveToggle studio={studio} onToggle={() => toggleActive(studio)} />
                     </td>
                     <td style={{ padding: '12px 16px' }}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => { setEditingStudio(studio); setModalOpen(true) }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', borderRadius: 6, border: '1px solid #E5E5E5', background: 'white', fontSize: 12, color: '#717171', cursor: 'pointer', transition: 'all 0.15s' }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = '#801A00'; e.currentTarget.style.borderColor = '#801A00' }}
-                          onMouseLeave={(e) => { e.currentTarget.style.color = '#717171'; e.currentTarget.style.borderColor = '#E5E5E5' }}
-                        >
-                          <Pencil size={13} /> ویرایش
-                        </button>
-                        <button
-                          onClick={() => deleteStudio(studio)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', borderRadius: 6, border: '1px solid #FEE2E2', background: 'white', fontSize: 12, color: '#DC2626', cursor: 'pointer', transition: 'all 0.15s' }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF2F2' }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = 'white' }}
-                        >
-                          <Trash2 size={13} /> حذف
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => { setEditingStudio(studio); setModalOpen(true) }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', borderRadius: 6, border: '1px solid #E5E5E5', background: 'white', fontSize: 12, color: '#717171', cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = '#801A00'; e.currentTarget.style.borderColor = '#801A00' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#717171'; e.currentTarget.style.borderColor = '#E5E5E5' }}
+                      >
+                        <Pencil size={13} /> ویرایش
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -189,7 +157,7 @@ export default function AdminStudiosPage() {
         )}
       </div>
 
-      {modalOpen && (
+      {modalOpen && editingStudio && (
         <StudioModal
           open={modalOpen}
           studio={editingStudio}

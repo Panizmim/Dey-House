@@ -101,8 +101,27 @@ type StudioId = keyof typeof studiosData
 
 /* ─── صفحه ─── */
 export default function StudioDetailPage({ params }: { params: { studioId: string } }) {
-  const studio = studiosData[params.studioId as StudioId]
-  if (!studio) notFound()
+  const studioStatic = studiosData[params.studioId as StudioId]
+  if (!studioStatic) notFound()
+
+  type LiveStudio = { id: string; name: string; capacity: number; pricePerHour: number; images: string[] }
+  const [liveRows, setLiveRows] = useState<LiveStudio[] | null>(null)
+
+  useEffect(() => {
+    fetch('/api/studios')
+      .then((res) => res.json())
+      .then((rows: LiveStudio[]) => { if (Array.isArray(rows)) setLiveRows(rows) })
+      .catch(() => {})
+  }, [])
+
+  const liveData = liveRows?.find((s) => s.id === studioStatic.id)
+  const studio = liveData ? {
+    ...studioStatic,
+    name:         liveData.name,
+    pricePerHour: liveData.pricePerHour,
+    chairCount:   liveData.capacity,
+    images:       liveData.images.length > 0 ? liveData.images : studioStatic.images,
+  } : studioStatic
 
   const [showPicker, setShowPicker]               = useState(false)
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null)
@@ -347,7 +366,16 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
         <div className="px-4 py-5 mb-28">
           <h2 className="text-[19px] font-black text-[#171717] mb-4">فضاهای دیگر</h2>
           <div className="grid grid-cols-2 gap-3">
-            {Object.values(studiosData).filter(s => s.id !== studio.id).map((other) => (
+            {Object.values(studiosData).filter(s => s.id !== studio.id).map((otherStatic) => {
+              const otherLive = liveRows?.find((s) => s.id === otherStatic.id)
+              const other = otherLive ? {
+                ...otherStatic,
+                name:         otherLive.name,
+                pricePerHour: otherLive.pricePerHour,
+                chairCount:   otherLive.capacity,
+                images:       otherLive.images.length > 0 ? otherLive.images : otherStatic.images,
+              } : otherStatic
+              return (
               <Link key={other.id} href={`/booking/${other.id}`} style={{ textDecoration: 'none' }}>
                 <div className="border border-[#EFEFEF] rounded-xl overflow-hidden" style={{ transition: 'box-shadow 200ms' }}>
                   <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
@@ -369,7 +397,8 @@ export default function StudioDetailPage({ params }: { params: { studioId: strin
                   </div>
                 </div>
               </Link>
-            ))}
+              )
+            })}
           </div>
         </div>
 
