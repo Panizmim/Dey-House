@@ -7,83 +7,112 @@ const phones = [
   { label: 'گالری', tel: '09189282145', display: '۰۹۱۸۹۲۸۲۱۴۵' },
 ]
 
+function InfoIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-center flex-shrink-0">
+      {children}
+    </div>
+  )
+}
+
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <PageHero title="تماس با ما" />
+    <>
+      <PageHero title="تماس با ما" subtitle="هر سوالی دارید، خوشحال می‌شویم پاسخ‌گو باشیم" />
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px 96px' }}>
+      <div className="max-w-container mx-auto px-6 md:px-8 lg:px-12 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 items-stretch">
 
-        {/* ── نقشه ── */}
-        <a
-          href="https://nshn.ir/_bvk7KWxiB9q"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ display: 'block', textDecoration: 'none', marginBottom: 40 }}
-        >
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: 4 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/map.png"
-              alt="نقشه خانه دی"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'grayscale(30%)' }}
-            />
-            <div style={{
-              position: 'absolute', bottom: 16, left: 16,
-              display: 'flex', alignItems: 'center', gap: 5,
-              background: 'white', padding: '7px 14px', borderRadius: 100,
-              fontSize: 12, fontWeight: 700, color: '#171717',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
-            }}>
-              <MapPin size={12} color="#801A00" />
-              نشان روی نقشه
-              <ExternalLink size={10} color="#999" />
+          {/* ── ستون اطلاعات تماس ── */}
+          <div className="flex flex-col gap-4">
+
+            {/* آدرس */}
+            <div className="bg-neutral-50 border border-neutral-200 rounded-card p-6 flex items-start gap-4">
+              <InfoIcon>
+                <MapPin size={22} className="text-brand" />
+              </InfoIcon>
+              <div>
+                <p className="text-sm text-neutral-500 mb-1">آدرس</p>
+                <p className="text-lg font-bold text-neutral-900 leading-relaxed">
+                  خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳
+                </p>
+              </div>
             </div>
+
+            {/* ایمیل */}
+            <div className="bg-neutral-50 border border-neutral-200 rounded-card p-6 flex items-center gap-4">
+              <InfoIcon>
+                <Mail size={21} className="text-brand" />
+              </InfoIcon>
+              <div>
+                <p className="text-sm text-neutral-500 mb-1">ایمیل</p>
+                <a
+                  href="mailto:info@deyhouse.ir"
+                  dir="ltr"
+                  className="text-lg font-bold text-neutral-900 hover:text-brand transition-colors duration-150"
+                  style={{ display: 'inline-block' }}
+                >
+                  info@deyhouse.ir
+                </a>
+              </div>
+            </div>
+
+            {/* شماره‌های تماس */}
+            <div className="bg-neutral-50 border border-neutral-200 rounded-card p-6 flex-1">
+              <div className="flex items-center gap-4 mb-5">
+                <InfoIcon>
+                  <Phone size={21} className="text-brand" />
+                </InfoIcon>
+                <p className="text-sm text-neutral-500">تماس تلفنی</p>
+              </div>
+              <div className="flex flex-col gap-4">
+                {phones.map(({ label, tel, display }, i) => (
+                  <div
+                    key={tel}
+                    className={`flex items-center justify-between ${i !== phones.length - 1 ? 'pb-4 border-b border-neutral-200' : ''}`}
+                  >
+                    <span className="text-base text-neutral-500 font-medium">{label}</span>
+                    <a
+                      href={`tel:${tel}`}
+                      dir="ltr"
+                      className="text-lg font-bold text-neutral-900 hover:text-brand transition-colors duration-150"
+                      style={{ letterSpacing: '0.01em' }}
+                    >
+                      {display}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
-        </a>
 
-        {/* ── آدرس ── */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 48, paddingBottom: 48, borderBottom: '1px solid #F0F0F0' }}>
-          <MapPin size={18} color="#801A00" style={{ flexShrink: 0, marginTop: 3 }} />
-          <p style={{ fontSize: 18, fontWeight: 700, color: '#171717', lineHeight: 1.8, margin: 0 }}>
-            خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳
-          </p>
-        </div>
-
-        {/* ── ایمیل ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
-          <Mail size={17} color="#801A00" style={{ flexShrink: 0 }} />
+          {/* ── نقشه ── */}
           <a
-            href="mailto:info@deyhouse.ir"
-            dir="ltr"
-            style={{ fontSize: 16, fontWeight: 500, color: '#171717', textDecoration: 'none', transition: 'color 150ms' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = '#801A00' }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = '#171717' }}
+            href="https://nshn.ir/_bvk7KWxiB9q"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block"
+            style={{ textDecoration: 'none' }}
           >
-            info@deyhouse.ir
-          </a>
-        </div>
-
-        {/* ── شماره‌ها ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {phones.map(({ label, tel, display }) => (
-            <div key={tel} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Phone size={17} color="#801A00" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: 14, color: '#A0A0A0', fontWeight: 400, minWidth: 36 }}>{label}</span>
-              <a
-                href={`tel:${tel}`}
-                dir="ltr"
-                style={{ fontSize: 16, fontWeight: 600, color: '#171717', textDecoration: 'none', transition: 'color 150ms', letterSpacing: '0.01em' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = '#801A00' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = '#171717' }}
-              >
-                {display}
-              </a>
+            <div className="relative w-full h-full overflow-hidden rounded-card border border-neutral-200" style={{ minHeight: 280 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/map.png"
+                alt="نقشه خانه دی"
+                className="group-hover:scale-[1.03] transition-transform duration-500"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <div className="absolute bottom-4 left-4 flex items-center gap-1.5 bg-white rounded-chip px-3.5 py-2 text-xs font-bold text-neutral-900 shadow-card">
+                <MapPin size={13} className="text-brand" />
+                نشان روی نقشه
+                <ExternalLink size={11} className="text-neutral-500" />
+              </div>
             </div>
-          ))}
-        </div>
+          </a>
 
+        </div>
       </div>
-    </div>
+    </>
   )
 }
