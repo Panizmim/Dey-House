@@ -169,12 +169,33 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
 
   const isCrop = mode === 'crop'
 
+  function hasUnsavedChanges() {
+    const currentImages = gallery.filter((s) => s.url).map((s) => s.url as string)
+    const imagesChanged =
+      currentImages.length !== studio.images.length ||
+      currentImages.some((url, i) => url !== studio.images[i])
+    const formChanged =
+      form.name !== studio.name ||
+      form.description !== (studio.description ?? '') ||
+      form.capacity !== String(studio.capacity) ||
+      form.pricePerHour !== String(studio.pricePerHour) ||
+      form.isActive !== studio.isActive
+    return imagesChanged || formChanged
+  }
+
+  function handleRequestClose() {
+    if (hasUnsavedChanges() && !window.confirm('تغییرات ذخیره‌نشده از دست می‌رود. مطمئنید می‌خواهید ببندید؟')) {
+      return
+    }
+    onClose()
+  }
+
   return (
     <Modal
       open={open}
       maxWidth={680}
       title={isCrop ? 'برش تصویر' : 'ویرایش پلاتو'}
-      onClose={isCrop ? () => setMode('form') : onClose}
+      onClose={isCrop ? () => setMode('form') : handleRequestClose}
       footer={
         isCrop ? (
           <>
@@ -200,7 +221,7 @@ export default function StudioModal({ open, studio, onClose, onSave }: StudioMod
         ) : (
           <>
             <button
-              onClick={onClose}
+              onClick={handleRequestClose}
               style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #E5E5E5', background: 'white', fontSize: 14, cursor: 'pointer' }}
             >
               انصراف
