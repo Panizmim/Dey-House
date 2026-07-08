@@ -7,6 +7,7 @@ import { z } from 'zod'
 import toast from 'react-hot-toast'
 import { Upload, CheckCircle, X } from '@/components/ui/icons'
 import PageHero from '@/components/ui/PageHero'
+import { convertIfHeic } from '@/lib/convertHeic'
 
 /* ─── Validation ─── */
 const schema = z.object({
@@ -165,7 +166,7 @@ function ArtworkUploadZone({ state, onFile, onClear }: { state: UploadState; onF
         <input
           ref={ref}
           type="file"
-          accept=".jpg,.jpeg,.png"
+          accept=".jpg,.jpeg,.png,.heic,.heif"
           className="hidden"
           onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
         />
@@ -179,8 +180,9 @@ function ArtworkUploadZone({ state, onFile, onClear }: { state: UploadState; onF
 
 /* ─── Page ─── */
 async function uploadFile(file: File, folder: string): Promise<string> {
+  const converted = await convertIfHeic(file)
   const fd = new FormData()
-  fd.append('file', file)
+  fd.append('file', converted)
   fd.append('folder', folder)
   const res = await fetch('/api/uploads', { method: 'POST', body: fd })
   if (!res.ok) {

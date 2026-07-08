@@ -2,7 +2,7 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { NextRequest, NextResponse } from 'next/server'
 
-const ALLOWED = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']
+const ALLOWED = ['image/jpeg', 'image/png', 'image/jpg', 'image/heic', 'image/heif', 'application/pdf']
 const MAX_SIZE = 8 * 1024 * 1024
 
 async function uploadToSupabase(buffer: Buffer, folder: string, filename: string, contentType: string): Promise<string> {
