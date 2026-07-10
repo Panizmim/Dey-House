@@ -157,6 +157,15 @@ model HeroBanner {
   @@index([order])
 }
 
+model AdminSeen {
+  id      String   @id @default(cuid())
+  userId  String
+  section String
+  seenAt  DateTime @default(now())
+
+  @@unique([userId, section])
+}
+
 model Gallery {
   id          String   @id @default(cuid())
   title       String

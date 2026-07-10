@@ -1,10 +1,13 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { LayoutDashboard, Calendar, UtensilsCrossed, BookOpen, Phone, Users, Palette, ArrowRight, LogOut, Grid2x2, Monitor, GraduationCap, Building2 } from '@/components/ui/icons'
+
+type NotifKey = 'users' | 'bookings'
 
 const navGroups = [
   {
@@ -25,21 +28,79 @@ const navGroups = [
   {
     label: 'رزروها',
     items: [
-      { href: '/admin/bookings',         label: 'رزروها',             icon: BookOpen, exact: false },
+      { href: '/admin/bookings',         label: 'رزروها',             icon: BookOpen, exact: false, notifKey: 'bookings' as NotifKey },
       { href: '/admin/contact-requests', label: 'درخواست‌های تماس', icon: Phone,    exact: false },
     ],
   },
   {
     label: 'کاربران',
     items: [
-      { href: '/admin/users',       label: 'کاربران',         icon: Users,   exact: false },
+      { href: '/admin/users',       label: 'کاربران',         icon: Users,   exact: false, notifKey: 'users' as NotifKey },
       { href: '/admin/submissions', label: 'همکاری هنرمندان', icon: Palette, exact: false },
     ],
   },
 ]
 
+const POLL_INTERVAL = 30_000
+
+function NotifBadge({ count }: { count: number }) {
+  if (count <= 0) return null
+  return (
+    <span
+      style={{
+        marginRight: 'auto',
+        background: '#801A00',
+        color: 'white',
+        fontSize: 11,
+        fontWeight: 700,
+        borderRadius: 999,
+        minWidth: 18,
+        height: 18,
+        padding: '0 5px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        lineHeight: 1,
+      }}
+    >
+      {count > 99 ? '۹۹+' : count.toLocaleString('fa-IR')}
+    </span>
+  )
+}
+
 export default function AdminSidebar() {
   const pathname = usePathname()
+  const [counts, setCounts] = useState<Record<NotifKey, number>>({ users: 0, bookings: 0 })
+  const seenSections = useRef(new Set<NotifKey>())
+
+  async function fetchCounts() {
+    try {
+      const res = await fetch('/api/admin/notifications')
+      if (!res.ok) return
+      const data = await res.json()
+      setCounts({ users: data.users ?? 0, bookings: data.bookings ?? 0 })
+    } catch {
+      // بی‌صدا رد می‌شویم — نوتیف حیاتی نیست
+    }
+  }
+
+  useEffect(() => {
+    fetchCounts()
+    const interval = setInterval(fetchCounts, POLL_INTERVAL)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const section = (['users', 'bookings'] as NotifKey[]).find((key) => pathname.startsWith(`/admin/${key}`))
+    if (!section || seenSections.current.has(section)) return
+    seenSections.current.add(section)
+    setCounts((prev) => ({ ...prev, [section]: 0 }))
+    fetch('/api/admin/notifications/seen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section }),
+    }).catch(() => {})
+  }, [pathname])
 
   function isActive(href: string, exact?: boolean) {
     return exact ? pathname === href : pathname.startsWith(href)
@@ -112,6 +173,7 @@ export default function AdminSidebar() {
                 >
                   <Icon size={17} color={active ? '#801A00' : '#A0A0A0'} />
                   {item.label}
+                  {'notifKey' in item && item.notifKey && <NotifBadge count={counts[item.notifKey]} />}
                 </Link>
               )
             })}
