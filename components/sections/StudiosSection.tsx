@@ -56,10 +56,11 @@ const baseStudios = [
   },
 ]
 
-type StudioView = typeof baseStudios[number]
+type StudioView = typeof baseStudios[number] & { slug?: string }
 
 interface DbStudio {
   id: string
+  slug: string
   name: string
   capacity: number
   pricePerHour: number
@@ -74,7 +75,7 @@ function StudioCard({ studio }: { studio: StudioView }) {
   const next = () => setCurrent((c) => (c + 1) % studio.images.length)
 
   return (
-    <Link href={`/booking/${studio.id}`} className="block group cursor-pointer" style={{ textDecoration: 'none' }}>
+    <Link href={`/booking/${studio.slug ?? studio.id}`} className="block group cursor-pointer" style={{ textDecoration: 'none' }}>
 
       {/* ─── تصویر ─── */}
       <div className="relative w-full overflow-hidden mb-4" style={{ aspectRatio: '4/3' }}>
@@ -193,6 +194,7 @@ export function StudiosSection() {
           if (!live) return base
           return {
             ...base,
+            slug:         live.slug,
             name:         live.name,
             pricePerHour: live.pricePerHour,
             chairCount:   live.capacity,

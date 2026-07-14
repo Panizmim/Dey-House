@@ -118,6 +118,9 @@ export default function AdminStudiosPage() {
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ fontSize: 14, fontWeight: 600, color: '#171717' }}>{studio.name}</span>
+                      <p style={{ fontSize: 11, color: '#B0B0B0', marginTop: 2, direction: 'ltr', textAlign: 'right' }}>
+                        deyhouse.ir/booking/{studio.slug}
+                      </p>
                       {studio.description && <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>{studio.description}</p>}
                     </td>
                     <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>

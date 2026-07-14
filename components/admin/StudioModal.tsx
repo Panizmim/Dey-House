@@ -10,6 +10,7 @@ import { convertIfHeic } from '@/lib/convertHeic'
 
 export interface Studio {
   id: string
+  slug: string
   name: string
   description: string | null
   capacity: number

@@ -24,6 +24,7 @@ model User {
 model Studio {
   id           String    @id @default(cuid())
   name         String
+  slug         String    @unique @default(cuid())
   description  String?
   capacity     Int
   pricePerHour Int
