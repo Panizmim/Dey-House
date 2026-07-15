@@ -36,9 +36,9 @@ const typeLabel: Record<string, string> = {
 }
 
 const studioImageFallback: Record<string, string> = {
-  'اتاق سفید':    '/images/studios/white-room-1.jpg',
-  'اتاق سیاه یک': '/images/studios/black-room1-1.jpg',
-  'اتاق سیاه دو': '/images/studios/black-room2-1.jpg',
+  'دیـ‌وان': '/images/studios/white-room-1.jpg',
+  'دیـ‌دار': '/images/studios/black-room1-1.jpg',
+  'دیـ‌جور': '/images/studios/black-room2-1.jpg',
 }
 
 export default function BookingDetailPage() {

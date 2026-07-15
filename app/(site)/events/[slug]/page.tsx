@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import { db } from '@/lib/db'
 import EventGallery from './EventGallery'
 import { toJalali, PERSIAN_MONTHS, toPersian } from '@/lib/jalali'
+import { buildMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,10 +39,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug  = decodeURIComponent(params.slug)
   const event = await db.event.findUnique({ where: { slug } })
   if (!event) return { title: 'رویداد یافت نشد | خانه دی' }
-  return {
-    title:       `${event.title} | خانه دی`,
-    description: (event.description ?? '').replace(/\n/g, ' ').slice(0, 120),
-  }
+
+  const description = (event.description ?? '').replace(/\s+/g, ' ').trim().slice(0, 150)
+    || `${event.title} — رویدادهای خانه دی در تهران`
+
+  return buildMetadata({
+    title:       `${event.title} | رویدادهای خانه دی`,
+    description,
+    path:        `/events/${event.slug}`,
+    type:        'article',
+  })
 }
 
 export default async function EventDetailPage({ params }: Props) {

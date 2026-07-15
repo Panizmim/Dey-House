@@ -5,8 +5,15 @@ import { EventsSection }        from '@/components/sections/EventsSection'
 import { GallerySection }       from '@/components/sections/GallerySection'
 import { ArtistSubmissionCTA }  from '@/components/sections/ArtistSubmissionCTA'
 import { db }                   from '@/lib/db'
+import { buildMetadata }        from '@/lib/seo'
 
 export const revalidate = 0
+
+export const metadata = buildMetadata({
+  title:       'خانه دی | کافه‌گالری و پلاتوهای تمرین در تهران',
+  description: 'خانه دی، کافه‌گالری هنر معاصر و پلاتوهای تمرین در تهران؛ فضایی برای دیدن هنر، نوشیدن قهوه و برگزاری رویداد.',
+  path:        '/',
+})
 
 export default async function HomePage() {
   const FALLBACK_BANNERS = [

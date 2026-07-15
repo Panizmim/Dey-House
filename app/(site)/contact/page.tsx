@@ -1,5 +1,12 @@
 import { MapPin, Phone, Mail, ExternalLink } from '@/components/ui/icons'
 import PageHero from '@/components/ui/PageHero'
+import { buildMetadata } from '@/lib/seo'
+
+export const metadata = buildMetadata({
+  title:       'تماس با ما و آدرس | خانه دی تهران',
+  description: 'آدرس، شماره‌های تماس و راه‌های ارتباط با خانه دی؛ خیابان سنائی، کوچه فریدون نژادکی، پلاک ۳.',
+  path:        '/contact',
+})
 
 const phones = [
   { label: 'کافه',  tel: '09029282135', display: '۰۹۰۲۹۲۸۲۱۳۵' },

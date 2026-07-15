@@ -1,11 +1,12 @@
-import type { Metadata } from 'next'
 import Image from 'next/image'
 import PageHero from '@/components/ui/PageHero'
+import { buildMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title:       'درباره ما | خانه دی',
   description: 'خانه‌دی، یک خانه‌ی قدیمی‌ست که با احیائ دوباره‌اش، جانی تازه گرفته تا بستری برای جریان هنر، گفت‌وگو و تجربه‌های جمعی باشد.',
-}
+  path:        '/about',
+})
 
 export default function AboutPage() {
   return (
