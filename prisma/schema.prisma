@@ -187,3 +187,13 @@ model Gallery {
   @@index([slug])
   @@index([status])
 }
+
+model SitePhone {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  number    String
+  isVisible Boolean  @default(true)
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
+}

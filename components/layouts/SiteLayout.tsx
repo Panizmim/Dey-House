@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { Menu, X, ChevronDown, User, CalendarDays, CreditCard, LogOut, MapPin, Phone, LayoutDashboard } from '@/components/ui/icons'
 import { signOut } from 'next-auth/react'
+import { DEFAULT_PHONES, toFaDigits, type SitePhone } from '@/lib/site-phones'
 import { LoginModal }    from '@/components/ui/LoginModal'
 import { RegisterModal } from '@/components/ui/RegisterModal'
 
@@ -439,7 +440,7 @@ const socialLinks = [
   { label: 'واتساپ',     href: '#' },
 ]
 
-function Footer() {
+function Footer({ phones }: { phones: SitePhone[] }) {
   return (
     <footer className="bg-neutral-900">
       <div className="max-w-container mx-auto px-6 md:px-8 lg:px-12 pt-14 pb-8">
@@ -470,22 +471,18 @@ function Footer() {
 
             {/* شماره‌های تماس */}
             <div className="flex flex-col gap-2">
-              {[
-                { label: 'کافه',  tel: '09029282135', display: '۰۹۰۲۹۲۸۲۱۳۵' },
-                { label: 'پلاتو', tel: '09020282145', display: '۰۹۰۲۰۲۸۲۱۴۵' },
-                { label: 'گالری', tel: '09189282145', display: '۰۹۱۸۹۲۸۲۱۴۵' },
-              ].map(({ label, tel, display }) => (
-                <div key={tel} className="flex items-center gap-2">
+              {phones.map(({ key, label, number }) => (
+                <div key={key} className="flex items-center gap-2">
                   <Phone size={13} style={{ opacity: 0.4, color: 'white', flexShrink: 0 }} />
                   <span className="font-light" style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)' }}>
                     {label}
                   </span>
                   <a
-                    href={`tel:${tel}`}
+                    href={`tel:${number}`}
                     className="font-light transition-colors hover:text-white"
                     style={{ fontSize: '16px', color: 'rgba(255,255,255,0.55)', direction: 'ltr', display: 'inline-block' }}
                   >
-                    {display}
+                    {toFaDigits(number)}
                   </a>
                 </div>
               ))}
@@ -535,7 +532,7 @@ function Footer() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img referrerPolicy="origin" src="https://trustseal.enamad.ir/logo.aspx?id=754268&Code=gJrkEsq8dJ4VdfeXCbuOt4NdClsypqfv" alt="نماد اعتماد الکترونیکی" style={{ cursor: 'pointer' }} />
             </a>
-            <p className="text-white/20 text-sm">deyhouse.ir</p>
+            <p className="text-white/20 text-sm">deyhouse.com</p>
           </div>
         </div>
       </div>
@@ -544,7 +541,7 @@ function Footer() {
 }
 
 /* ─── SiteLayout ─── */
-export function SiteLayout({ children }: { children: React.ReactNode }) {
+export function SiteLayout({ children, phones = DEFAULT_PHONES }: { children: React.ReactNode; phones?: SitePhone[] }) {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
   return (
@@ -553,7 +550,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <main className={isHomePage ? 'flex-1' : 'flex-1 pt-[60px] lg:pt-[68px]'}>
         {children}
       </main>
-      <Footer />
+      <Footer phones={phones} />
     </div>
   )
 }

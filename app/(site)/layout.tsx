@@ -1,9 +1,12 @@
 import { SiteLayout } from '@/components/layouts/SiteLayout'
+import { getSitePhones } from '@/lib/site-phones.server'
 
-export default function SiteGroupLayout({
+export default async function SiteGroupLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <SiteLayout>{children}</SiteLayout>
+  const phones = await getSitePhones()
+
+  return <SiteLayout phones={phones}>{children}</SiteLayout>
 }

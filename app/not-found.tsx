@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { SiteLayout } from '@/components/layouts/SiteLayout'
+import { getSitePhones } from '@/lib/site-phones.server'
 
-export default function NotFound() {
+export default async function NotFound() {
+  const phones = await getSitePhones()
+
   return (
-    <SiteLayout>
+    <SiteLayout phones={phones}>
       <div
         className="min-h-[80vh] flex flex-col items-center justify-center px-6 text-center"
         dir="rtl"

@@ -1,6 +1,8 @@
 import { MapPin, Phone, Mail, ExternalLink } from '@/components/ui/icons'
 import PageHero from '@/components/ui/PageHero'
 import { buildMetadata } from '@/lib/seo'
+import { getSitePhones } from '@/lib/site-phones.server'
+import { toFaDigits } from '@/lib/site-phones'
 
 export const metadata = buildMetadata({
   title:       'تماس با ما و آدرس | خانه دی تهران',
@@ -8,11 +10,6 @@ export const metadata = buildMetadata({
   path:        '/contact',
 })
 
-const phones = [
-  { label: 'کافه',  tel: '09029282135', display: '۰۹۰۲۹۲۸۲۱۳۵' },
-  { label: 'پلاتو', tel: '09020282145', display: '۰۹۰۲۰۲۸۲۱۴۵' },
-  { label: 'گالری', tel: '09189282145', display: '۰۹۱۸۹۲۸۲۱۴۵' },
-]
 
 function InfoIcon({ children }: { children: React.ReactNode }) {
   return (
@@ -22,7 +19,9 @@ function InfoIcon({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const phones = await getSitePhones()
+
   return (
     <>
       <PageHero title="تماس با ما" subtitle="هر سوالی دارید، خوشحال می‌شویم پاسخ‌گو باشیم" />
@@ -54,12 +53,12 @@ export default function ContactPage() {
               <div>
                 <p className="text-sm text-neutral-500 mb-1">ایمیل</p>
                 <a
-                  href="mailto:info@deyhouse.ir"
+                  href="mailto:info@deyhouse.com"
                   dir="ltr"
                   className="text-lg font-bold text-neutral-900 hover:text-brand transition-colors duration-150"
                   style={{ display: 'inline-block' }}
                 >
-                  info@deyhouse.ir
+                  info@deyhouse.com
                 </a>
               </div>
             </div>
@@ -73,19 +72,19 @@ export default function ContactPage() {
                 <p className="text-sm text-neutral-500">تماس تلفنی</p>
               </div>
               <div className="flex flex-col gap-4">
-                {phones.map(({ label, tel, display }, i) => (
+                {phones.map(({ key, label, number }, i) => (
                   <div
-                    key={tel}
+                    key={key}
                     className={`flex items-center justify-between ${i !== phones.length - 1 ? 'pb-4 border-b border-neutral-200' : ''}`}
                   >
                     <span className="text-base text-neutral-500 font-medium">{label}</span>
                     <a
-                      href={`tel:${tel}`}
+                      href={`tel:${number}`}
                       dir="ltr"
                       className="text-lg font-bold text-neutral-900 hover:text-brand transition-colors duration-150"
                       style={{ letterSpacing: '0.01em' }}
                     >
-                      {display}
+                      {toFaDigits(number)}
                     </a>
                   </div>
                 ))}
