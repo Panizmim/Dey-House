@@ -17,9 +17,9 @@ export const metadata = buildMetadata({
 
 export default async function HomePage() {
   const FALLBACK_BANNERS = [
-    { id: 'f1', imageUrl: '/images/hero/slide1.JPG', mobileImageUrl: null, showText: true  },
-    { id: 'f2', imageUrl: '/images/hero/slide2.JPG', mobileImageUrl: null, showText: false },
-    { id: 'f3', imageUrl: '/images/hero/slide3.JPG', mobileImageUrl: null, showText: false },
+    { id: 'f1', imageUrl: '/images/hero/slide1.jpg', mobileImageUrl: null, showText: true  },
+    { id: 'f2', imageUrl: '/images/hero/slide2.jpg', mobileImageUrl: null, showText: false },
+    { id: 'f3', imageUrl: '/images/hero/slide3.jpg', mobileImageUrl: null, showText: false },
   ]
 
   let banners: { id: string; imageUrl: string; mobileImageUrl: string | null; showText: boolean }[] = []

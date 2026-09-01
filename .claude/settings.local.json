@@ -41,7 +41,17 @@
       "Bash(curl -s http://localhost:3000)",
       "Bash(npm list *)",
       "Bash(pkill -f \"next dev\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)",
+      "Bash(npx --yes vercel@latest deploy --yes)",
+      "Bash(npx --yes vercel@latest curl \"https://dey-house-j8pl2owoa-paniz-molamohamad-s-projects.vercel.app/contact\")",
+      "Bash(curl -s --max-time 20 \"https://deyhouse.com/contact\")",
+      "Bash(curl -s --max-time 10 \"http://localhost:3000/contact\")",
+      "Bash(lsof -i :3000 -sTCP:LISTEN -t)",
+      "Bash(curl -s -o /dev/null -w \"%{url_effective} -> %{http_code}\\\\n\" -L --max-time 25 \"https://deyhouse.com/contact\")",
+      "Bash(curl -sL --max-time 25 \"https://deyhouse.com/contact\")",
+      "Bash(curl -sL --max-time 25 \"https://www.deyhouse.com/contact\")",
+      "Bash(npx --yes vercel@latest deploy --prod --yes)",
+      "Bash(curl -s --max-time 60 \"http://localhost:3000/contact\")"
     ],
     "additionalDirectories": [
       "/Users/paniz/Downloads/Brand Asset/deyhouse"

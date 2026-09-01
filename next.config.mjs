@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // تصاویر پیش از آپلود به WebP تبدیل می‌شوند؛ بنابراین بهینه‌ساز runtime
+    // و محدودیت Image Optimization در Vercel لازم نیست.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

@@ -1,11 +1,12 @@
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { NextRequest, NextResponse } from 'next/server'
+import sharp from 'sharp'
 
-const ALLOWED = ['image/jpeg', 'image/png', 'image/jpg', 'image/heic', 'image/heif', 'application/pdf']
+const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.heics', '.avif']
 const MAX_SIZE = 8 * 1024 * 1024
 
-async function uploadToSupabase(buffer: Buffer, folder: string, filename: string, contentType: string): Promise<string> {
+async function uploadToSupabase(buffer: Uint8Array, folder: string, filename: string, contentType: string): Promise<string> {
   const supabaseUrl = process.env.SUPABASE_URL!
   const anonKey     = process.env.SUPABASE_ANON_KEY!
   const path        = `${folder}/${filename}`
@@ -28,7 +29,7 @@ async function uploadToSupabase(buffer: Buffer, folder: string, filename: string
   return `${supabaseUrl}/storage/v1/object/public/uploads/${path}`
 }
 
-async function uploadToLocal(buffer: Buffer, folder: string, filename: string): Promise<string> {
+async function uploadToLocal(buffer: Uint8Array, folder: string, filename: string): Promise<string> {
   const dir = join(process.cwd(), 'public', 'uploads', folder)
   await mkdir(dir, { recursive: true })
   await writeFile(join(dir, filename), buffer)
@@ -41,19 +42,45 @@ export async function POST(req: NextRequest) {
     const file   = formData.get('file')   as File
     const folder = (formData.get('folder') as string) || 'submissions'
 
-    if (!file)                      return NextResponse.json({ error: 'فایلی انتخاب نشده' },       { status: 400 })
-    if (file.size > MAX_SIZE)       return NextResponse.json({ error: 'حجم فایل بیش از ۸MB است' }, { status: 400 })
-    if (!ALLOWED.includes(file.type)) return NextResponse.json({ error: 'فرمت فایل مجاز نیست' },   { status: 400 })
+    if (!file)                return NextResponse.json({ error: 'فایلی انتخاب نشده' },       { status: 400 })
+    if (file.size > MAX_SIZE) return NextResponse.json({ error: 'حجم فایل بیش از ۸MB است' }, { status: 400 })
 
-    const bytes  = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const ext    = file.name.split('.').pop() ?? 'bin'
-    const name   = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const ext = '.' + (file.name.split('.').pop() ?? '').toLowerCase()
+    const isPdf = file.type === 'application/pdf' || ext === '.pdf'
+    const isImage = file.type.startsWith('image/') || file.type === '' || file.type === 'application/octet-stream'
+    if (!isPdf && (!isImage || !ALLOWED_IMAGE_EXTENSIONS.includes(ext))) {
+      return NextResponse.json({ error: 'فرمت فایل مجاز نیست' }, { status: 400 })
+    }
+
+    const bytes = await file.arrayBuffer()
+    const inputBuffer = Buffer.from(bytes)
+    let outputBuffer: Uint8Array = inputBuffer
+    let contentType = file.type
+    let outputExt = ext || '.bin'
+
+    if (!isPdf) {
+      const isHeic = ['.heic', '.heif', '.heics'].includes(ext) || ['image/heic', 'image/heif', 'image/heics'].includes(file.type)
+      if (isHeic) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const heicConvert = require('heic-convert')
+        outputBuffer = Buffer.from(await heicConvert({ buffer: inputBuffer, format: 'JPEG', quality: 0.92 }))
+      }
+
+      outputBuffer = await sharp(outputBuffer, { failOn: 'none' })
+        .rotate()
+        .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 82, effort: 4 })
+        .toBuffer()
+      contentType = 'image/webp'
+      outputExt = '.webp'
+    }
+
+    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}${outputExt}`
 
     const useSupabase = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
     const url = useSupabase
-      ? await uploadToSupabase(buffer, folder, name, file.type)
-      : await uploadToLocal(buffer, folder, name)
+      ? await uploadToSupabase(outputBuffer, folder, name, contentType)
+      : await uploadToLocal(outputBuffer, folder, name)
 
     return NextResponse.json({ url })
   } catch (error) {

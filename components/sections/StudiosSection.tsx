@@ -8,11 +8,11 @@ import { toPersianNum } from '@/lib/utils'
 const baseStudios = [
   {
     id:           'white-room',
-    name:         'اتاق سفید',
+    name:         'دیـ وان',
     area:         '۵۰ متر مربع',
     pricePerHour: 400_000,
     floorType:    'پارکت',
-    wallType:     'سفید',
+    wallType:     'چرم',
     chairCount:   30,
     acoustic:     'اکوستیک',
     images: [
@@ -24,11 +24,11 @@ const baseStudios = [
   },
   {
     id:           'black-room-1',
-    name:         'اتاق سیاه یک',
+    name:         'دیـ دار',
     area:         '۲۰ متر مربع',
     pricePerHour: 300_000,
     floorType:    'سیمانی',
-    wallType:     'سیاه',
+    wallType:     'چرم',
     chairCount:   20,
     acoustic:     'اکوستیک',
     images: [
@@ -40,7 +40,7 @@ const baseStudios = [
   },
   {
     id:           'black-room-2',
-    name:         'اتاق سیاه دو',
+    name:         'دیـ جور',
     area:         '۱۲ متر مربع',
     pricePerHour: 150_000,
     floorType:    'سیمانی',
@@ -184,8 +184,11 @@ export function StudiosSection() {
   const [studios, setStudios] = useState<StudioView[]>(baseStudios)
 
   useEffect(() => {
-    fetch('/api/studios')
-      .then((res) => res.json())
+    fetch('/api/studios', { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) throw new Error('Could not load studios')
+        return res.json()
+      })
       .then((rows: DbStudio[]) => {
         if (!Array.isArray(rows)) return
         const byId = new Map(rows.map((s) => [s.id, s]))

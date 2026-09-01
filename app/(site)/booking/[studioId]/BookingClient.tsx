@@ -27,10 +27,10 @@ const THEATER_BOOKING_URL = 'https://pelatoo.com/center/%D8%AE%D8%A7%D9%86%D9%87
 const studiosData = {
   'white-room': {
     id: 'white-room',
-    name: 'اتاق سفید',
+    name: 'دیـ وان',
     area: '۵۰ متر مربع',
     floorType: 'کفپوش',
-    wallType: 'نقاشی',
+    wallType: 'چرم',
     chairCount: 20,
     pricePerHour: 400000,
     description: `این فضا یک وایت باکس چند منظوره برای کاربرد هایی همچون تمرین تئاتر، برگزاری کلاس های یوگا و مدیتیشن، نمایشگاه آثار هنری و تجسمی، تمرین موسیقی و آواز و رقص می باشد.`,
@@ -53,10 +53,10 @@ const studiosData = {
   },
   'black-room-1': {
     id: 'black-room-1',
-    name: 'اتاق سیاه یک',
+    name: 'دیـ دار',
     area: '۲۰ متر مربع',
     floorType: 'لمینت',
-    wallType: 'نقاشی',
+    wallType: 'چرم',
     chairCount: 8,
     pricePerHour: 300000,
     description: `این فضا یک بلک باکس ۲۰ متر مربعی با کاربرد هایی همچون تمرین تئاتر، برگزاری کلاس رقص و موسیقی می باشد.`,
@@ -77,7 +77,7 @@ const studiosData = {
   },
   'black-room-2': {
     id: 'black-room-2',
-    name: 'اتاق سیاه دو',
+    name: 'دیـ جور',
     area: '۱۲ متر مربع',
     floorType: 'لمینت',
     wallType: 'نقاشی',
@@ -111,8 +111,11 @@ export default function BookingClient({ studioId }: { studioId: StudioId }) {
   const [liveRows, setLiveRows] = useState<LiveStudio[] | null>(null)
 
   useEffect(() => {
-    fetch('/api/studios')
-      .then((res) => res.json())
+    fetch('/api/studios', { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) throw new Error('Could not load studios')
+        return res.json()
+      })
       .then((rows: LiveStudio[]) => { if (Array.isArray(rows)) setLiveRows(rows) })
       .catch(() => {})
   }, [])

@@ -2,8 +2,8 @@
 
 ## درباره پروژه
 وبسایت رسمی خانه دی — کافه‌گالری و فضای فرهنگی معاصر
-دامنه: deyhouse.ir
-ادمین پنل: deyhouse.ir/admin
+دامنه: deyhouse.com
+ادمین پنل: deyhouse.com/admin
 
 ---
 

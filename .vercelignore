@@ -1,0 +1,18 @@
+# Local/archive assets; production uses the equivalents inside public/.
+/public_backup/
+/hero images/
+/studios/
+
+# Source/reference assets that are not imported by the application.
+/artists.JPG
+/chair.png
+/Timer Picker.jpg
+/logo transparent.png
+/@Digifonts Paeez Regular.otf
+/Screenshot 2026-05-13 at 1.34.46 PM.png
+/Screenshot 2026-05-14 at 6.59.54 PM.png
+/Screenshot 2026-05-14 at 7.29.41 PM.png
+/screencapture-artunity-art-artistApplication-request-2026-05-13-00_47_22.png
+
+# Local development database; production uses Postgres via environment variables.
+prisma/dev.db
