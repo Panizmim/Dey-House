@@ -18,6 +18,13 @@ type MenuItem = {
 
 type Category = { id: string; name: string; order: number }
 
+/** جمله‌های نوار هشدار بالای صفحه منو */
+const CAFE_NOTICES = [
+  'در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید',
+  'ورود و مصرف کیک و خوراکی‌های تهیه‌شده خارج از مجموعه در فضای کافه مجاز نیست.',
+  'مدت زمان استفاده از فضای کافه در ساعات شلوغی، حداکثر یک ساعت است.',
+]
+
 const placeholderGradients = [
   'linear-gradient(135deg, #f5e6d3, #e8c9a0)',
   'linear-gradient(135deg, #d3e8f5, #a0c9e8)',
@@ -276,17 +283,27 @@ export default function CafeClient() {
     <div className="min-h-screen bg-white">
       <PageHero title="منوی کافه" />
 
-      {/* نوار هشدار حساسیت */}
-      <div style={{ borderBottom: '1px solid #F0EDE9', padding: '10px 24px', textAlign: 'center' }}>
-        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic' }}>
-          در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید
-        </p>
-        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic', marginTop: 4 }}>
-          ورود و مصرف کیک و خوراکی‌های تهیه‌شده خارج از مجموعه در فضای کافه مجاز نیست.
-        </p>
-        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic', marginTop: 4 }}>
-          مدت زمان استفاده از فضای کافه در ساعات شلوغی، حداکثر یک ساعت است.
-        </p>
+      {/* نوار هشدار — هر جمله با یک نقطه‌ی ریز از بقیه جدا می‌شود */}
+      <div style={{ borderBottom: '1px solid #F0EDE9', padding: '10px 24px' }}>
+        {CAFE_NOTICES.map((notice) => (
+          <p
+            key={notice}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+              fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic',
+              marginTop: 4, textAlign: 'center',
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                flexShrink: 0, width: 4, height: 4, borderRadius: '50%',
+                background: '#8C2020', display: 'inline-block',
+              }}
+            />
+            {notice}
+          </p>
+        ))}
       </div>
 
 
