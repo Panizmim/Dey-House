@@ -212,6 +212,14 @@ export function Mail(props: IconProps) {
   )
 }
 
+export function Bell(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M14.857 17.082A23.85 23.85 0 0 0 18 16.5a8.967 8.967 0 0 1-2.25-5.982V9.75a5.25 5.25 0 1 0-10.5 0v.768c0 2.27-.84 4.34-2.25 5.982 1.017.24 2.064.435 3.143.582m12.714 0A24.2 24.2 0 0 1 12 17.25c-1.6 0-3.16-.09-4.714-.268m0 0a3 3 0 1 0 5.83 1.018" />
+    </Icon>
+  )
+}
+
 export function Phone(props: IconProps) {
   return (
     <Icon {...props}>

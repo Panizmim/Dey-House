@@ -197,3 +197,17 @@ model SitePhone {
   order     Int      @default(0)
   updatedAt DateTime @updatedAt
 }
+
+/// مقصدهای اطلاع‌رسانی ادمین — شماره موبایل یا ایمیلی که هنگام رزرو جدید پیام می‌گیرد
+model AdminNotifyTarget {
+  id        String   @id @default(cuid())
+  channel   String   // SMS | EMAIL
+  value     String   // شماره موبایل یا آدرس ایمیل
+  label     String   @default("")
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([channel, value])
+}

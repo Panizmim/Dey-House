@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { LayoutDashboard, Calendar, UtensilsCrossed, BookOpen, Phone, Users, Palette, ArrowRight, LogOut, Grid2x2, Monitor, GraduationCap, Building2, SlidersHorizontal } from '@/components/ui/icons'
+import { LayoutDashboard, Calendar, UtensilsCrossed, BookOpen, Phone, Users, Palette, ArrowRight, LogOut, Grid2x2, Monitor, GraduationCap, Building2, SlidersHorizontal, Bell } from '@/components/ui/icons'
 
 type NotifKey = 'users' | 'bookings'
 
@@ -42,7 +42,8 @@ const navGroups = [
   {
     label: 'تنظیمات',
     items: [
-      { href: '/admin/settings', label: 'شماره‌های تماس', icon: SlidersHorizontal, exact: false },
+      { href: '/admin/settings',      label: 'شماره‌های تماس',  icon: SlidersHorizontal, exact: false },
+      { href: '/admin/notifications', label: 'اطلاع‌رسانی رزرو', icon: Bell,              exact: false },
     ],
   },
 ]

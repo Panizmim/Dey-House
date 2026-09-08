@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { notifyAdmins } from '@/lib/notify'
 
 const schema = z.object({
   fullName:     z.string().min(2, 'نام باید حداقل ۲ کاراکتر باشد'),
@@ -39,6 +40,17 @@ export async function POST(req: NextRequest) {
         resumeUrl:   portfolioUrl || null,
         status:      'PENDING',
       },
+    })
+
+    await notifyAdmins({
+      title: 'درخواست همکاری هنرمند',
+      rows: [
+        ['نام',        fullName],
+        ['موبایل',     phone],
+        ['ایمیل',      email],
+        ['رشته هنری',  artField],
+      ],
+      adminPath: '/admin/submissions',
     })
 
     return NextResponse.json({ success: true })

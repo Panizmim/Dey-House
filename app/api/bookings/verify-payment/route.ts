@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { verifyPayment } from '@/lib/zarinpal'
+import { notifyAdmins } from '@/lib/notify'
+import { jalaliToDisplay, toPersian } from '@/lib/jalali'
 
 export async function GET(req: NextRequest) {
   const session = await auth()
@@ -36,14 +38,30 @@ export async function GET(req: NextRequest) {
     const result = await verifyPayment(authority, booking.totalPrice)
 
     if (result.success) {
-      await db.booking.update({
-        where: { id: bookingId },
-        data:  {
+      const confirmed = await db.booking.update({
+        where:   { id: bookingId },
+        data:    {
           status:        'CONFIRMED',
           paymentStatus: 'PAID',
           zarinpalRef:   String(result.refId ?? authority),
         },
+        include: { studio: true, user: true },
       })
+
+      // اطلاع‌رسانی به ادمین — نباید پاسخ کاربر را معطل یا خراب کند
+      await notifyAdmins({
+        title: 'رزرو جدید پلاتو',
+        rows: [
+          ['پلاتو',   confirmed.studio.name],
+          ['تاریخ',   jalaliToDisplay(confirmed.date)],
+          ['ساعت',    `${confirmed.startTime} تا ${confirmed.endTime}`],
+          ['نام',     confirmed.user.name],
+          ['موبایل',  confirmed.user.phone ?? '—'],
+          ['مبلغ',    `${toPersian(confirmed.totalPrice.toLocaleString('en-US'))} تومان`],
+        ],
+        adminPath: '/admin/bookings',
+      })
+
       return NextResponse.json({ success: true, refId: result.refId })
     }
 

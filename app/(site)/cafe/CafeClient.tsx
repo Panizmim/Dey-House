@@ -281,6 +281,12 @@ export default function CafeClient() {
         <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic' }}>
           در صورتی که حساسیت غذایی دارید به ویتر اطلاع دهید
         </p>
+        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic', marginTop: 4 }}>
+          ورود و مصرف کیک و خوراکی‌های تهیه‌شده خارج از مجموعه در فضای کافه مجاز نیست.
+        </p>
+        <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 300, fontStyle: 'italic', marginTop: 4 }}>
+          مدت زمان استفاده از فضای کافه در ساعات شلوغی، حداکثر یک ساعت است.
+        </p>
       </div>
 
 

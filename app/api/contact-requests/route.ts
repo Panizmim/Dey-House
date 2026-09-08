@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
+import { notifyAdmins } from '@/lib/notify'
 
 const contactSchema = z.object({
   name:      z.string().min(1),
@@ -19,7 +20,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'اطلاعات وارد شده معتبر نیست' }, { status: 400 })
     }
 
-    await db.contactRequest.create({ data: parsed.data })
+    const request = await db.contactRequest.create({ data: parsed.data })
+
+    await notifyAdmins({
+      title: 'درخواست رزرو جدید',
+      rows: [
+        ['نام',      request.name],
+        ['موبایل',   request.phone || '—'],
+        ['ایمیل',    request.email || '—'],
+        ['نوع',      request.usageType],
+        ['توضیحات',  request.message?.slice(0, 120) || '—'],
+      ],
+      adminPath: '/admin/contact-requests',
+    })
 
     return NextResponse.json({
       success: true,
