@@ -7,7 +7,7 @@ import {
   MapPin, Grid2x2, X, ChevronLeft, ChevronRight,
   Lightbulb, Monitor, Scan, Wind, Volume2, Square, Wifi,
   Maximize2, Armchair, Layers, PaintBucket, Calendar,
-  MessageCircle, CheckCircle, ExternalLink,
+  MessageCircle, CheckCircle, ExternalLink, Phone,
 } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
 import DateTimePickerModal from '@/components/ui/DateTimePickerModal'
@@ -15,6 +15,10 @@ import { LoginModal } from '@/components/ui/LoginModal'
 import { RegisterModal } from '@/components/ui/RegisterModal'
 import { toPersianNum } from '@/lib/utils'
 import { PERSIAN_MONTHS, toJalali, toPersian, TIME_SLOTS } from '@/lib/jalali'
+import { DEFAULT_PHONES, toFaDigits } from '@/lib/site-phones'
+
+/** شماره تماس برای تأیید نهایی رزروِ «سایر موارد» — همان شماره پلاتو در فوتر سایت */
+const BOOKING_PHONE = DEFAULT_PHONES.find((p) => p.key === 'studio')?.number ?? '09020282145'
 
 /* ─── آیکون‌ها ─── */
 const iconMap: Record<string, React.ElementType> = {
@@ -973,9 +977,17 @@ export default function BookingClient({ studioId }: { studioId: StudioId }) {
             <p className="text-[14px] text-[#717171] font-light leading-relaxed mb-2">
               تیم خانه دی درخواست رزرو شما را دریافت کرد.
             </p>
-            <p className="text-[13px] text-[#404040] font-medium leading-relaxed">
-              ظرف ۲۴ ساعت آینده با شما تماس گرفته می‌شود تا جزئیات رزرو و هزینه نهایی هماهنگ شود.
+            <p className="text-[13px] text-[#404040] font-medium leading-relaxed mb-4">
+              برای تایید نهایی رزرو خودتون با این شماره تماس بگیرید
             </p>
+            <a
+              href={`tel:${BOOKING_PHONE}`}
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl transition-all"
+              style={{ background: '#801A00', color: 'white', fontSize: 16, fontWeight: 800, letterSpacing: '0.02em' }}
+            >
+              <Phone size={17} color="white" />
+              <span dir="ltr">{toFaDigits(BOOKING_PHONE)}</span>
+            </a>
           </div>
         </div>
       )}
