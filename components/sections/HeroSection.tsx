@@ -161,7 +161,7 @@ export function HeroSection({ initialSlides }: { initialSlides?: Slide[] }) {
               src={slide.imageUrl}
               alt=""
               fill
-              className="object-cover"
+              className="object-cover object-top"
               priority={index === 0}
             />
           </div>
