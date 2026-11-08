@@ -9,7 +9,7 @@ import ImageCropper, { getCroppedFile as getCroppedFileHelper } from './ImageCro
 import { jalaliToDisplay } from '@/lib/jalali'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { ChevronDown } from '@/components/ui/icons'
-import { convertIfHeic } from '@/lib/convertHeic'
+import { prepareImageForUpload } from '@/lib/convertHeic'
 import type { Area } from 'react-easy-crop'
 
 export interface WorkshopRow {
@@ -32,7 +32,7 @@ const inputClass = 'w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm 
 const labelClass = 'block text-sm font-medium text-[#404040] mb-1'
 
 async function uploadImage(file: File): Promise<string> {
-  const converted = await convertIfHeic(file)
+  const converted = await prepareImageForUpload(file)
   const fd = new FormData()
   fd.append('file', converted)
   fd.append('folder', 'workshops')

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Plus, Trash2, X, ImagePlus } from '@/components/ui/icons'
 import toast from 'react-hot-toast'
-import { convertIfHeic } from '@/lib/convertHeic'
+import { prepareImageForUpload } from '@/lib/convertHeic'
 
 type HeroBanner = {
   id:             string
@@ -77,7 +77,7 @@ function UploadZone({
 }
 
 async function uploadFile(file: File): Promise<string> {
-  const converted = await convertIfHeic(file)
+  const converted = await prepareImageForUpload(file)
   const fd = new FormData()
   fd.append('file', converted)
   fd.append('folder', 'hero')

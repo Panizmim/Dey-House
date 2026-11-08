@@ -8,7 +8,7 @@ import Modal from './Modal'
 import ImageUploadZone, { type UploadStatus } from './ImageUploadZone'
 import JalaliDatePicker from '@/components/ui/JalaliDatePicker'
 import { jalaliToDisplay } from '@/lib/jalali'
-import { convertIfHeic } from '@/lib/convertHeic'
+import { prepareImageForUpload } from '@/lib/convertHeic'
 
 export interface EventRow {
   id: string
@@ -144,7 +144,7 @@ function TimePickerDropdown({ value, onChange }: { value: string; onChange: (v: 
 }
 
 async function uploadImage(file: File): Promise<string> {
-  const converted = await convertIfHeic(file)
+  const converted = await prepareImageForUpload(file)
   const fd = new FormData()
   fd.append('file', converted)
   fd.append('folder', 'events')
@@ -324,7 +324,7 @@ export default function EventModal({ open, event, onClose, onSaved }: EventModal
   }
 
   async function handleGalleryFile(index: number, file: File) {
-    const converted = await convertIfHeic(file)
+    const converted = await prepareImageForUpload(file)
     const preview   = URL.createObjectURL(converted)
     setGallery((g) => g.map((slot, i) => i === index ? { url: null, file: converted, preview } : slot))
   }
